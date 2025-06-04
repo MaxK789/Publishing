@@ -69,7 +69,7 @@
     <Compile Include="addOrderForm.Designer.cs">
       <DependentUpon>addOrderForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="CurentUser.cs" />
+    <Compile Include="CurrentUser.cs" />
     <Compile Include="DataBase.cs" />
     <Compile Include="deleteOrderForm.cs">
       <SubType>Form</SubType>
