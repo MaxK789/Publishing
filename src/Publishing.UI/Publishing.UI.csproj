@@ -68,49 +68,49 @@
     <Compile Include="Forms\addOrderForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\addOrderForm.Designer.cs">
+    <Compile Include="Forms\addOrderForm.designer.cs">
       <DependentUpon>addOrderForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\deleteOrderForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\deleteOrderForm.Designer.cs">
+    <Compile Include="Forms\deleteOrderForm.designer.cs">
       <DependentUpon>deleteOrderForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\loginForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\loginForm.Designer.cs">
+    <Compile Include="Forms\loginForm.designer.cs">
       <DependentUpon>loginForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\mainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\mainForm.Designer.cs">
+    <Compile Include="Forms\mainForm.designer.cs">
       <DependentUpon>mainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\organizationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\organizationForm.Designer.cs">
+    <Compile Include="Forms\organizationForm.designer.cs">
       <DependentUpon>organizationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\profileForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\profileForm.Designer.cs">
+    <Compile Include="Forms\profileForm.designer.cs">
       <DependentUpon>profileForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\registrationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\registrationForm.Designer.cs">
+    <Compile Include="Forms\registrationForm.designer.cs">
       <DependentUpon>registrationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\statisticForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\statisticForm.Designer.cs">
+    <Compile Include="Forms\statisticForm.designer.cs">
       <DependentUpon>statisticForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
@@ -145,6 +145,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -155,9 +156,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

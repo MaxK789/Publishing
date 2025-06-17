@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решен
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9FCB158E-82F3-4656-90C3-45A54BFB864D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Publishing", "src\Publishing.UI\Publishing.csproj", "{AB7D7FE1-A49F-4348-8748-0722CCD78754}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Publishing.UI", "src\Publishing.UI\Publishing.UI.csproj", "{AB7D7FE1-A49F-4348-8748-0722CCD78754}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
