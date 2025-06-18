@@ -10,6 +10,7 @@
     <Folder Include="DataAccess\" />
     <Folder Include="DI\" />
     <Folder Include="Repositories\" />
+    <ProjectReference Include="..\Publishing.Core\Publishing.Core.csproj" />
   </ItemGroup>
 
 </Project>

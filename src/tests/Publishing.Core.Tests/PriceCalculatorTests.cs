@@ -7,11 +7,12 @@ namespace Publishing.Core.Tests
     [TestClass]
     public class PriceCalculatorTests
     {
+        private PriceCalculator _calculator = null!;
+
         [TestInitialize]
         public void Init()
         {
-            // reset to default price before each test to avoid cross-test contamination
-            PriceCalculator.PricePerPage = 2.5m;
+            _calculator = new PriceCalculator();
         }
 
         [DataTestMethod]
@@ -21,15 +22,14 @@ namespace Publishing.Core.Tests
         public void CalculateTotal_ReturnsExpected(int pages, int copies, double expectedD)
         {
             var expected = (decimal)expectedD;
-            var result = PriceCalculator.CalculateTotal(pages, copies);
+            var result = _calculator.Calculate(pages, copies, 2.5m);
             Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
         public void CalculateTotal_ZeroPricePerPage_ReturnsZero()
         {
-            PriceCalculator.PricePerPage = 0m;
-            var result = PriceCalculator.CalculateTotal(10, 2);
+            var result = _calculator.Calculate(10, 2, 0m);
             Assert.AreEqual(0m, result);
         }
 
@@ -37,15 +37,14 @@ namespace Publishing.Core.Tests
         [ExpectedException(typeof(OverflowException))]
         public void CalculateTotal_LargeValues_Overflow()
         {
-            PriceCalculator.PricePerPage = decimal.MaxValue;
-            PriceCalculator.CalculateTotal(int.MaxValue, int.MaxValue);
+            _calculator.Calculate(int.MaxValue, int.MaxValue, decimal.MaxValue);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void CalculateTotal_Negative_Throws()
         {
-            PriceCalculator.CalculateTotal(-1, 1);
+            _calculator.Calculate(-1, 1, 2.5m);
         }
     }
 }
