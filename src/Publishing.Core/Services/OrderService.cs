@@ -32,6 +32,8 @@ namespace Publishing.Core.Services
 
         public Order CreateOrder(CreateOrderDto dto)
         {
+            if (dto is null)
+                throw new ArgumentNullException(nameof(dto));
             _validator.Validate(dto);
 
             decimal price = CalculatePrice(dto.Pages, dto.Tirage);
