@@ -49,7 +49,7 @@ namespace Publishing.Core.Tests
         {
             if (isInsert)
             {
-                return "INSERT INTO Organization(nameOrganization, emailOrganization, phoneOrganization, faxOrganization, addressOrganization, idPerson) VALUES (@orgName, @Email, @phone, @fax, @address, @id)";
+                return "INSERT INTO Organization(nameOrganization, emailOrganization, phoneOrganization, faxOrganization, addressOrganization, idPerson) VALUES(@orgName, @Email, @phone, @fax, @address, @id)";
             }
             string query = "UPDATE Organization SET";
             if (values.ContainsKey("orgName")) query += " nameOrganization = @orgName,";

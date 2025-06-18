@@ -11,7 +11,13 @@ namespace Publishing.Core.Services
             if (pages < 0 || copies < 0)
                 throw new ArgumentException("Values cannot be negative");
 
-            return pages * copies * PricePerPage;
+            // perform calculation in decimal with overflow checking
+            decimal dPages = pages;
+            decimal dCopies = copies;
+            checked
+            {
+                return dPages * dCopies * PricePerPage;
+            }
         }
     }
 }

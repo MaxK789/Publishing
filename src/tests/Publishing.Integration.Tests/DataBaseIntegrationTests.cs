@@ -22,7 +22,13 @@ namespace Publishing.Integration.Tests
             {
                 con.Open();
                 using var cmd = con.CreateCommand();
-                cmd.CommandText = $"IF DB_ID('{DbName}') IS NOT NULL DROP DATABASE [{DbName}]; CREATE DATABASE [{DbName}];";
+                cmd.CommandText = $@"
+IF DB_ID('{DbName}') IS NOT NULL
+BEGIN
+    ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE [{DbName}];
+END
+CREATE DATABASE [{DbName}];";
                 cmd.ExecuteNonQuery();
             }
 
@@ -38,7 +44,12 @@ namespace Publishing.Integration.Tests
             {
                 con.Open();
                 using var cmd = con.CreateCommand();
-                cmd.CommandText = $"IF DB_ID('{DbName}') IS NOT NULL DROP DATABASE [{DbName}];";
+                cmd.CommandText = $@"
+IF DB_ID('{DbName}') IS NOT NULL
+BEGIN
+    ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE [{DbName}];
+END";
                 cmd.ExecuteNonQuery();
             }
         }
