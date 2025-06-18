@@ -7,6 +7,13 @@ namespace Publishing.Core.Tests
     [TestClass]
     public class PriceCalculatorTests
     {
+        [TestInitialize]
+        public void Init()
+        {
+            // reset to default price before each test to avoid cross-test contamination
+            PriceCalculator.PricePerPage = 2.5m;
+        }
+
         [DataTestMethod]
         [DataRow(10, 3, 75.0)]
         [DataRow(0, 5, 0.0)]
@@ -24,7 +31,6 @@ namespace Publishing.Core.Tests
             PriceCalculator.PricePerPage = 0m;
             var result = PriceCalculator.CalculateTotal(10, 2);
             Assert.AreEqual(0m, result);
-            PriceCalculator.PricePerPage = 2.5m;
         }
 
         [TestMethod]
