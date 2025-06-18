@@ -8,9 +8,9 @@ namespace Publishing.Core.Tests
     public class PriceCalculatorTests
     {
         [DataTestMethod]
-        [DataRow(10, 3, 75)]
-        [DataRow(0, 5, 0)]
-        [DataRow(5, 0, 0)]
+        [DataRow(10, 3, 75m)]
+        [DataRow(0, 5, 0m)]
+        [DataRow(5, 0, 0m)]
         public void CalculateTotal_ReturnsExpected(int pages, int copies, decimal expected)
         {
             var result = PriceCalculator.CalculateTotal(pages, copies);
