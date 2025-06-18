@@ -14,9 +14,12 @@ namespace Publishing.Core.Services
             // perform calculation in decimal with overflow checking
             decimal dPages = pages;
             decimal dCopies = copies;
+
             checked
             {
-                return dPages * dCopies * PricePerPage;
+                decimal result = PricePerPage * dPages;
+                result = result * dCopies;
+                return result;
             }
         }
     }
