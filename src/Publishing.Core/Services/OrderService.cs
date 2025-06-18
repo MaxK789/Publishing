@@ -1,45 +1,80 @@
 using System;
+using Publishing.Core.Domain;
+using Publishing.Core.DTOs;
+using Publishing.Core.Interfaces;
 
 namespace Publishing.Core.Services
 {
-    public class OrderDto
+    public class OrderService : IOrderService
     {
-        public string Type { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-        public int Pages { get; set; }
-        public int Tirage { get; set; }
-    }
+        private readonly IOrderRepository _orderRepository;
+        private readonly IPrinteryRepository _printeryRepository;
+        private readonly ILogger _logger;
+        private readonly IPriceCalculator _priceCalculator;
+        private readonly IOrderValidator _validator;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-    public class Order
-    {
-        public string Type { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-        public int Pages { get; set; }
-        public int Tirage { get; set; }
-        public DateTime DateStart { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public decimal Price { get; set; }
-    }
-
-    public class OrderService
-    {
-        public Order CreateOrder(OrderDto dto)
+        public OrderService(
+            IOrderRepository orderRepository,
+            IPrinteryRepository printeryRepository,
+            ILogger logger,
+            IPriceCalculator priceCalculator,
+            IOrderValidator validator,
+            IDateTimeProvider dateTimeProvider)
         {
-            if (dto == null)
-                throw new ArgumentNullException(nameof(dto));
-            if (dto.Pages <= 0 || dto.Tirage <= 0)
-                throw new ArgumentException("Pages and tirage must be positive");
+            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            _printeryRepository = printeryRepository ?? throw new ArgumentNullException(nameof(printeryRepository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _priceCalculator = priceCalculator ?? throw new ArgumentNullException(nameof(priceCalculator));
+            _validator = validator ?? throw new ArgumentNullException(nameof(validator));
+            _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+        }
 
-            return new Order
+        public Order CreateOrder(CreateOrderDto dto)
+        {
+            _validator.Validate(dto);
+
+            decimal price = CalculatePrice(dto.Pages, dto.Tirage);
+            (DateTime start, DateTime finish) = CalculateDates(dto.Pages, dto.Tirage);
+
+            var order = new Order
             {
                 Type = dto.Type,
                 Name = dto.Name,
                 Pages = dto.Pages,
                 Tirage = dto.Tirage,
-                DateStart = DateTime.Today.AddDays(1),
-                Status = "в роботі",
-                Price = PriceCalculator.CalculateTotal(dto.Pages, dto.Tirage)
+                DateStart = start,
+                DateFinish = finish,
+                Status = OrderStatus.InProgress,
+                Price = price
             };
+
+            SaveOrder(order);
+            return order;
+        }
+
+        private decimal CalculatePrice(int pages, int tirage)
+        {
+            decimal pricePerPage = _printeryRepository.GetPricePerPage();
+            return _priceCalculator.Calculate(pages, tirage, pricePerPage);
+        }
+
+        private (DateTime start, DateTime finish) CalculateDates(int pages, int tirage)
+        {
+            int pagesPerDay = _printeryRepository.GetPagesPerDay();
+            double days = 0;
+            if (pagesPerDay > 0)
+                days = Math.Ceiling((double)(pages * tirage) / pagesPerDay);
+
+            DateTime start = _dateTimeProvider.Today.AddDays(1);
+            DateTime finish = start.AddDays(days);
+            return (start, finish);
+        }
+
+        private void SaveOrder(Order order)
+        {
+            _orderRepository.Save(order);
+            _logger.LogInformation($"Order for product {order.Name} saved.");
         }
     }
 }

@@ -1,18 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
+using Publishing.Core.Interfaces;
+using Publishing.Core.Services;
+using Publishing.Infrastructure;
+using Publishing.Infrastructure.Repositories;
 using System.Windows.Forms;
 
 namespace Publishing
 {
     public partial class loginForm : Form
     {
-        public loginForm()
+        private readonly IOrderService _orderService;
+        private readonly ILoginRepository _loginRepository;
+
+        public loginForm(IOrderService orderService, ILoginRepository loginRepository)
         {
+            _orderService = orderService;
+            _loginRepository = loginRepository;
             InitializeComponent();
             try
             {
-                DataBase.OpenConnection();
+                _loginRepository.OpenConnection();
             }
             catch (SqlException ex)
             {
@@ -22,6 +31,18 @@ namespace Publishing
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
             }
+        }
+
+        public loginForm() : this(
+            new OrderService(
+                new OrderRepository(),
+                new PrinteryRepository(),
+                new LoggerService(),
+                new PriceCalculator(),
+                new OrderValidator(),
+                new SystemDateTimeProvider()),
+            new LoginRepository())
+        {
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -34,28 +55,13 @@ namespace Publishing
                 new SqlParameter("@Email", email)
             };
 
-            string storedHashedPassword = DataBase.ExecuteQuery("SELECT password FROM Person INNER JOIN Pass ON Pass.idPerson = Person.idPerson WHERE emailPerson = @Email", parametersForPassword);
+            string storedHashedPassword = _loginRepository.GetHashedPassword(email);
 
             if (storedHashedPassword != null && BCrypt.Net.BCrypt.Verify(password, storedHashedPassword))
             {
-                List<SqlParameter> parametersForId = new List<SqlParameter>
-                {
-                    new SqlParameter("@Email", email)
-                };
-
-                List<SqlParameter> parametersForType = new List<SqlParameter>
-                {
-                    new SqlParameter("@Email", email)
-                };
-
-                List<SqlParameter> parametersForFName = new List<SqlParameter>
-                {
-                    new SqlParameter("@Email", email)
-                };
-
-                string idPerson = DataBase.ExecuteQuery("SELECT idPerson FROM Person WHERE emailPerson = @Email", parametersForId);
-                string typePerson = DataBase.ExecuteQuery("SELECT typePerson FROM Person WHERE emailPerson = @Email", parametersForType);
-                string FName = DataBase.ExecuteQuery("SELECT FName FROM Person WHERE emailPerson = @Email", parametersForFName);
+                string idPerson = _loginRepository.GetUserId(email);
+                string typePerson = _loginRepository.GetUserType(email);
+                string FName = _loginRepository.GetUserName(email);
 
                 CurrentUser.UserId = idPerson;
                 CurrentUser.UserType = typePerson;
@@ -81,7 +87,7 @@ namespace Publishing
 
         private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            DataBase.CloseConnection();
+            _loginRepository.CloseConnection();
             Application.Exit();
         }
 

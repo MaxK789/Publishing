@@ -1,23 +1,22 @@
 using System;
 
+using Publishing.Core.Interfaces;
+
 namespace Publishing.Core.Services
 {
-    public static class PriceCalculator
+    public class PriceCalculator : IPriceCalculator
     {
-        public static decimal PricePerPage { get; set; } = 2.5m;
-
-        public static decimal CalculateTotal(int pages, int copies)
+        public decimal Calculate(int pages, int copies, decimal pricePerPage)
         {
             if (pages < 0 || copies < 0)
                 throw new ArgumentException("Values cannot be negative");
 
-            // perform calculation in decimal with overflow checking
             decimal dPages = pages;
             decimal dCopies = copies;
 
             checked
             {
-                decimal result = PricePerPage * dPages;
+                decimal result = pricePerPage * dPages;
                 result = result * dCopies;
                 return result;
             }

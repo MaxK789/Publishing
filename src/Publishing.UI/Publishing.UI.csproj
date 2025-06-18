@@ -64,7 +64,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CurrentUser.cs" />
-    <Compile Include="DataBase.cs" />
     <Compile Include="Forms\addOrderForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -160,6 +159,11 @@
   <ItemGroup />
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Publishing.Infrastructure\Publishing.Infrastructure.csproj" />
+    <ProjectReference Include="..\Publishing.Core\Publishing.Core.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
