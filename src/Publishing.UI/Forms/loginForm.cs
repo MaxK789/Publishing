@@ -10,7 +10,18 @@ namespace Publishing
         public loginForm()
         {
             InitializeComponent();
-            DataBase.OpenConnection();
+            try
+            {
+                DataBase.OpenConnection();
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show(
+                    "Не вдалося з'єднатися з базою: " + ex.Message,
+                    "Помилка",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
