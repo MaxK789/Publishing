@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Publishing.Core.Services;
 using System.Collections.Generic;
 using System;
-using Microsoft.Data.SqlClient;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace Publishing.Core.Tests

@@ -56,9 +56,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="Microsoft.Data.SqlClient">
-      <HintPath>packages\Microsoft.Data.SqlClient.5.1.0\lib\net472\Microsoft.Data.SqlClient.dll</HintPath>
-    </Reference>
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />

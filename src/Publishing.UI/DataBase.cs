@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
+using System.Data.SqlClient;
 using System.Data;
 
 namespace Publishing
 {
-    public static class DataBase
+    internal class DataBase
     {
         public static string connectString;
 
