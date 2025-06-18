@@ -49,14 +49,25 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="EmailValidatorTests.cs" />
+    <Compile Include="LoginLogicTests.cs" />
+    <Compile Include="ParsingTests.cs" />
+    <Compile Include="QueryBuilderTests.cs" />
+    <Compile Include="StatusUpdateTests.cs" />
+    <Compile Include="PriceCalculatorTests.cs" />
+    <Compile Include="OrderServiceTests.cs" />
+    <Compile Include="SqlParameterBuilderTests.cs" />
+    <Compile Include="ExceptionFlowTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Publishing.Core\Publishing.Core.csproj" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
