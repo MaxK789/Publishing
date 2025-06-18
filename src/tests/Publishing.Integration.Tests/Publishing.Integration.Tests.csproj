@@ -11,7 +11,4 @@
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.0" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Publishing.UI\Publishing.UI.csproj" />
-  </ItemGroup>
 </Project>
