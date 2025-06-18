@@ -16,7 +16,10 @@ namespace Publishing
 
         public static void OpenConnection()
         {
-            connectString = @"Data Source=" + SQLServerName + ";Initial Catalog=" + dataBaseName + ";Integrated Security=true";
+            connectString =
+                @"Data Source=" + SQLServerName +
+                ";Initial Catalog=" + dataBaseName +
+                ";Integrated Security=true;Encrypt=True;TrustServerCertificate=True";
 
             sqlConnection = new SqlConnection(connectString);
 
@@ -25,7 +28,12 @@ namespace Publishing
 
         public static void OpenConnection(string login, string password)
         {
-            connectString = @"Data Source=" + SQLServerName + ";Initial Catalog=" + dataBaseName + ";User ID=" + login + ";Password=" + password + ";";
+            connectString =
+                @"Data Source=" + SQLServerName +
+                ";Initial Catalog=" + dataBaseName +
+                ";User ID=" + login +
+                ";Password=" + password +
+                ";Encrypt=True;TrustServerCertificate=True";
 
             sqlConnection = new SqlConnection(connectString);
 
