@@ -16,20 +16,24 @@ namespace Publishing.Core.Tests
         }
 
         [DataTestMethod]
-        [DataRow(10, 3, 75.0)]
-        [DataRow(0, 5, 0.0)]
-        [DataRow(5, 0, 0.0)]
-        public void CalculateTotal_ReturnsExpected(int pages, int copies, double expectedD)
+        [DataRow(10, 3, 2.5, 75.0)]
+        [DataRow(1, 1, 1.0, 1.0)]
+        public void CalculateTotal_ReturnsExpected(int pages, int copies, double price, double expectedD)
         {
             var expected = (decimal)expectedD;
-            var result = _calculator.Calculate(pages, copies, 2.5m);
+            var result = _calculator.Calculate(pages, copies, (decimal)price);
             Assert.AreEqual(expected, result);
         }
 
-        [TestMethod]
-        public void CalculateTotal_ZeroPricePerPage_ReturnsZero()
+        [DataTestMethod]
+        [DataRow(0, 5, 2.5)]
+        [DataRow(5, 0, 2.5)]
+        [DataRow(5, 5, 0.0)]
+        [DataRow(int.MaxValue, 0, double.MaxValue)]
+        [DataRow(0, int.MaxValue, double.MaxValue)]
+        public void CalculateTotal_ZeroParameter_ReturnsZero(int pages, int copies, double price)
         {
-            var result = _calculator.Calculate(10, 2, 0m);
+            var result = _calculator.Calculate(pages, copies, (decimal)price);
             Assert.AreEqual(0m, result);
         }
 
@@ -40,11 +44,14 @@ namespace Publishing.Core.Tests
             _calculator.Calculate(int.MaxValue, int.MaxValue, decimal.MaxValue);
         }
 
-        [TestMethod]
+        [DataTestMethod]
+        [DataRow(-1, 1, 1.0)]
+        [DataRow(1, -1, 1.0)]
+        [DataRow(1, 1, -1.0)]
         [ExpectedException(typeof(ArgumentException))]
-        public void CalculateTotal_Negative_Throws()
+        public void CalculateTotal_Negative_Throws(int pages, int copies, double price)
         {
-            _calculator.Calculate(-1, 1, 2.5m);
+            _calculator.Calculate(pages, copies, (decimal)price);
         }
     }
 }
