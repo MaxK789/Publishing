@@ -29,6 +29,7 @@ namespace Publishing
             ConfigureServices(services);
             Services = services.BuildServiceProvider();
 
+            // Apply any pending EF Core migrations before showing the UI
             using (var scope = Services.CreateScope())
             {
                 var init = scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>();
@@ -70,7 +71,7 @@ namespace Publishing
                     b => b.MigrationsAssembly("Publishing.Infrastructure")));
             services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
             services.AddTransient<IDbContext, DapperDbContext>();
-            services.AddScoped<IDatabaseInitializer, DatabaseInitializer>();
+            services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
             services.AddScoped<IDbHelper, DbHelper>();
             services.AddScoped<ILoginRepository, LoginRepository>();
             services.AddScoped<IAuthService, AuthService>();
