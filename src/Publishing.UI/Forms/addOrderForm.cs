@@ -57,66 +57,80 @@ namespace Publishing
 
         private async void calculateButton_Click(object sender, EventArgs e)
         {
-            if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
+            try
             {
-                MessageBox.Show("pagesNumParse");
-                return;
+                if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
+                {
+                    MessageBox.Show("pagesNumParse");
+                    return;
+                }
+
+                if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
+                {
+                    MessageBox.Show("tirageParse");
+                    return;
+                }
+
+                var dto = new CreateOrderDto
+                {
+                    Type = typeBox.SelectedItem?.ToString() ?? string.Empty,
+                    Name = nameProductTextBox.Text,
+                    Pages = pageNum,
+                    Tirage = tirageNum,
+                    Printery = printeryBox.SelectedItem?.ToString() ?? string.Empty,
+                    PersonId = CurrentUser.UserId
+                };
+
+                var order = await _orderService.CreateOrderAsync(dto);
+                totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
             }
-
-            if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
+            catch (Exception ex)
             {
-                MessageBox.Show("tirageParse");
-                return;
+                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            var dto = new CreateOrderDto
-            {
-                Type = typeBox.SelectedItem?.ToString() ?? string.Empty,
-                Name = nameProductTextBox.Text,
-                Pages = pageNum,
-                Tirage = tirageNum,
-                Printery = printeryBox.SelectedItem?.ToString() ?? string.Empty,
-                PersonId = CurrentUser.UserId
-            };
-
-            var order = await _orderService.CreateOrderAsync(dto);
-            totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
         }
 
         private async void orderButton_Click(object sender, EventArgs e)
         {
-            string type = typeBox.SelectedItem?.ToString();
-            if (type == null)
-                return;
-
-            if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
+            try
             {
-                MessageBox.Show("pagesNumParse");
-                return;
+                string type = typeBox.SelectedItem?.ToString();
+                if (type == null)
+                    return;
+
+                if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
+                {
+                    MessageBox.Show("pagesNumParse");
+                    return;
+                }
+
+                if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
+                {
+                    MessageBox.Show("tirageParse");
+                    return;
+                }
+
+                var dto = new CreateOrderDto
+                {
+                    Type = type,
+                    Name = nameProductTextBox.Text,
+                    Pages = pageNum,
+                    Tirage = tirageNum,
+                    Printery = printeryBox.SelectedItem?.ToString() ?? string.Empty,
+                    PersonId = CurrentUser.UserId
+                };
+
+                var order = await _orderService.CreateOrderAsync(dto);
+
+                MessageBox.Show("Замовлення успішно додано");
+                totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
+
+                _navigation.Navigate<mainForm>(this);
             }
-
-            if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
+            catch (Exception ex)
             {
-                MessageBox.Show("tirageParse");
-                return;
+                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            var dto = new CreateOrderDto
-            {
-                Type = type,
-                Name = nameProductTextBox.Text,
-                Pages = pageNum,
-                Tirage = tirageNum,
-                Printery = printeryBox.SelectedItem?.ToString() ?? string.Empty,
-                PersonId = CurrentUser.UserId
-            };
-
-            var order = await _orderService.CreateOrderAsync(dto);
-
-            MessageBox.Show("Замовлення успішно додано");
-            totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
-
-            _navigation.Navigate<mainForm>(this);
         }
 
         private void змінитиДаніToolStripMenuItem_Click_1(object sender, EventArgs e)

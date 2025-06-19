@@ -26,29 +26,36 @@ namespace Publishing
 
         private async void statisticForm_Load(object sender, EventArgs e)
         {
-            authorsBox.Items.Clear();
-            authorsBox.Items.Add("Усі");
-
-            List<string[]> authorNames = await _statRepo.GetAuthorNamesAsync();
-
-            if (authorNames != null && authorNames.Count > 0)
+            try
             {
-                foreach (string[] authorArray in authorNames)
+                authorsBox.Items.Clear();
+                authorsBox.Items.Add("Усі");
+
+                List<string[]> authorNames = await _statRepo.GetAuthorNamesAsync();
+
+                if (authorNames != null && authorNames.Count > 0)
                 {
-                    string authorName = authorArray[0];
-                    authorsBox.Items.Add(authorName);
+                    foreach (string[] authorArray in authorNames)
+                    {
+                        string authorName = authorArray[0];
+                        authorsBox.Items.Add(authorName);
+                    }
+
+                    authorsBox.SelectedIndex = 0;
                 }
 
-                authorsBox.SelectedIndex = 0;
+                chart1.Series[0].Points.Clear();
+
+                List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync();
+
+                foreach (var dataPoint in dataList)
+                {
+                    chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+                }
             }
-
-            chart1.Series[0].Points.Clear();
-
-            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync();
-
-            foreach (var dataPoint in dataList)
+            catch (Exception ex)
             {
-                chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -78,79 +85,107 @@ namespace Publishing
 
         private async void orderCountPerMonthButton_Click(object sender, EventArgs e)
         {
-            chart1.Series[0].Points.Clear();
-
-            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync();
-
-            foreach (var dataPoint in dataList)
-            {
-                chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
-            }
-        }
-
-        private async void orderCountPerAuthorButton_Click(object sender, EventArgs e)
-        {
-            if (authorsBox.SelectedItem != null && authorsBox.SelectedItem.ToString() == "Усі")
+            try
             {
                 chart1.Series[0].Points.Clear();
 
-                List<string[]> dataList = await _statRepo.GetOrdersPerAuthorAsync();
+                List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync();
 
                 foreach (var dataPoint in dataList)
                 {
                     chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
                 }
             }
-            else
+            catch (Exception ex)
             {
-                chart1.Series[0].Points.Clear();
+                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
-                string fullNameAuthor = authorsBox.SelectedItem?.ToString();
-                if (fullNameAuthor == null)
+        private async void orderCountPerAuthorButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (authorsBox.SelectedItem != null && authorsBox.SelectedItem.ToString() == "Усі")
                 {
-                    return;
+                    chart1.Series[0].Points.Clear();
+
+                    List<string[]> dataList = await _statRepo.GetOrdersPerAuthorAsync();
+
+                    foreach (var dataPoint in dataList)
+                    {
+                        chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+                    }
                 }
-
-                List<string[]> dataList = await _statRepo.GetOrdersPerAuthorAsync(fullNameAuthor);
-
-                foreach (var dataPoint in dataList)
+                else
                 {
-                    string authorName = dataPoint[0];
-                    int orderCount = int.Parse(dataPoint[1]);
+                    chart1.Series[0].Points.Clear();
 
-                    chart1.Series[0].Points.AddXY(authorName, orderCount);
+                    string fullNameAuthor = authorsBox.SelectedItem?.ToString();
+                    if (fullNameAuthor == null)
+                    {
+                        return;
+                    }
+
+                    List<string[]> dataList = await _statRepo.GetOrdersPerAuthorAsync(fullNameAuthor);
+
+                    foreach (var dataPoint in dataList)
+                    {
+                        string authorName = dataPoint[0];
+                        int orderCount = int.Parse(dataPoint[1]);
+
+                        chart1.Series[0].Points.AddXY(authorName, orderCount);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private async void fromDateToDateButton_Click(object sender, EventArgs e)
         {
-            chart1.Series[0].Points.Clear();
-
-            DateTime fDate = dateTimePicker1.Value;
-            DateTime lDate = dateTimePicker2.Value;
-
-            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync(fDate, lDate);
-
-            foreach (var dataPoint in dataList)
+            try
             {
-                string orderMonth = dataPoint[0];
-                int orderCount = int.Parse(dataPoint[1]);
+                chart1.Series[0].Points.Clear();
 
-                chart1.Series[0].Points.AddXY(orderMonth, orderCount);
+                DateTime fDate = dateTimePicker1.Value;
+                DateTime lDate = dateTimePicker2.Value;
+
+                List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync(fDate, lDate);
+
+                foreach (var dataPoint in dataList)
+                {
+                    string orderMonth = dataPoint[0];
+                    int orderCount = int.Parse(dataPoint[1]);
+
+                    chart1.Series[0].Points.AddXY(orderMonth, orderCount);
+                }
+
             }
-
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void tirageButton_Click(object sender, EventArgs e)
         {
-            chart1.Series[0].Points.Clear();
-
-            List<string[]> dataList = await _statRepo.GetTiragePerAuthorAsync();
-
-            foreach (var dataPoint in dataList)
+            try
             {
-                chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+                chart1.Series[0].Points.Clear();
+
+                List<string[]> dataList = await _statRepo.GetTiragePerAuthorAsync();
+
+                foreach (var dataPoint in dataList)
+                {
+                    chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
