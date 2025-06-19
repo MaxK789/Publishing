@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Publishing.Services;
@@ -11,7 +9,7 @@ namespace Publishing
     public partial class profileForm : Form
     {
         private readonly INavigationService _navigation;
-        private readonly IDatabaseClient _db;
+        private readonly IProfileRepository _profileRepo;
 
         [Obsolete("Designer only", error: false)]
         public profileForm()
@@ -19,10 +17,10 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public profileForm(INavigationService navigation, IDatabaseClient db)
+        public profileForm(INavigationService navigation, IProfileRepository profileRepo)
         {
             _navigation = navigation;
-            _db = db;
+            _profileRepo = profileRepo;
             InitializeComponent();
         }
 
@@ -31,7 +29,7 @@ namespace Publishing
             Application.Exit();
         }
 
-        private void changeButton_Click(object sender, EventArgs e)
+        private async void changeButton_Click(object sender, EventArgs e)
         {
             string id = CurrentUser.UserId;
             string fName = FNameTextBox.Text;
@@ -42,37 +40,21 @@ namespace Publishing
             string fax = faxTextBox.Text;
             string address = addressTextBox.Text;
 
-            List<SqlParameter> parametersForEmail = new List<SqlParameter>
-            {
-                new SqlParameter("@Email", email)
-            };
-            string queryEmail = _db.ExecuteQuery("SELECT emailPerson FROM Person WHERE emailPerson = @Email", parametersForEmail);
-
-            if (queryEmail == email)
+            bool exists = await _profileRepo.EmailExistsAsync(email).ConfigureAwait(false);
+            if (exists)
             {
                 MessageBox.Show("Email вже використовується");
                 return;
             }
 
-            List<SqlParameter> parameters = new List<SqlParameter>
-            {
-                new SqlParameter("@id", id)
-            };
-
-            string query = "UPDATE Person SET";
             int count = 0;
-
             if (fName != "")
             {
                 count++;
-                query += " FName = @FName,";
-                parameters.Add(new SqlParameter("@FName", fName));
             }
             if (lName != "")
             {
                 count++;
-                query += " LName = @LName,";
-                parameters.Add(new SqlParameter("@LName", lName));
             }
             if (email != "")
             {
@@ -83,49 +65,31 @@ namespace Publishing
                     return;
                 }
                 count++;
-                query += " emailPerson = @Email,";
-                parameters.Add(new SqlParameter("@Email", email));
             }
             if (status != null)
             {
                 count++;
-                query += " typePerson = @Status,";
-                parameters.Add(new SqlParameter("@Status", status));
             }
             if (phone != "")
             {
                 count++;
-                query += " phonePerson = @phone,";
-                parameters.Add(new SqlParameter("@phone", phone));
             }
             if (fax != "")
             {
                 count++;
-                query += " faxPerson = @fax,";
-                parameters.Add(new SqlParameter("@fax", fax));
             }
             if (address != "")
             {
                 count++;
-                query += " addressPerson = @address,";
-                parameters.Add(new SqlParameter("@address", address));
-            }
-
-            if (query.EndsWith(","))
-            {
-                count++;
-                query = query.Remove(query.Length - 1, 1);
             }
             if (count > 0)
             {
-                query += " WHERE idPerson = @id";
-
-                _db.ExecuteQueryWithoutResponse(query, parameters);
+                await _profileRepo.UpdateAsync(id, fName, lName, email, status, phone, fax, address).ConfigureAwait(false);
 
                 MessageBox.Show("Дані успішно змінено");
 
                 _navigation.Navigate<mainForm>(this);
-            }           
+            }
         }
 
         private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)

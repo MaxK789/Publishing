@@ -1,6 +1,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
+using System.Linq;
+using System.Threading.Tasks;
 using Publishing.Core.Interfaces;
 using Publishing.Infrastructure.Repositories;
 
@@ -9,30 +11,30 @@ namespace Publishing.Core.Tests
     [TestClass]
     public class LoginRepositoryTests
     {
-        private class StubDbClient : IDatabaseClient
+        private class StubDbClient : IDbContext
         {
             public string? LastQuery;
-            public List<SqlParameter>? LastParams;
+            public IDictionary<string, object>? LastParams;
             public string? LastNonQuery;
-            public List<SqlParameter>? LastNonParams;
-            public string? ExecuteResult = "res";
+            public IDictionary<string, object>? LastNonParams;
+            public object? ExecuteResult = "res";
 
-            public void OpenConnection() { }
-            public void OpenConnection(string l, string p) { }
-            public System.Data.DataTable ExecuteQueryToDataTable(string q, List<SqlParameter>? p = null) => new();
-            public List<string[]> ExecuteQueryList(string q, List<SqlParameter>? p = null) => new();
-            public string ExecuteQuery(string q, List<SqlParameter>? p = null)
+            public Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null)
             {
-                LastQuery = q;
-                LastParams = p;
-                return ExecuteResult ?? string.Empty;
+                LastQuery = sql;
+                LastParams = param == null ? null :
+                    param.GetType().GetProperties().ToDictionary(p => p.Name, p => p.GetValue(param) ?? new object());
+                IEnumerable<T> result = new List<T> { (T)Convert.ChangeType(ExecuteResult!, typeof(T)) };
+                return Task.FromResult(result);
             }
-            public void ExecuteQueryWithoutResponse(string q, List<SqlParameter>? p = null)
+
+            public Task<int> ExecuteAsync(string sql, object? param = null)
             {
-                LastNonQuery = q;
-                LastNonParams = p;
+                LastNonQuery = sql;
+                LastNonParams = param == null ? null :
+                    param.GetType().GetProperties().ToDictionary(p => p.Name, p => p.GetValue(param) ?? new object());
+                return Task.FromResult(0);
             }
-            public void CloseConnection() { }
         }
 
         [TestMethod]
@@ -45,7 +47,8 @@ namespace Publishing.Core.Tests
             StringAssert.Contains(db.LastQuery!, "password");
             Assert.IsNotNull(db.LastParams);
             Assert.AreEqual(1, db.LastParams!.Count);
-            Assert.AreEqual("@Email", db.LastParams[0].ParameterName);
+            Assert.IsTrue(db.LastParams.ContainsKey("Email"));
+            Assert.AreEqual("a@a.com", db.LastParams["Email"]);
         }
 
         [TestMethod]
@@ -60,13 +63,14 @@ namespace Publishing.Core.Tests
             StringAssert.Contains(db.LastQuery!, "emailPerson = @Email");
             Assert.IsNotNull(db.LastParams);
             Assert.AreEqual(1, db.LastParams!.Count);
-            Assert.AreEqual("@Email", db.LastParams[0].ParameterName);
+            Assert.IsTrue(db.LastParams.ContainsKey("Email"));
+            Assert.AreEqual("x@y.com", db.LastParams["Email"]);
         }
 
         [TestMethod]
         public void InsertPerson_ReturnsInsertedId()
         {
-            var db = new StubDbClient { ExecuteResult = "7" };
+            var db = new StubDbClient { ExecuteResult = 7 };
             var repo = new LoginRepository(db);
 
             int id = repo.InsertPerson("F", "L", "e", "s");
@@ -74,6 +78,9 @@ namespace Publishing.Core.Tests
             Assert.AreEqual(7, id);
             StringAssert.Contains(db.LastQuery!, "INSERT INTO Person");
             Assert.AreEqual(4, db.LastParams!.Count);
+            CollectionAssert.AreEquivalent(
+                new[] { "FName", "LName", "Email", "Status" },
+                db.LastParams!.Keys.ToArray());
         }
 
         [TestMethod]
@@ -88,6 +95,9 @@ namespace Publishing.Core.Tests
             StringAssert.Contains(db.LastNonQuery!, "INSERT INTO Pass");
             Assert.IsNotNull(db.LastNonParams);
             Assert.AreEqual(2, db.LastNonParams!.Count);
+            CollectionAssert.AreEquivalent(
+                new[] { "Password", "Id" },
+                db.LastNonParams!.Keys.ToArray());
         }
     }
 }

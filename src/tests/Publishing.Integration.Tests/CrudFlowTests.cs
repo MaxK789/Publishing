@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
-using System.Reflection;
+using System.Linq;
+using Publishing.Core.Interfaces;
+using Publishing.Infrastructure;
 using BCrypt.Net;
 using Publishing.Core.Services;
 using Publishing.Infrastructure.Repositories;
@@ -36,24 +38,24 @@ CREATE DATABASE [{DbName}];";
                 cmd.ExecuteNonQuery();
             }
 
-            SetInternalFields(Server, DbName);
-            Publishing.DataBase.OpenConnection();
+            var cs = $"Data Source={Server};Initial Catalog={DbName};Integrated Security=true";
+            _db = new SqlDbContext(cs);
 
             // create minimal schema
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                "CREATE TABLE Person(idPerson INT IDENTITY(1,1) PRIMARY KEY, FName NVARCHAR(50), LName NVARCHAR(50), emailPerson NVARCHAR(50), typePerson NVARCHAR(20));");
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                "CREATE TABLE Pass(password NVARCHAR(255), idPerson INT);");
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                "CREATE TABLE Product(idProduct INT IDENTITY(1,1) PRIMARY KEY, idPerson INT, typeProduct NVARCHAR(50), nameProduct NVARCHAR(50), pagesNum INT);");
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                "CREATE TABLE Orders(idOrder INT IDENTITY(1,1) PRIMARY KEY, idProduct INT, idPerson INT, namePrintery NVARCHAR(50), dateOrder DATETIME, dateStart DATETIME, dateFinish DATETIME, statusOrder NVARCHAR(50), tirage INT, price INT);");
+            _db.ExecuteAsync(
+                "CREATE TABLE Person(idPerson INT IDENTITY(1,1) PRIMARY KEY, FName NVARCHAR(50), LName NVARCHAR(50), emailPerson NVARCHAR(50), typePerson NVARCHAR(20));").Wait();
+            _db.ExecuteAsync(
+                "CREATE TABLE Pass(password NVARCHAR(255), idPerson INT);").Wait();
+            _db.ExecuteAsync(
+                "CREATE TABLE Product(idProduct INT IDENTITY(1,1) PRIMARY KEY, idPerson INT, typeProduct NVARCHAR(50), nameProduct NVARCHAR(50), pagesNum INT);").Wait();
+            _db.ExecuteAsync(
+                "CREATE TABLE Orders(idOrder INT IDENTITY(1,1) PRIMARY KEY, idProduct INT, idPerson INT, namePrintery NVARCHAR(50), dateOrder DATETIME, dateStart DATETIME, dateFinish DATETIME, statusOrder NVARCHAR(50), tirage INT, price INT);").Wait();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            Publishing.DataBase.CloseConnection();
+            // nothing to dispose
             using (var con = new SqlConnection(MasterConnection))
             {
                 con.Open();
@@ -68,34 +70,24 @@ END";
             }
         }
 
-        private static void SetInternalFields(string server, string db)
-        {
-            var t = typeof(Publishing.DataBase);
-            var serverField = t.GetField("SQLServerName", BindingFlags.NonPublic | BindingFlags.Static);
-            var dbField = t.GetField("dataBaseName", BindingFlags.NonPublic | BindingFlags.Static);
-            serverField?.SetValue(null, server);
-            dbField?.SetValue(null, db);
-        }
 
         [TestMethod]
         public void Registration_InsertsPerson()
         {
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                "INSERT INTO Person(FName,LName,emailPerson,typePerson) VALUES('A','B','a@b.com','user')");
-            string result = Publishing.DataBase.ExecuteQuery("SELECT COUNT(*) FROM Person");
-            Assert.AreEqual("1", result);
+            _db.ExecuteAsync("INSERT INTO Person(FName,LName,emailPerson,typePerson) VALUES('A','B','a@b.com','user')").Wait();
+            var result = _db.QueryAsync<int>("SELECT COUNT(*) FROM Person").Result.First();
+            Assert.AreEqual(1, result);
         }
 
         [TestMethod]
         public void Login_SetsCurrentUser()
         {
             string hash = BCrypt.Net.BCrypt.HashPassword("pass", 11);
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                "INSERT INTO Person(FName,LName,emailPerson,typePerson) VALUES('A','B','c@d.com','user');");
-            string id = Publishing.DataBase.ExecuteQuery("SELECT idPerson FROM Person WHERE emailPerson='c@d.com'");
-            Publishing.DataBase.ExecuteQueryWithoutResponse($"INSERT INTO Pass(password,idPerson) VALUES('{hash}', {id})");
+            _db.ExecuteAsync("INSERT INTO Person(FName,LName,emailPerson,typePerson) VALUES('A','B','c@d.com','user');").Wait();
+            string id = _db.QueryAsync<int>("SELECT idPerson FROM Person WHERE emailPerson='c@d.com'").Result.First().ToString();
+            _db.ExecuteAsync($"INSERT INTO Pass(password,idPerson) VALUES('{hash}', {id})").Wait();
 
-            var service = new AuthService(new LoginRepository(new DatabaseClient()));
+            var service = new AuthService(new LoginRepository(_db));
             var user = service.Authenticate("c@d.com", "pass");
 
             Assert.IsNotNull(user);
@@ -105,38 +97,31 @@ END";
         [TestMethod]
         public void AddOrder_InsertsOrder()
         {
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                "INSERT INTO Person(FName,LName,emailPerson,typePerson) VALUES('A','B','e@f.com','user');");
-            string id = Publishing.DataBase.ExecuteQuery("SELECT idPerson FROM Person WHERE emailPerson='e@f.com'");
+            _db.ExecuteAsync("INSERT INTO Person(FName,LName,emailPerson,typePerson) VALUES('A','B','e@f.com','user');").Wait();
+            int id = _db.QueryAsync<int>("SELECT idPerson FROM Person WHERE emailPerson='e@f.com'").Result.First();
 
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                $"INSERT INTO Product(idPerson,typeProduct,nameProduct,pagesNum) VALUES({id},'book','Title',10)");
-            string idProd = Publishing.DataBase.ExecuteQuery("SELECT idProduct FROM Product WHERE nameProduct='Title'");
+            _db.ExecuteAsync($"INSERT INTO Product(idPerson,typeProduct,nameProduct,pagesNum) VALUES({id},'book','Title',10)").Wait();
+            int idProd = _db.QueryAsync<int>("SELECT idProduct FROM Product WHERE nameProduct='Title'").Result.First();
 
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                $"INSERT INTO Orders(idProduct,idPerson,namePrintery,dateOrder,dateStart,dateFinish,statusOrder,tirage,price) VALUES({idProd},{id},'P',GETDATE(),GETDATE(),GETDATE(),'в роботі',5,50)");
-            string count = Publishing.DataBase.ExecuteQuery("SELECT COUNT(*) FROM Orders");
-            Assert.AreEqual("1", count);
+            _db.ExecuteAsync($"INSERT INTO Orders(idProduct,idPerson,namePrintery,dateOrder,dateStart,dateFinish,statusOrder,tirage,price) VALUES({idProd},{id},'P',GETDATE(),GETDATE(),GETDATE(),'в роботі',5,50)").Wait();
+            int count = _db.QueryAsync<int>("SELECT COUNT(*) FROM Orders").Result.First();
+            Assert.AreEqual(1, count);
         }
 
         [TestMethod]
         public void DeleteOrder_RemovesRow()
         {
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                "INSERT INTO Person(FName,LName,emailPerson,typePerson) VALUES('A','B','g@h.com','user');");
-            string id = Publishing.DataBase.ExecuteQuery("SELECT idPerson FROM Person WHERE emailPerson='g@h.com'");
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                $"INSERT INTO Product(idPerson,typeProduct,nameProduct,pagesNum) VALUES({id},'book','Del',10)");
-            string idProd = Publishing.DataBase.ExecuteQuery("SELECT idProduct FROM Product WHERE nameProduct='Del'");
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                $"INSERT INTO Orders(idProduct,idPerson,namePrintery,dateOrder,dateStart,dateFinish,statusOrder,tirage,price) VALUES({idProd},{id},'P',GETDATE(),GETDATE(),GETDATE(),'в роботі',5,50)");
-            string idOrder = Publishing.DataBase.ExecuteQuery("SELECT idOrder FROM Orders");
+            _db.ExecuteAsync("INSERT INTO Person(FName,LName,emailPerson,typePerson) VALUES('A','B','g@h.com','user');").Wait();
+            int id = _db.QueryAsync<int>("SELECT idPerson FROM Person WHERE emailPerson='g@h.com'").Result.First();
+            _db.ExecuteAsync($"INSERT INTO Product(idPerson,typeProduct,nameProduct,pagesNum) VALUES({id},'book','Del',10)").Wait();
+            int idProd = _db.QueryAsync<int>("SELECT idProduct FROM Product WHERE nameProduct='Del'").Result.First();
+            _db.ExecuteAsync($"INSERT INTO Orders(idProduct,idPerson,namePrintery,dateOrder,dateStart,dateFinish,statusOrder,tirage,price) VALUES({idProd},{id},'P',GETDATE(),GETDATE(),GETDATE(),'в роботі',5,50)").Wait();
+            int idOrder = _db.QueryAsync<int>("SELECT idOrder FROM Orders").Result.First();
 
-            List<SqlParameter> parameters = new List<SqlParameter> { new SqlParameter("@id", idOrder) };
-            Publishing.DataBase.ExecuteQueryWithoutResponse("DELETE FROM Orders WHERE idOrder=@id", parameters);
+            _db.ExecuteAsync("DELETE FROM Orders WHERE idOrder=@id", new { id = idOrder }).Wait();
 
-            string count = Publishing.DataBase.ExecuteQuery("SELECT COUNT(*) FROM Orders");
-            Assert.AreEqual("0", count);
+            int count2 = _db.QueryAsync<int>("SELECT COUNT(*) FROM Orders").Result.First();
+            Assert.AreEqual(0, count2);
         }
     }
 }

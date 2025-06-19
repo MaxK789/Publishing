@@ -4,8 +4,6 @@ namespace Publishing.Core.Interfaces
 
     public interface IAuthService
     {
-        void OpenConnection();
-        void CloseConnection();
         UserDto? Authenticate(string email, string password);
         UserDto Register(string firstName, string lastName, string email, string status, string password);
     }

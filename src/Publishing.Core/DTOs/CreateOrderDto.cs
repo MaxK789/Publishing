@@ -6,5 +6,7 @@ namespace Publishing.Core.DTOs
         public string Name { get; set; } = string.Empty;
         public int Pages { get; set; }
         public int Tirage { get; set; }
+        public string Printery { get; set; } = string.Empty;
+        public string PersonId { get; set; } = string.Empty;
     }
 }

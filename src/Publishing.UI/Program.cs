@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using Publishing.Infrastructure;
 using Publishing.Infrastructure.Repositories;
-using Publishing.Infrastructure.DataAccess;
 using Publishing.Services;
 
 namespace Publishing
@@ -41,17 +41,24 @@ namespace Publishing
 
         private static void ConfigureServices(ServiceCollection services)
         {
-            services.AddSingleton<IOrderRepository, OrderRepository>();
-            services.AddSingleton<IPrinteryRepository, PrinteryRepository>();
-            services.AddSingleton<ILogger, LoggerService>();
-            services.AddSingleton<IPriceCalculator, PriceCalculator>();
-            services.AddSingleton<IOrderValidator, OrderValidator>();
-            services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
-            services.AddSingleton<IDatabaseClient, Publishing.Infrastructure.DataAccess.DatabaseClient>();
-            services.AddSingleton<ILoginRepository, LoginRepository>();
-            services.AddSingleton<IAuthService, AuthService>();
-            services.AddSingleton<INavigationService, NavigationService>();
-            services.AddTransient<IOrderService, OrderService>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IStatisticRepository, StatisticRepository>();
+            services.AddScoped<IProfileRepository, ProfileRepository>();
+            services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+            services.AddScoped<IPrinteryRepository, PrinteryRepository>();
+            services.AddScoped<ILogger, LoggerService>();
+            services.AddScoped<IPriceCalculator, PriceCalculator>();
+            services.AddScoped<IOrderValidator, OrderValidator>();
+            services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
+            IConfiguration config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+            string cs = config.GetConnectionString("Publishing")!;
+            services.AddScoped<IDbContext>(sp => new SqlDbContext(cs));
+            services.AddScoped<ILoginRepository, LoginRepository>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<INavigationService, NavigationService>();
+            services.AddScoped<IOrderService, OrderService>();
             services.AddTransient<loginForm>();
             services.AddTransient<registrationForm>();
             services.AddTransient<addOrderForm>();

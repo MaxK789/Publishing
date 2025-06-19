@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Publishing.Services;
@@ -11,7 +9,7 @@ namespace Publishing
     public partial class organizationForm : Form
     {
         private readonly INavigationService _navigation;
-        private readonly IDatabaseClient _db;
+        private readonly IOrganizationRepository _orgRepo;
 
         [Obsolete("Designer only", error: false)]
         public organizationForm()
@@ -19,10 +17,10 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public organizationForm(INavigationService navigation, IDatabaseClient db)
+        public organizationForm(INavigationService navigation, IOrganizationRepository orgRepo)
         {
             _navigation = navigation;
-            _db = db;
+            _orgRepo = orgRepo;
             InitializeComponent();
         }
 
@@ -36,7 +34,7 @@ namespace Publishing
             Application.Exit();
         }
 
-        private void changeButton_Click(object sender, EventArgs e)
+        private async void changeButton_Click(object sender, EventArgs e)
         {
             string id = CurrentUser.UserId;
             string orgName = orgNameTextBox.Text;
@@ -45,13 +43,7 @@ namespace Publishing
             string fax = faxTextBox.Text;
             string address = addressTextBox.Text;
 
-            List<SqlParameter> parametersForCheckName = new List<SqlParameter>
-            {
-                new SqlParameter("@orgName", orgName)
-            };
-
-            string checkName = _db.ExecuteQuery("SELECT nameOrganization FROM Organization " +
-                "WHERE nameOrganization = @orgName", parametersForCheckName);
+            string? checkName = await _orgRepo.GetNameIfExistsAsync(orgName).ConfigureAwait(false);
 
             if (!orgName.Equals(checkName))
             {
@@ -62,78 +54,11 @@ namespace Publishing
                     return;
                 }
 
-                List<SqlParameter> parameters = new List<SqlParameter>
-                {
-                    new SqlParameter("@orgName", orgName),
-                    new SqlParameter("@Email", email),
-                    new SqlParameter("@phone", phone),
-                    new SqlParameter("@fax", fax),
-                    new SqlParameter("@address", address),
-                    new SqlParameter("@id", id)
-                };
-
-                _db.ExecuteQueryWithoutResponse("INSERT INTO Organization(nameOrganization, emailOrganization, " +
-                    "phoneOrganization, faxOrganization, addressOrganization, idPerson) VALUES (@orgName, @Email," +
-                    " @phone, @fax, @address, @id)", parameters);
+                await _orgRepo.InsertAsync(orgName, email, phone, fax, address, id).ConfigureAwait(false);
             }
             else
             {
-                List<SqlParameter> parameters = new List<SqlParameter>
-            {
-                new SqlParameter("@id", id)
-            };
-
-                string query = "UPDATE Organization SET";
-                int count = 0;
-
-                if (orgName != "")
-                {
-                    count++;
-                    query += " nameOrganization = @orgName,";
-                    parameters.Add(new SqlParameter("@orgName", orgName));
-                }
-                if (email != "")
-                {
-                    string pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$";
-                    if (!Regex.IsMatch(email, pattern))
-                    {
-                        MessageBox.Show("Email is not valid");
-                        return;
-                    }
-                    count++;
-                    query += " emailOrganization = @Email,";
-                    parameters.Add(new SqlParameter("@Email", email));
-                }
-                if (phone != "")
-                {
-                    count++;
-                    query += " phoneOrganization = @phone,";
-                    parameters.Add(new SqlParameter("@phone", phone));
-                }
-                if (fax != "")
-                {
-                    count++;
-                    query += " faxOrganization = @fax,";
-                    parameters.Add(new SqlParameter("@fax", fax));
-                }
-                if (address != "")
-                {
-                    count++;
-                    query += " addressOrganization = @address,";
-                    parameters.Add(new SqlParameter("@address", address));
-                }
-
-                if (query.EndsWith(","))
-                {
-                    count++;
-                    query = query.Remove(query.Length - 1, 1);
-                }
-                if (count > 0)
-                {
-                    query += " WHERE idPerson = @id";
-
-                    _db.ExecuteQueryWithoutResponse(query, parameters);
-                }
+                await _orgRepo.UpdateAsync(id, orgName, email, phone, fax, address).ConfigureAwait(false);
                 MessageBox.Show("Дані успішно змінено");
 
                 _navigation.Navigate<mainForm>(this);

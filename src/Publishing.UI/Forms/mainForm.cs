@@ -9,7 +9,7 @@ namespace Publishing
     public partial class mainForm : Form
     {
         private readonly INavigationService _navigation;
-        private readonly IDatabaseClient _db;
+        private readonly IOrderRepository _orderRepo;
 
         [Obsolete("Designer only", error: false)]
         public mainForm()
@@ -17,10 +17,10 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public mainForm(INavigationService navigation, IDatabaseClient db)
+        public mainForm(INavigationService navigation, IOrderRepository orderRepo)
         {
             _navigation = navigation;
-            _db = db;
+            _orderRepo = orderRepo;
             InitializeComponent();
         }
 
@@ -58,7 +58,7 @@ namespace Publishing
             _navigation.Navigate<deleteOrderForm>(this);
         }
 
-        private void mainForm_Load(object sender, EventArgs e)
+        private async void mainForm_Load(object sender, EventArgs e)
         {
             if (CurrentUser.UserType == "контактна особа")
                 організаціяToolStripMenuItem.Visible = true;
@@ -77,14 +77,8 @@ namespace Publishing
                 додатиToolStripMenuItem.Visible = false;
             }
 
-            _db.ExecuteQueryWithoutResponse("UPDATE Orders SET statusOrder = 'завершено' " +
-                "WHERE statusOrder <> 'завершено' AND dateFinish < GETDATE()");
-
-            DataTable dataTable = _db.ExecuteQueryToDataTable("SELECT O.namePrintery, " +
-                "Prod.typeProduct, Prod.nameProduct, Per.FName, Per.LName, O.dateOrder, O.dateStart, " +
-                "O.dateFinish, O.statusOrder, O.price FROM(Orders O INNER JOIN Product Prod ON " +
-                "Prod.idProduct = O.idProduct ) INNER JOIN Person Per ON Per.idPerson = Prod.idPerson " +
-                "WHERE O.statusOrder = 'в роботі' ORDER BY O.dateOrder");
+            await _orderRepo.UpdateExpiredAsync().ConfigureAwait(false);
+            DataTable dataTable = await _orderRepo.GetActiveAsync().ConfigureAwait(false);
 
             dataGridView1.DataSource = dataTable;
         }

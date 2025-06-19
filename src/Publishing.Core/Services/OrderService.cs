@@ -48,7 +48,9 @@ namespace Publishing.Core.Services
                 DateStart = start,
                 DateFinish = finish,
                 Status = OrderStatus.InProgress,
-                Price = price
+                Price = price,
+                PersonId = dto.PersonId,
+                Printery = dto.Printery
             };
 
             SaveOrder(order);

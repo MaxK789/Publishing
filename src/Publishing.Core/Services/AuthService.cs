@@ -14,8 +14,6 @@ namespace Publishing.Core.Services
             _repo = repo;
         }
 
-        public void OpenConnection() => _repo.OpenConnection();
-        public void CloseConnection() => _repo.CloseConnection();
 
         public UserDto? Authenticate(string email, string password)
         {
