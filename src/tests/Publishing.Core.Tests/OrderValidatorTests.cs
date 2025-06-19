@@ -2,6 +2,8 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Publishing.Core.DTOs;
 using Publishing.Core.Services;
+using System.Threading.Tasks;
+using System.Data;
 
 namespace Publishing.Core.Tests
 {

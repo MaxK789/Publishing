@@ -1,5 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using BCrypt.Net;
+using System.Threading.Tasks;
+using System.Data;
 
 namespace Publishing.Core.Tests
 {

@@ -1,4 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
+using System.Data;
 
 namespace Publishing.Core.Tests
 {
