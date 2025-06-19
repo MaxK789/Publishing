@@ -16,13 +16,13 @@ namespace Publishing.Infrastructure
 
         public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null)
         {
-            await using var con = await _connectionFactory.CreateOpenConnectionAsync();
+            using var con = await _connectionFactory.CreateOpenConnectionAsync();
             return await con.QueryAsync<T>(sql, param);
         }
 
         public async Task<int> ExecuteAsync(string sql, object? param = null)
         {
-            await using var con = await _connectionFactory.CreateOpenConnectionAsync();
+            using var con = await _connectionFactory.CreateOpenConnectionAsync();
             return await con.ExecuteAsync(sql, param);
         }
     }
