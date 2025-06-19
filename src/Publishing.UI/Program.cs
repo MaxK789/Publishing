@@ -9,6 +9,7 @@ using Publishing.Core.Services;
 using Publishing.Infrastructure;
 using Publishing.Infrastructure.Repositories;
 using Publishing.Infrastructure.DataAccess;
+using Publishing.Services;
 
 namespace Publishing
 {
@@ -49,9 +50,16 @@ namespace Publishing
             services.AddSingleton<IDatabaseClient, Publishing.Infrastructure.DataAccess.DatabaseClient>();
             services.AddSingleton<ILoginRepository, LoginRepository>();
             services.AddSingleton<IAuthService, AuthService>();
+            services.AddSingleton<INavigationService, NavigationService>();
             services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<loginForm>();
             services.AddTransient<registrationForm>();
+            services.AddTransient<addOrderForm>();
+            services.AddTransient<deleteOrderForm>();
+            services.AddTransient<mainForm>();
+            services.AddTransient<profileForm>();
+            services.AddTransient<organizationForm>();
+            services.AddTransient<statisticForm>();
         }
     }
 }

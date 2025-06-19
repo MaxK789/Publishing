@@ -3,20 +3,31 @@ using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
+using Publishing.Core.Interfaces;
 
 namespace Publishing
 {
     public partial class profileForm : Form
     {
+        private readonly INavigationService _navigation;
+        private readonly IDatabaseClient _db;
+
+        [Obsolete("Designer only", error: false)]
         public profileForm()
         {
-            InitializeComponent();    
+            InitializeComponent();
+        }
+
+        public profileForm(INavigationService navigation, IDatabaseClient db)
+        {
+            _navigation = navigation;
+            _db = db;
+            InitializeComponent();
         }
 
         private void profileForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            DataBase.CloseConnection();
             Application.Exit();
         }
 
@@ -35,7 +46,7 @@ namespace Publishing
             {
                 new SqlParameter("@Email", email)
             };
-            string queryEmail = DataBase.ExecuteQuery("SELECT emailPerson FROM Person WHERE emailPerson = @Email", parametersForEmail);
+            string queryEmail = _db.ExecuteQuery("SELECT emailPerson FROM Person WHERE emailPerson = @Email", parametersForEmail);
 
             if (queryEmail == email)
             {
@@ -109,13 +120,11 @@ namespace Publishing
             {
                 query += " WHERE idPerson = @id";
 
-                DataBase.ExecuteQueryWithoutResponse(query, parameters);
+                _db.ExecuteQueryWithoutResponse(query, parameters);
 
                 MessageBox.Show("Дані успішно змінено");
 
-                this.Hide();
-                mainForm mainForm = new mainForm();
-                mainForm.Show();
+                _navigation.Navigate<mainForm>(this);
             }           
         }
 
@@ -125,16 +134,12 @@ namespace Publishing
             CurrentUser.UserName = "";
             CurrentUser.UserType = "";
 
-            this.Hide();
-            var logForm = Program.Services.GetRequiredService<loginForm>();
-            logForm.Show();
+            _navigation.Navigate<loginForm>(this);
         }
 
         private void списокToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            mainForm mainForm = new mainForm();
-            mainForm.Show();
+            _navigation.Navigate<mainForm>(this);
         }
 
         private void profileForm_Load(object sender, EventArgs e)
@@ -147,30 +152,22 @@ namespace Publishing
 
         private void додатиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            addOrderForm adF = new addOrderForm();
-            adF.Show();
+            _navigation.Navigate<addOrderForm>(this);
         }
 
         private void видалитиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            deleteOrderForm delF = new deleteOrderForm();
-            delF.Show();
+            _navigation.Navigate<deleteOrderForm>(this);
         }
 
         private void змінитиДаніToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            profileForm profForm = new profileForm();
-            profForm.Show();
+            _navigation.Navigate<profileForm>(this);
         }
 
         private void організаціяToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            organizationForm orgF = new organizationForm();
-            orgF.Show();
+            _navigation.Navigate<organizationForm>(this);
         }
     }
 }

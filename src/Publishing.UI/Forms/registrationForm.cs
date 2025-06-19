@@ -1,20 +1,28 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Publishing.Core.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
 
 namespace Publishing
 {
     public partial class registrationForm : Form
     {
         private readonly IAuthService _authService;
+        private readonly INavigationService _navigation;
 
-        public registrationForm(IAuthService authService)
+        [Obsolete("Designer only", error: false)]
+        public registrationForm()
+        {
+            InitializeComponent();
+        }
+
+        public registrationForm(IAuthService authService, INavigationService navigation)
         {
             _authService = authService;
+            _navigation = navigation;
             InitializeComponent();
             try
             {
@@ -29,9 +37,7 @@ namespace Publishing
 
         private void LoginLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            this.Hide();
-            var logForm = Program.Services.GetRequiredService<loginForm>();
-            logForm.Show();
+            _navigation.Navigate<loginForm>(this);
         }
 
         private void LoginButton_Click(object sender, EventArgs e)
@@ -60,9 +66,7 @@ namespace Publishing
                 CurrentUser.UserType = user.Type;
                 CurrentUser.UserName = user.Name;
 
-                this.Hide();
-                mainForm mainForm = new mainForm();
-                mainForm.Show();
+                _navigation.Navigate<mainForm>(this);
                 MessageBox.Show("Вітаємо, " + CurrentUser.UserName + " (" + CurrentUser.UserType + ")!");
             }
             catch (Exception ex)
