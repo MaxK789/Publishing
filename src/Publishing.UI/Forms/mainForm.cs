@@ -60,34 +60,27 @@ namespace Publishing
 
         private async void mainForm_Load(object sender, EventArgs e)
         {
-            try
+            if (CurrentUser.UserType == "контактна особа")
+                організаціяToolStripMenuItem.Visible = true;
+            else
+                організаціяToolStripMenuItem.Visible = false;
+
+            if (CurrentUser.UserType != "admin")
             {
-                if (CurrentUser.UserType == "контактна особа")
-                    організаціяToolStripMenuItem.Visible = true;
-                else
-                    організаціяToolStripMenuItem.Visible = false;
-
-                if (CurrentUser.UserType != "admin")
-                {
-                    статистикаToolStripMenuItem.Visible = false;
-                    змінитиДаніToolStripMenuItem.Visible = true;
-                }
-                else
-                {
-                    статистикаToolStripMenuItem.Visible = true;
-                    змінитиДаніToolStripMenuItem.Visible = false;
-                    додатиToolStripMenuItem.Visible = false;
-                }
-
-                await _orderRepo.UpdateExpiredAsync();
-                DataTable dataTable = await _orderRepo.GetActiveAsync();
-
-                dataGridView1.DataSource = dataTable;
+                статистикаToolStripMenuItem.Visible = false;
+                змінитиДаніToolStripMenuItem.Visible = true;
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                статистикаToolStripMenuItem.Visible = true;
+                змінитиДаніToolStripMenuItem.Visible = false;
+                додатиToolStripMenuItem.Visible = false;
             }
+
+            await _orderRepo.UpdateExpiredAsync();
+            DataTable dataTable = await _orderRepo.GetActiveAsync();
+
+            dataGridView1.DataSource = dataTable;
         }
 
         private void статистикаToolStripMenuItem_Click(object sender, EventArgs e)
