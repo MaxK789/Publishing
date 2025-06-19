@@ -8,12 +8,10 @@ namespace Publishing.Infrastructure.Repositories
     public class OrderRepository : IOrderRepository
     {
         private readonly IDbContext _db;
-        private readonly IDbHelper _helper;
 
-        public OrderRepository(IDbContext db, IDbHelper helper)
+        public OrderRepository(IDbContext db)
         {
             _db = db;
-            _helper = helper;
         }
 
         public void Save(Publishing.Core.Domain.Order order)
@@ -64,18 +62,18 @@ namespace Publishing.Infrastructure.Repositories
         public Task<DataTable> GetActiveAsync()
         {
             const string sql = @"SELECT O.namePrintery, Prod.typeProduct, Prod.nameProduct, Per.FName, Per.LName, O.dateOrder, O.dateStart, O.dateFinish, O.statusOrder, O.price FROM(Orders O INNER JOIN Product Prod ON Prod.idProduct = O.idProduct ) INNER JOIN Person Per ON Per.idPerson = Prod.idPerson WHERE O.statusOrder = 'в роботі' ORDER BY O.dateOrder";
-            return _helper.QueryDataTableAsync(sql);
+            return DbContextExtensions.QueryDataTableAsync(_db, sql);
         }
 
         public Task<DataTable> GetByPersonAsync(string personId)
         {
             const string sql = "SELECT * FROM Orders where idPerson = @id";
-            return _helper.QueryDataTableAsync(sql, new { id = personId });
+            return DbContextExtensions.QueryDataTableAsync(_db, sql, new { id = personId });
         }
 
         public Task<DataTable> GetAllAsync()
         {
-            return _helper.QueryDataTableAsync("SELECT * FROM Orders");
+            return DbContextExtensions.QueryDataTableAsync(_db, "SELECT * FROM Orders");
         }
 
         public Task DeleteAsync(int id)

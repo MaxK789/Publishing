@@ -60,9 +60,7 @@ namespace Publishing
                 .Build();
 
             services.AddSingleton<IConfiguration>(configuration);
-            services.AddSingleton<IDbConnectionFactory, SqlDbConnectionFactory>();
             services.AddScoped<IDbContext, SqlDbContext>();
-            services.AddScoped<IDbHelper, DbHelper>();
             services.AddScoped<ILoginRepository, LoginRepository>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<INavigationService, NavigationService>();

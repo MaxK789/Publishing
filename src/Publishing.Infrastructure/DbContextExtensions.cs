@@ -1,23 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Threading.Tasks;
-using Publishing.Core.Interfaces;
-
 namespace Publishing.Infrastructure
 {
-    public class DbHelper : IDbHelper
+    using System;
+    using System.Collections.Generic;
+    using System.Data;
+    using System.Threading.Tasks;
+    using Dapper;
+    using Publishing.Core.Interfaces;
+
+    public static class DbContextExtensions
     {
-        private readonly IDbContext _db;
-
-        public DbHelper(IDbContext db)
+        public static async Task<DataTable> QueryDataTableAsync(this IDbContext db, string sql, object? param = null)
         {
-            _db = db;
-        }
-
-        public async Task<DataTable> QueryDataTableAsync(string sql, object? param = null)
-        {
-            var result = await _db.QueryAsync<dynamic>(sql, param);
+            var result = await db.QueryAsync<dynamic>(sql, param);
             var table = new DataTable();
             bool columnsCreated = false;
             foreach (var row in result)
@@ -41,9 +35,9 @@ namespace Publishing.Infrastructure
             return table;
         }
 
-        public async Task<List<string[]>> QueryStringListAsync(string sql, object? param = null)
+        public static async Task<List<string[]>> QueryStringListAsync(this IDbContext db, string sql, object? param = null)
         {
-            var result = await _db.QueryAsync<dynamic>(sql, param);
+            var result = await db.QueryAsync<dynamic>(sql, param);
             var list = new List<string[]>();
             foreach (var row in result)
             {
