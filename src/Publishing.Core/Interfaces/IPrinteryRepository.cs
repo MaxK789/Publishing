@@ -1,8 +1,10 @@
+using System.Threading.Tasks;
+
 namespace Publishing.Core.Interfaces
-{
+{ 
     public interface IPrinteryRepository
     {
-        decimal GetPricePerPage();
-        int GetPagesPerDay();
+        Task<decimal> GetPricePerPageAsync();
+        Task<int> GetPagesPerDayAsync();
     }
 }

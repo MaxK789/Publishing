@@ -2,6 +2,7 @@ using System;
 using Publishing.Core.Domain;
 using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
+using System.Threading.Tasks;
 
 namespace Publishing.Core.Services
 {
@@ -30,14 +31,14 @@ namespace Publishing.Core.Services
             _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
 
-        public Order CreateOrder(CreateOrderDto dto)
+        public async Task<Order> CreateOrderAsync(CreateOrderDto dto)
         {
             if (dto is null)
                 throw new ArgumentNullException(nameof(dto));
             _validator.Validate(dto);
 
-            decimal price = CalculatePrice(dto.Pages, dto.Tirage);
-            (DateTime start, DateTime finish) = CalculateDates(dto.Pages, dto.Tirage);
+            decimal price = await CalculatePriceAsync(dto.Pages, dto.Tirage);
+            (DateTime start, DateTime finish) = await CalculateDatesAsync(dto.Pages, dto.Tirage);
 
             var order = new Order
             {
@@ -53,19 +54,19 @@ namespace Publishing.Core.Services
                 Printery = dto.Printery
             };
 
-            SaveOrder(order);
+            await SaveOrderAsync(order);
             return order;
         }
 
-        private decimal CalculatePrice(int pages, int tirage)
+        private async Task<decimal> CalculatePriceAsync(int pages, int tirage)
         {
-            decimal pricePerPage = _printeryRepository.GetPricePerPage();
+            decimal pricePerPage = await _printeryRepository.GetPricePerPageAsync();
             return _priceCalculator.Calculate(pages, tirage, pricePerPage);
         }
 
-        private (DateTime start, DateTime finish) CalculateDates(int pages, int tirage)
+        private async Task<(DateTime start, DateTime finish)> CalculateDatesAsync(int pages, int tirage)
         {
-            int pagesPerDay = _printeryRepository.GetPagesPerDay();
+            int pagesPerDay = await _printeryRepository.GetPagesPerDayAsync();
             double days = 0;
             if (pagesPerDay > 0)
                 days = Math.Ceiling((double)(pages * tirage) / pagesPerDay);
@@ -75,9 +76,9 @@ namespace Publishing.Core.Services
             return (start, finish);
         }
 
-        private void SaveOrder(Order order)
+        private async Task SaveOrderAsync(Order order)
         {
-            _orderRepository.Save(order);
+            await _orderRepository.SaveAsync(order);
             _logger.LogInformation($"Order for product {order.Name} saved.");
         }
     }

@@ -4,6 +4,8 @@ using Publishing.Core.Services;
 using Publishing.Core.DTOs;
 using Publishing.Core.Domain;
 using System;
+using System.Data;
+using System.Threading.Tasks;
 
 namespace Publishing.Core.Tests
 {
@@ -12,7 +14,7 @@ namespace Publishing.Core.Tests
     {
         private class StubOrderRepository : IOrderRepository
         {
-            public void Save(Order order) { }
+            public Task SaveAsync(Order order) => Task.CompletedTask;
 
             public Task UpdateExpiredAsync() => Task.CompletedTask;
 
@@ -30,8 +32,8 @@ namespace Publishing.Core.Tests
 
         private class StubPrinteryRepository : IPrinteryRepository
         {
-            public decimal GetPricePerPage() => 2.5m;
-            public int GetPagesPerDay() => 100;
+            public Task<decimal> GetPricePerPageAsync() => Task.FromResult(2.5m);
+            public Task<int> GetPagesPerDayAsync() => Task.FromResult(100);
         }
 
         private class StubLogger : ILogger
@@ -60,7 +62,7 @@ namespace Publishing.Core.Tests
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void OrderService_ThrowsOnNullDto()
+        public async Task OrderService_ThrowsOnNullDto()
         {
             var service = new OrderService(
                 new StubOrderRepository(),
@@ -69,7 +71,7 @@ namespace Publishing.Core.Tests
                 new PriceCalculator(),
                 new StubValidator(),
                 new StubDateTimeProvider());
-            service.CreateOrder(null);
+            await service.CreateOrderAsync(null);
         }
     }
 }
