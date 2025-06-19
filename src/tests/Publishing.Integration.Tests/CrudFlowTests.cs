@@ -97,7 +97,7 @@ END";
             _db.ExecuteAsync($"INSERT INTO Pass(password,idPerson) VALUES('{hash}', {id})").Wait();
 
             var service = new AuthService(new LoginRepository(_db));
-            var user = service.AuthenticateAsync("c@d.com", "pass").Result;
+            var user = service.Authenticate("c@d.com", "pass");
 
             Assert.IsNotNull(user);
             Assert.AreEqual(id, user!.Id);

@@ -31,7 +31,7 @@ namespace Publishing
             _navigation.Navigate<loginForm>(this);
         }
 
-        private async void LoginButton_Click(object sender, EventArgs e)
+        private void LoginButton_Click(object sender, EventArgs e)
         {
             string fName = FNameTextBox.Text;
             string lName = LNameTextBox.Text;
@@ -52,7 +52,7 @@ namespace Publishing
 
             try
             {
-                var user = await _authService.RegisterAsync(fName, lName, email, status, password).ConfigureAwait(false);
+                var user = _authService.Register(fName, lName, email, status, password);
                 CurrentUser.UserId = user.Id;
                 CurrentUser.UserType = user.Type;
                 CurrentUser.UserName = user.Name;
