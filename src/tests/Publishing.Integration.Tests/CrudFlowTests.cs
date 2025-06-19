@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Publishing.Infrastructure.Migrations;
 using System.Linq;
 using Publishing.Core.Interfaces;
 using Publishing.Infrastructure;
@@ -48,17 +50,16 @@ CREATE DATABASE [{DbName}];";
                     ["ConnectionStrings:DefaultConnection"] = cs
                 })
                 .Build();
-            _db = new SqlDbContext(config);
 
-            // create minimal schema
-            _db.ExecuteAsync(
-                "CREATE TABLE Person(idPerson INT IDENTITY(1,1) PRIMARY KEY, FName NVARCHAR(50), LName NVARCHAR(50), emailPerson NVARCHAR(50), typePerson NVARCHAR(20));").Wait();
-            _db.ExecuteAsync(
-                "CREATE TABLE Pass(password NVARCHAR(255), idPerson INT);").Wait();
-            _db.ExecuteAsync(
-                "CREATE TABLE Product(idProduct INT IDENTITY(1,1) PRIMARY KEY, idPerson INT, typeProduct NVARCHAR(50), nameProduct NVARCHAR(50), pagesNum INT);").Wait();
-            _db.ExecuteAsync(
-                "CREATE TABLE Orders(idOrder INT IDENTITY(1,1) PRIMARY KEY, idProduct INT, idPerson INT, namePrintery NVARCHAR(50), dateOrder DATETIME, dateStart DATETIME, dateFinish DATETIME, statusOrder NVARCHAR(50), tirage INT, price INT);").Wait();
+            var options = new DbContextOptionsBuilder<Publishing.Infrastructure.Migrations.PublishingDbContext>()
+                .UseSqlServer(cs)
+                .Options;
+            using (var ctx = new Publishing.Infrastructure.Migrations.PublishingDbContext(options))
+            {
+                ctx.Database.Migrate();
+            }
+
+            _db = new SqlDbContext(config);
         }
 
         [TestCleanup]

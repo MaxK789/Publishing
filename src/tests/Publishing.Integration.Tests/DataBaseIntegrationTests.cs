@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Publishing.Infrastructure.Migrations;
 using System.Threading.Tasks;
 using System.Linq;
 using Publishing.Core.Interfaces;
@@ -45,6 +47,13 @@ CREATE DATABASE [{DbName}];";
                     ["ConnectionStrings:DefaultConnection"] = cs
                 })
                 .Build();
+            var options = new DbContextOptionsBuilder<Publishing.Infrastructure.Migrations.PublishingDbContext>()
+                .UseSqlServer(cs)
+                .Options;
+            using (var ctx = new Publishing.Infrastructure.Migrations.PublishingDbContext(options))
+            {
+                ctx.Database.Migrate();
+            }
             _db = new SqlDbContext(config);
         }
 
