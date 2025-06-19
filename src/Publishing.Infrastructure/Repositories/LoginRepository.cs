@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Dapper;
 using Publishing.Core.Interfaces;
 
@@ -16,47 +15,47 @@ namespace Publishing.Infrastructure.Repositories
         }
 
 
-        public async Task<string?> GetHashedPasswordAsync(string email)
+        public string? GetHashedPassword(string email)
         {
-            var res = await _db.QueryAsync<string>("SELECT password FROM Person INNER JOIN Pass ON Pass.idPerson = Person.idPerson WHERE emailPerson = @Email", new { Email = email });
+            var res = _db.QueryAsync<string>("SELECT password FROM Person INNER JOIN Pass ON Pass.idPerson = Person.idPerson WHERE emailPerson = @Email", new { Email = email }).Result;
             return res.FirstOrDefault();
         }
 
-        public async Task<string?> GetUserIdAsync(string email)
+        public string? GetUserId(string email)
         {
-            var res = await _db.QueryAsync<string>("SELECT idPerson FROM Person WHERE emailPerson = @Email", new { Email = email });
+            var res = _db.QueryAsync<string>("SELECT idPerson FROM Person WHERE emailPerson = @Email", new { Email = email }).Result;
             return res.FirstOrDefault();
         }
 
-        public async Task<string?> GetUserTypeAsync(string email)
+        public string? GetUserType(string email)
         {
-            var res = await _db.QueryAsync<string>("SELECT typePerson FROM Person WHERE emailPerson = @Email", new { Email = email });
+            var res = _db.QueryAsync<string>("SELECT typePerson FROM Person WHERE emailPerson = @Email", new { Email = email }).Result;
             return res.FirstOrDefault();
         }
 
-        public async Task<string?> GetUserNameAsync(string email)
+        public string? GetUserName(string email)
         {
-            var res = await _db.QueryAsync<string>("SELECT FName FROM Person WHERE emailPerson = @Email", new { Email = email });
+            var res = _db.QueryAsync<string>("SELECT FName FROM Person WHERE emailPerson = @Email", new { Email = email }).Result;
             return res.FirstOrDefault();
         }
 
-        public async Task<bool> EmailExistsAsync(string email)
+        public bool EmailExists(string email)
         {
-            var res = (await _db.QueryAsync<string>("SELECT emailPerson FROM Person WHERE emailPerson = @Email", new { Email = email })).FirstOrDefault();
+            var res = _db.QueryAsync<string>("SELECT emailPerson FROM Person WHERE emailPerson = @Email", new { Email = email }).Result.FirstOrDefault();
             return res == email;
         }
 
-        public async Task<int> InsertPersonAsync(string fName, string lName, string email, string status)
+        public int InsertPerson(string fName, string lName, string email, string status)
         {
             const string query = "INSERT INTO Person(FName, LName, emailPerson,typePerson) VALUES(@FName, @LName, @Email, @Status); SELECT CAST(SCOPE_IDENTITY() as int);";
-            var res = await _db.QueryAsync<int>(query, new { FName = fName, LName = lName, Email = email, Status = status });
+            var res = _db.QueryAsync<int>(query, new { FName = fName, LName = lName, Email = email, Status = status }).Result;
             return res.FirstOrDefault();
         }
 
-        public Task InsertPasswordAsync(string hashedPassword, int personId)
+        public void InsertPassword(string hashedPassword, int personId)
         {
             const string query = "INSERT INTO Pass(password, idPerson) VALUES(@Password, @Id)";
-            return _db.ExecuteAsync(query, new { Password = hashedPassword, Id = personId });
+            _db.ExecuteAsync(query, new { Password = hashedPassword, Id = personId }).Wait();
         }
     }
 }
