@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Linq;
 using Publishing.Core.Interfaces;
@@ -47,8 +48,14 @@ CREATE DATABASE [{DbName}];";
                 })
                 .Build();
             var factory = new SqlDbConnectionFactory(config);
-            _db = new SqlDbContext(factory);
+            _db = new DapperDbContext(factory);
             _helper = new DbHelper(_db);
+
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer(cs)
+                .Options;
+            var initializer = new DatabaseInitializer(new AppDbContext(options));
+            initializer.InitializeAsync().Wait();
         }
 
         [TestCleanup]

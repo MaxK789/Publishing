@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Publishing.Core.Interfaces;
 using Publishing.Infrastructure;
@@ -48,17 +49,14 @@ CREATE DATABASE [{DbName}];";
                 })
                 .Build();
             var factory = new SqlDbConnectionFactory(config);
-            _db = new SqlDbContext(factory);
+            _db = new DapperDbContext(factory);
 
-            // create minimal schema
-            _db.ExecuteAsync(
-                "CREATE TABLE Person(idPerson INT IDENTITY(1,1) PRIMARY KEY, FName NVARCHAR(50), LName NVARCHAR(50), emailPerson NVARCHAR(50), typePerson NVARCHAR(20));").Wait();
-            _db.ExecuteAsync(
-                "CREATE TABLE Pass(password NVARCHAR(255), idPerson INT);").Wait();
-            _db.ExecuteAsync(
-                "CREATE TABLE Product(idProduct INT IDENTITY(1,1) PRIMARY KEY, idPerson INT, typeProduct NVARCHAR(50), nameProduct NVARCHAR(50), pagesNum INT);").Wait();
-            _db.ExecuteAsync(
-                "CREATE TABLE Orders(idOrder INT IDENTITY(1,1) PRIMARY KEY, idProduct INT, idPerson INT, namePrintery NVARCHAR(50), dateOrder DATETIME, dateStart DATETIME, dateFinish DATETIME, statusOrder NVARCHAR(50), tirage INT, price INT);").Wait();
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer(cs)
+                .Options;
+            var efContext = new AppDbContext(options);
+            var initializer = new DatabaseInitializer(efContext);
+            initializer.InitializeAsync().Wait();
         }
 
         [TestCleanup]
