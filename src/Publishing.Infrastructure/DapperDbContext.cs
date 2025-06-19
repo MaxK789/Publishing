@@ -5,11 +5,11 @@ namespace Publishing.Infrastructure
     using Dapper;
     using Publishing.Core.Interfaces;
 
-    public class SqlDbContext : IDbContext
+    public class DapperDbContext : IDbContext
     {
         private readonly IDbConnectionFactory _connectionFactory;
 
-        public SqlDbContext(IDbConnectionFactory connectionFactory)
+        public DapperDbContext(IDbConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory;
         }

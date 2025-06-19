@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Publishing.Core.Interfaces;
 using Publishing.Infrastructure;
@@ -45,16 +46,20 @@ CREATE DATABASE [{DbName}];";
                 })
                 .Build();
             var factory = new SqlDbConnectionFactory(config);
-            _db = new SqlDbContext(factory);
+            _db = new DapperDbContext(factory);
             _helper = new DbHelper(_db);
 
-            _db.ExecuteAsync("CREATE TABLE Person(idPerson INT IDENTITY(1,1) PRIMARY KEY, FName NVARCHAR(50));").Wait();
-            _db.ExecuteAsync("CREATE TABLE Orders(idOrder INT IDENTITY(1,1) PRIMARY KEY, idPerson INT, dateOrder DATETIME);").Wait();
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer(cs)
+                .Options;
+            var efContext = new AppDbContext(options);
+            var initializer = new DatabaseInitializer(efContext);
+            initializer.InitializeAsync().Wait();
 
-            _db.ExecuteAsync("INSERT INTO Person(FName) VALUES('A');").Wait();
+            _db.ExecuteAsync("INSERT INTO Person(FName,LName,emailPerson,typePerson) VALUES('A','B','x@y.com','user');").Wait();
             int id = _db.QueryAsync<int>("SELECT idPerson FROM Person").Result.First();
 
-            _db.ExecuteAsync($"INSERT INTO Orders(idPerson,dateOrder) VALUES({id},'2024-01-10'),({id},'2024-01-20'),({id},'2024-02-05')").Wait();
+            _db.ExecuteAsync($"INSERT INTO Orders(idProduct,idPerson,namePrintery,dateOrder,dateStart,dateFinish,statusOrder,tirage,price) VALUES(NULL,{id},'P','2024-01-10','2024-01-10','2024-01-10','done',1,10),(NULL,{id},'P','2024-01-20','2024-01-20','2024-01-20','done',1,10),(NULL,{id},'P','2024-02-05','2024-02-05','2024-02-05','done',1,10)").Wait();
         }
 
         [TestCleanup]

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Publishing.Core.Interfaces;
@@ -27,6 +28,12 @@ namespace Publishing
             var services = new ServiceCollection();
             ConfigureServices(services);
             Services = services.BuildServiceProvider();
+
+            using (var scope = Services.CreateScope())
+            {
+                var init = scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>();
+                init.InitializeAsync().GetAwaiter().GetResult();
+            }
 
             var form = Services.GetRequiredService<loginForm>();
             Application.Run(form);
@@ -57,8 +64,13 @@ namespace Publishing
                 .Build();
 
             services.AddSingleton<IConfiguration>(configuration);
+            services.AddDbContext<AppDbContext>(o =>
+                o.UseSqlServer(
+                    configuration.GetConnectionString("DefaultConnection"),
+                    b => b.MigrationsAssembly("Publishing.Infrastructure")));
             services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
-            services.AddTransient<IDbContext, SqlDbContext>();
+            services.AddTransient<IDbContext, DapperDbContext>();
+            services.AddScoped<IDatabaseInitializer, DatabaseInitializer>();
             services.AddScoped<IDbHelper, DbHelper>();
             services.AddScoped<ILoginRepository, LoginRepository>();
             services.AddScoped<IAuthService, AuthService>();
