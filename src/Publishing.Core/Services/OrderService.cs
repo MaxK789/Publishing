@@ -54,7 +54,8 @@ namespace Publishing.Core.Services
                 Printery = dto.Printery
             };
 
-            await SaveOrderAsync(order).ConfigureAwait(false);
+            await _orderRepository.SaveAsync(order).ConfigureAwait(false);
+            _logger.LogInformation($"Order for product {order.Name} saved.");
             return order;
         }
 
@@ -76,13 +77,5 @@ namespace Publishing.Core.Services
             return (start, finish);
         }
 
-        private Task SaveOrderAsync(Order order)
-        {
-            return Task.Run(() =>
-            {
-                _orderRepository.Save(order);
-                _logger.LogInformation($"Order for product {order.Name} saved.");
-            });
-        }
     }
 }

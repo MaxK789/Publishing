@@ -14,33 +14,35 @@ namespace Publishing.Infrastructure.Repositories
             _db = db;
         }
 
-        public void Save(Publishing.Core.Domain.Order order)
+        public async Task SaveAsync(Publishing.Core.Domain.Order order)
         {
             const string selectProduct = @"SELECT idProduct FROM Product WHERE typeProduct = @Type AND nameProduct = @Name AND idPerson = @PersonId AND pagesNum = @Pages";
-            var prodId = _db.QueryAsync<int>(selectProduct, new
+            var prodList = await _db.QueryAsync<int>(selectProduct, new
             {
                 order.Type,
                 order.Name,
                 order.PersonId,
                 order.Pages
-            }).Result.FirstOrDefault();
+            });
+            var prodId = prodList.FirstOrDefault();
 
             if (prodId == 0)
             {
                 const string insertProd = @"INSERT INTO Product(idPerson,typeProduct,nameProduct,pagesNum) VALUES(@PersonId,@Type,@Name,@Pages); SELECT CAST(SCOPE_IDENTITY() as int);";
-                prodId = _db.QueryAsync<int>(insertProd, new
+                var prodList2 = await _db.QueryAsync<int>(insertProd, new
                 {
                     order.PersonId,
                     order.Type,
                     order.Name,
                     order.Pages
-                }).Result.First();
+                });
+                prodId = prodList2.First();
             }
 
             const string sql = @"INSERT INTO Orders(idProduct,idPerson,namePrintery,dateOrder,dateStart,dateFinish,statusOrder,tirage,price)
                                    VALUES(@ProdId,@PersonId,@Printery,GETDATE(),@DateStart,@DateFinish,@Status,@Tirage,@Price)";
 
-            _db.ExecuteAsync(sql, new
+            await _db.ExecuteAsync(sql, new
             {
                 ProdId = prodId,
                 order.PersonId,
@@ -50,7 +52,7 @@ namespace Publishing.Infrastructure.Repositories
                 Status = order.Status.ToString(),
                 order.Tirage,
                 order.Price
-            }).Wait();
+            });
         }
 
         public Task UpdateExpiredAsync()

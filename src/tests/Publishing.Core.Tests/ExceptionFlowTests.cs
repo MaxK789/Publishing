@@ -14,7 +14,7 @@ namespace Publishing.Core.Tests
     {
         private class StubOrderRepository : IOrderRepository
         {
-            public void Save(Order order) { }
+            public Task SaveAsync(Order order) => Task.CompletedTask;
 
             public Task UpdateExpiredAsync() => Task.CompletedTask;
 
@@ -61,7 +61,7 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        public async Task OrderService_ThrowsOnNullDto()
+        public async Task CreateOrderAsync_WhenDtoNull_Throws()
         {
             var service = new OrderService(
                 new StubOrderRepository(),
