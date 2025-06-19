@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using System.Linq;
 using Publishing.Core.Interfaces;
 using Publishing.Infrastructure;
@@ -36,7 +37,13 @@ CREATE DATABASE [{DbName}];";
             }
 
             var cs = $"Data Source={Server};Initial Catalog={DbName};Integrated Security=true";
-            _db = new SqlDbContext(cs);
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    ["ConnectionStrings:DefaultConnection"] = cs
+                })
+                .Build();
+            _db = new SqlDbContext(config);
 
             _db.ExecuteAsync("CREATE TABLE Person(idPerson INT IDENTITY(1,1) PRIMARY KEY, FName NVARCHAR(50));").Wait();
             _db.ExecuteAsync("CREATE TABLE Orders(idOrder INT IDENTITY(1,1) PRIMARY KEY, idPerson INT, dateOrder DATETIME);").Wait();

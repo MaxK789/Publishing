@@ -56,11 +56,14 @@ namespace Publishing
             services.AddScoped<IPriceCalculator, PriceCalculator>();
             services.AddScoped<IOrderValidator, OrderValidator>();
             services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
-            IConfiguration config = new ConfigurationBuilder()
+
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false)
                 .Build();
-            string cs = config.GetConnectionString("Publishing")!;
-            services.AddScoped<IDbContext>(sp => new SqlDbContext(cs));
+
+            services.AddSingleton<IConfiguration>(configuration);
+            services.AddScoped<IDbContext, SqlDbContext>();
             services.AddScoped<ILoginRepository, LoginRepository>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<INavigationService, NavigationService>();
