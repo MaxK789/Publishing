@@ -29,7 +29,7 @@ namespace Publishing
             authorsBox.Items.Clear();
             authorsBox.Items.Add("Усі");
 
-            List<string[]> authorNames = await _statRepo.GetAuthorNamesAsync().ConfigureAwait(false);
+            List<string[]> authorNames = await _statRepo.GetAuthorNamesAsync();
 
             if (authorNames != null && authorNames.Count > 0)
             {
@@ -44,7 +44,7 @@ namespace Publishing
 
             chart1.Series[0].Points.Clear();
 
-            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync().ConfigureAwait(false);
+            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync();
 
             foreach (var dataPoint in dataList)
             {
@@ -80,7 +80,7 @@ namespace Publishing
         {
             chart1.Series[0].Points.Clear();
 
-            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync().ConfigureAwait(false);
+            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync();
 
             foreach (var dataPoint in dataList)
             {
@@ -94,7 +94,7 @@ namespace Publishing
             {
                 chart1.Series[0].Points.Clear();
 
-                List<string[]> dataList = await _statRepo.GetOrdersPerAuthorAsync().ConfigureAwait(false);
+                List<string[]> dataList = await _statRepo.GetOrdersPerAuthorAsync();
 
                 foreach (var dataPoint in dataList)
                 {
@@ -111,7 +111,7 @@ namespace Publishing
                     return;
                 }
 
-                List<string[]> dataList = await _statRepo.GetOrdersPerAuthorAsync(fullNameAuthor).ConfigureAwait(false);
+                List<string[]> dataList = await _statRepo.GetOrdersPerAuthorAsync(fullNameAuthor);
 
                 foreach (var dataPoint in dataList)
                 {
@@ -130,7 +130,7 @@ namespace Publishing
             DateTime fDate = dateTimePicker1.Value;
             DateTime lDate = dateTimePicker2.Value;
 
-            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync(fDate, lDate).ConfigureAwait(false);
+            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync(fDate, lDate);
 
             foreach (var dataPoint in dataList)
             {
@@ -146,7 +146,7 @@ namespace Publishing
         {
             chart1.Series[0].Points.Clear();
 
-            List<string[]> dataList = await _statRepo.GetTiragePerAuthorAsync().ConfigureAwait(false);
+            List<string[]> dataList = await _statRepo.GetTiragePerAuthorAsync();
 
             foreach (var dataPoint in dataList)
             {
