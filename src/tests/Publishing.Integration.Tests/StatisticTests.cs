@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Publishing.Infrastructure.Migrations;
 using System.Linq;
 using Publishing.Core.Interfaces;
 using Publishing.Infrastructure;
@@ -43,15 +45,25 @@ CREATE DATABASE [{DbName}];";
                     ["ConnectionStrings:DefaultConnection"] = cs
                 })
                 .Build();
+
+            var options = new DbContextOptionsBuilder<Publishing.Infrastructure.Migrations.PublishingDbContext>()
+                .UseSqlServer(cs)
+                .Options;
+            using (var ctx = new Publishing.Infrastructure.Migrations.PublishingDbContext(options))
+            {
+                ctx.Database.Migrate();
+                ctx.Persons.Add(new Publishing.Infrastructure.Migrations.PersonEntity { FName = "A" });
+                ctx.SaveChanges();
+                int id = ctx.Persons.First().Id;
+                ctx.Orders.AddRange(
+                    new Publishing.Infrastructure.Migrations.OrderEntity { PersonId = id, ProductId = 1, DateOrder = new DateTime(2024, 1, 10) },
+                    new Publishing.Infrastructure.Migrations.OrderEntity { PersonId = id, ProductId = 1, DateOrder = new DateTime(2024, 1, 20) },
+                    new Publishing.Infrastructure.Migrations.OrderEntity { PersonId = id, ProductId = 1, DateOrder = new DateTime(2024, 2, 5) }
+                );
+                ctx.SaveChanges();
+            }
+
             _db = new SqlDbContext(config);
-
-            _db.ExecuteAsync("CREATE TABLE Person(idPerson INT IDENTITY(1,1) PRIMARY KEY, FName NVARCHAR(50));").Wait();
-            _db.ExecuteAsync("CREATE TABLE Orders(idOrder INT IDENTITY(1,1) PRIMARY KEY, idPerson INT, dateOrder DATETIME);").Wait();
-
-            _db.ExecuteAsync("INSERT INTO Person(FName) VALUES('A');").Wait();
-            int id = _db.QueryAsync<int>("SELECT idPerson FROM Person").Result.First();
-
-            _db.ExecuteAsync($"INSERT INTO Orders(idPerson,dateOrder) VALUES({id},'2024-01-10'),({id},'2024-01-20'),({id},'2024-02-05')").Wait();
         }
 
         [TestCleanup]
