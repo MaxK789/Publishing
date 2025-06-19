@@ -73,10 +73,13 @@ namespace Publishing.Infrastructure
                 entity.Property(e => e.Price).HasColumnName("price");
                 entity.HasOne(e => e.Product)
                       .WithMany(p => p.Orders)
-                      .HasForeignKey(e => e.ProductId);
+                      .HasForeignKey(e => e.ProductId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
                 entity.HasOne(e => e.Person)
                       .WithMany(p => p.Orders)
-                      .HasForeignKey(e => e.PersonId);
+                      .HasForeignKey(e => e.PersonId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }
