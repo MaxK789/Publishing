@@ -5,6 +5,9 @@ using System.Data;
 using Microsoft.Data.SqlClient;
 using System.Reflection;
 using BCrypt.Net;
+using Publishing.Core.Services;
+using Publishing.Infrastructure.Repositories;
+using Publishing.Infrastructure.DataAccess;
 
 namespace Publishing.Integration.Tests
 {
@@ -92,10 +95,11 @@ END";
             string id = Publishing.DataBase.ExecuteQuery("SELECT idPerson FROM Person WHERE emailPerson='c@d.com'");
             Publishing.DataBase.ExecuteQueryWithoutResponse($"INSERT INTO Pass(password,idPerson) VALUES('{hash}', {id})");
 
-            List<SqlParameter> parameters = new List<SqlParameter> { new SqlParameter("@Email", "c@d.com") };
-            string storedHash = Publishing.DataBase.ExecuteQuery("SELECT password FROM Pass WHERE idPerson = (SELECT idPerson FROM Person WHERE emailPerson=@Email)", parameters);
-            bool verified = BCrypt.Net.BCrypt.Verify("pass", storedHash);
-            Assert.IsTrue(verified);
+            var service = new AuthService(new LoginRepository(new DatabaseClient()));
+            var user = service.Authenticate("c@d.com", "pass");
+
+            Assert.IsNotNull(user);
+            Assert.AreEqual(id, user!.Id);
         }
 
         [TestMethod]

@@ -8,6 +8,7 @@ using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using Publishing.Infrastructure;
 using Publishing.Infrastructure.Repositories;
+using Publishing.Infrastructure.DataAccess;
 
 namespace Publishing
 {
@@ -24,11 +25,18 @@ namespace Publishing
 
             var services = new ServiceCollection();
             ConfigureServices(services);
-            using var provider = services.BuildServiceProvider();
+            Services = services.BuildServiceProvider();
 
-            var form = ActivatorUtilities.CreateInstance<loginForm>(provider);
+            var form = Services.GetRequiredService<loginForm>();
             Application.Run(form);
+
+            if (Services is IDisposable d)
+            {
+                d.Dispose();
+            }
         }
+
+        public static ServiceProvider Services { get; private set; } = null!;
 
         private static void ConfigureServices(ServiceCollection services)
         {
@@ -38,9 +46,12 @@ namespace Publishing
             services.AddSingleton<IPriceCalculator, PriceCalculator>();
             services.AddSingleton<IOrderValidator, OrderValidator>();
             services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
+            services.AddSingleton<IDatabaseClient, Publishing.Infrastructure.DataAccess.DatabaseClient>();
             services.AddSingleton<ILoginRepository, LoginRepository>();
+            services.AddSingleton<IAuthService, AuthService>();
             services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<loginForm>();
+            services.AddTransient<registrationForm>();
         }
     }
 }

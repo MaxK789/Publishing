@@ -3,20 +3,34 @@ using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Publishing.Core.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Publishing
 {
     public partial class registrationForm : Form
     {
-        public registrationForm()
+        private readonly IAuthService _authService;
+
+        public registrationForm(IAuthService authService)
         {
+            _authService = authService;
             InitializeComponent();
+            try
+            {
+                _authService.OpenConnection();
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show("Не вдалося з'єднатися з базою: " + ex.Message, "Помилка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
+
 
         private void LoginLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             this.Hide();
-            loginForm logForm = new loginForm();
+            var logForm = Program.Services.GetRequiredService<loginForm>();
             logForm.Show();
         }
 
@@ -33,68 +47,33 @@ namespace Publishing
             }
             string status = statusBox.SelectedItem?.ToString();
             string password = passwordTextBox.Text;
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, 11);
-
-            List<SqlParameter> parametersForEmail = new List<SqlParameter>
-            {
-                new SqlParameter("@Email", email)
-            };
-            string queryEmail = DataBase.ExecuteQuery("SELECT emailPerson FROM Person WHERE emailPerson = @Email", parametersForEmail);
-
-            if(queryEmail == email)
-            {
-                MessageBox.Show("Email вже використовується");
-                return;
-            }
 
             if (status == null)
             {
                 return;
             }
 
-            string query = "INSERT INTO Person(FName, LName, emailPerson, typePerson) VALUES(@FName, @LName, @Email, @Status)";
-            List<SqlParameter> parameters = new List<SqlParameter>
+            try
             {
-                new SqlParameter("@FName", fName),
-                new SqlParameter("@LName", lName),
-                new SqlParameter("@Email", email),
-                new SqlParameter("@Status", status)
-            };
-
-            DataBase.ExecuteQueryWithoutResponse(query, parameters);
-
-            string idQuery = "SELECT MAX(idPerson) FROM Person";
-
-            CurrentUser.UserId = DataBase.ExecuteQuery("SELECT MAX(idPerson) FROM Person");
-            CurrentUser.UserType = status;
-            CurrentUser.UserName = fName;
-
-            if (int.TryParse(DataBase.ExecuteQuery(idQuery), out int id))
-            {
-                string queryForPasswordAndID = "INSERT INTO Pass(password, idPerson) VALUES(@password, @id)";
-                List<SqlParameter> parametersForPasswordAndID = new List<SqlParameter>
-                {
-                    new SqlParameter("@Password", hashedPassword),
-                    new SqlParameter("@id", id)
-                };
-
-                DataBase.ExecuteQueryWithoutResponse(queryForPasswordAndID, parametersForPasswordAndID);
-
+                var user = _authService.Register(fName, lName, email, status, password);
+                CurrentUser.UserId = user.Id;
+                CurrentUser.UserType = user.Type;
+                CurrentUser.UserName = user.Name;
 
                 this.Hide();
                 mainForm mainForm = new mainForm();
                 mainForm.Show();
                 MessageBox.Show("Вітаємо, " + CurrentUser.UserName + " (" + CurrentUser.UserType + ")!");
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Failed to parse the user ID.");
+                MessageBox.Show(ex.Message);
             }
         }
 
         private void registrationForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            DataBase.CloseConnection();
+            _authService.CloseConnection();
             Application.Exit();
         }
 
