@@ -74,7 +74,9 @@ namespace Publishing
                 Type = typeBox.SelectedItem?.ToString() ?? string.Empty,
                 Name = nameProductTextBox.Text,
                 Pages = pageNum,
-                Tirage = tirageNum
+                Tirage = tirageNum,
+                Printery = printeryBox.SelectedItem?.ToString() ?? string.Empty,
+                PersonId = CurrentUser.UserId
             };
 
             var order = _orderService.CreateOrder(dto);
@@ -104,7 +106,9 @@ namespace Publishing
                 Type = type,
                 Name = nameProductTextBox.Text,
                 Pages = pageNum,
-                Tirage = tirageNum
+                Tirage = tirageNum,
+                Printery = printeryBox.SelectedItem?.ToString() ?? string.Empty,
+                PersonId = CurrentUser.UserId
             };
 
             var order = _orderService.CreateOrder(dto);

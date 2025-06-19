@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
@@ -10,7 +9,7 @@ namespace Publishing
     public partial class statisticForm : Form
     {
         private readonly INavigationService _navigation;
-        private readonly IDatabaseClient _db;
+        private readonly IStatisticRepository _statRepo;
 
         [Obsolete("Designer only", error: false)]
         public statisticForm()
@@ -18,20 +17,19 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public statisticForm(INavigationService navigation, IDatabaseClient db)
+        public statisticForm(INavigationService navigation, IStatisticRepository statRepo)
         {
             _navigation = navigation;
-            _db = db;
+            _statRepo = statRepo;
             InitializeComponent();
         }
 
-        private void statisticForm_Load(object sender, EventArgs e)
+        private async void statisticForm_Load(object sender, EventArgs e)
         {
             authorsBox.Items.Clear();
             authorsBox.Items.Add("Усі");
 
-            List<string[]> authorNames = _db.ExecuteQueryList("SELECT DISTINCT (FName + ' ' + LName) " +
-                "AS Author FROM Person P INNER JOIN Orders O ON O.idPerson = P.idPerson");
+            List<string[]> authorNames = await _statRepo.GetAuthorNamesAsync().ConfigureAwait(false);
 
             if (authorNames != null && authorNames.Count > 0)
             {
@@ -46,9 +44,7 @@ namespace Publishing
 
             chart1.Series[0].Points.Clear();
 
-            List<string[]> dataList = _db.ExecuteQueryList("SELECT DATENAME(MONTH, dateOrder) AS orderMonth, " +
-                "COUNT(*) AS Number FROM Orders WHERE YEAR(dateOrder) = YEAR(GETDATE()) " +
-                "GROUP BY DATENAME(MONTH, dateOrder)");
+            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync().ConfigureAwait(false);
 
             foreach (var dataPoint in dataList)
             {
@@ -80,13 +76,11 @@ namespace Publishing
             _navigation.Navigate<deleteOrderForm>(this);
         }
 
-        private void orderCountPerMonthButton_Click(object sender, EventArgs e)
+        private async void orderCountPerMonthButton_Click(object sender, EventArgs e)
         {
             chart1.Series[0].Points.Clear();
 
-            List<string[]> dataList = _db.ExecuteQueryList("SELECT DATENAME(MONTH, dateOrder) AS orderMonth, " +
-                "COUNT(*) AS Number FROM Orders WHERE YEAR(dateOrder) = YEAR(GETDATE()) " +
-                "GROUP BY DATENAME(MONTH, dateOrder)");
+            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync().ConfigureAwait(false);
 
             foreach (var dataPoint in dataList)
             {
@@ -94,15 +88,13 @@ namespace Publishing
             }
         }
 
-        private void orderCountPerAuthorButton_Click(object sender, EventArgs e)
+        private async void orderCountPerAuthorButton_Click(object sender, EventArgs e)
         {
             if (authorsBox.SelectedItem != null && authorsBox.SelectedItem.ToString() == "Усі")
             {
                 chart1.Series[0].Points.Clear();
 
-                List<string[]> dataList = _db.ExecuteQueryList("SELECT (P.FName + ' ' + P.LName) AS Author, " +
-                    "COUNT(*) AS Number\r\nFROM Orders O INNER JOIN Person P ON P.idPerson = O.idPerson\r\n" +
-                    "GROUP BY (P.FName + ' ' + P.LName)");
+                List<string[]> dataList = await _statRepo.GetOrdersPerAuthorAsync().ConfigureAwait(false);
 
                 foreach (var dataPoint in dataList)
                 {
@@ -119,13 +111,7 @@ namespace Publishing
                     return;
                 }
 
-                List<SqlParameter> parameters = new List<SqlParameter>
-{
-    new SqlParameter("@fullNameAuthor", fullNameAuthor)
-};
-                List<string[]> dataList = _db.ExecuteQueryList("SELECT (P.FName + ' ' + P.LName) AS Author, " +
-                    "COUNT(*) AS Number FROM Orders O INNER JOIN Person P ON P.idPerson = O.idPerson " +
-                    "WHERE (P.FName + ' ' + P.LName) = @fullNameAuthor GROUP BY (P.FName + ' ' + P.LName)", parameters);
+                List<string[]> dataList = await _statRepo.GetOrdersPerAuthorAsync(fullNameAuthor).ConfigureAwait(false);
 
                 foreach (var dataPoint in dataList)
                 {
@@ -137,24 +123,14 @@ namespace Publishing
             }
         }
 
-        private void fromDateToDateButton_Click(object sender, EventArgs e)
+        private async void fromDateToDateButton_Click(object sender, EventArgs e)
         {
             chart1.Series[0].Points.Clear();
 
             DateTime fDate = dateTimePicker1.Value;
             DateTime lDate = dateTimePicker2.Value;
 
-            List<SqlParameter> parameters = new List<SqlParameter>
-            {
-                new SqlParameter("@StartDate", fDate),
-                new SqlParameter("@EndDate", lDate)
-            };
-
-            List<string[]> dataList = _db.ExecuteQueryList(
-                "SELECT DATENAME(MONTH, dateOrder) AS orderMonth, COUNT(*) AS Number " +
-                "FROM Orders O INNER JOIN Person P ON P.idPerson = O.idPerson " +
-                "WHERE dateOrder BETWEEN @StartDate AND @EndDate " +
-                "GROUP BY DATENAME(MONTH, dateOrder)", parameters);
+            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync(fDate, lDate).ConfigureAwait(false);
 
             foreach (var dataPoint in dataList)
             {
@@ -166,13 +142,11 @@ namespace Publishing
 
         }
 
-        private void tirageButton_Click(object sender, EventArgs e)
+        private async void tirageButton_Click(object sender, EventArgs e)
         {
             chart1.Series[0].Points.Clear();
 
-            List<string[]> dataList = _db.ExecuteQueryList("SELECT (P.FName + ' ' + P.LName) " +
-                "AS Author, Sum(tirage) AS sumTirage\r\nFROM Orders O INNER JOIN Person P " +
-                "ON P.idPerson = O.idPerson\r\nGROUP BY (P.FName + ' ' + P.LName)");
+            List<string[]> dataList = await _statRepo.GetTiragePerAuthorAsync().ConfigureAwait(false);
 
             foreach (var dataPoint in dataList)
             {

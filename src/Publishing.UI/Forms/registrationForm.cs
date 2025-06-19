@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Publishing.Core.Interfaces;
@@ -24,14 +23,6 @@ namespace Publishing
             _authService = authService;
             _navigation = navigation;
             InitializeComponent();
-            try
-            {
-                _authService.OpenConnection();
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show("Не вдалося з'єднатися з базою: " + ex.Message, "Помилка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
         }
 
 
@@ -77,7 +68,6 @@ namespace Publishing
 
         private void registrationForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            _authService.CloseConnection();
             Application.Exit();
         }
 

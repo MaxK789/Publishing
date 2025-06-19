@@ -17,8 +17,6 @@ namespace Publishing.Core.Tests
             public string? Name { get; set; } = "name";
             public bool EmailExistsReturn { get; set; }
 
-            public void OpenConnection() { }
-            public void CloseConnection() { }
             public string? GetHashedPassword(string email) => StoredHash;
             public string? GetUserId(string email) => Id;
             public string? GetUserType(string email) => Type;

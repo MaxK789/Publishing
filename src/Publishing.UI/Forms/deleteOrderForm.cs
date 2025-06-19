@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using Microsoft.Data.SqlClient;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
@@ -11,7 +9,7 @@ namespace Publishing
     public partial class deleteOrderForm : Form
     {
         private readonly INavigationService _navigation;
-        private readonly IDatabaseClient _db;
+        private readonly IOrderRepository _orderRepo;
 
         [Obsolete("Designer only", error: false)]
         public deleteOrderForm()
@@ -19,25 +17,20 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public deleteOrderForm(INavigationService navigation, IDatabaseClient db)
+        public deleteOrderForm(INavigationService navigation, IOrderRepository orderRepo)
         {
             _navigation = navigation;
-            _db = db;
+            _orderRepo = orderRepo;
             InitializeComponent();
         }
 
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        private async void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == dataGridView1.Columns["DeleteColumn"].Index && e.RowIndex >= 0)
             {
                 int idToDelete = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["idOrder"].Value);
 
-                List<SqlParameter> parameters = new List<SqlParameter>
-                {
-                    new SqlParameter("@id", idToDelete)
-                };
-
-                _db.ExecuteQueryWithoutResponse("DELETE FROM Orders WHERE idOrder = @id", parameters);
+                await _orderRepo.DeleteAsync(idToDelete).ConfigureAwait(false);
 
                 MessageBox.Show("Видалено idOrder: " + idToDelete.ToString());
 
@@ -69,7 +62,7 @@ namespace Publishing
             _navigation.Navigate<loginForm>(this);
         }
 
-        private void deleteOrderForm_Load(object sender, EventArgs e)
+        private async void deleteOrderForm_Load(object sender, EventArgs e)
         {
             string id = CurrentUser.UserId;
 
@@ -83,12 +76,7 @@ namespace Publishing
                 статистикаToolStripMenuItem.Visible = false;
                 змінитиДаніToolStripMenuItem.Visible = true;
 
-                List<SqlParameter> parameters = new List<SqlParameter>
-                {
-                    new SqlParameter("@id", id)
-                };
-
-                DataTable dataTable = _db.ExecuteQueryToDataTable("SELECT * FROM Orders where idPerson = @id", parameters);
+                DataTable dataTable = await _orderRepo.GetByPersonAsync(id).ConfigureAwait(false);
 
                 dataGridView1.DataSource = dataTable;
 
@@ -106,7 +94,7 @@ namespace Publishing
                 статистикаToolStripMenuItem.Visible = true;
                 змінитиДаніToolStripMenuItem.Visible = false;
 
-                DataTable dataTable = _db.ExecuteQueryToDataTable("SELECT * FROM Orders");
+                DataTable dataTable = await _orderRepo.GetAllAsync().ConfigureAwait(false);
 
                 dataGridView1.DataSource = dataTable;
 

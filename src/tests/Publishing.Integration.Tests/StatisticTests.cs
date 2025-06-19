@@ -2,7 +2,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
-using System.Reflection;
+using System.Linq;
+using Publishing.Core.Interfaces;
+using Publishing.Infrastructure;
 
 namespace Publishing.Integration.Tests
 {
@@ -13,6 +15,8 @@ namespace Publishing.Integration.Tests
         private const string DbName = "PublishingStat";
 
         private static string MasterConnection => $"Data Source={Server};Initial Catalog=master;Integrated Security=true";
+
+        private IDbContext _db = null!;
 
         [TestInitialize]
         public void Setup()
@@ -31,24 +35,22 @@ CREATE DATABASE [{DbName}];";
                 cmd.ExecuteNonQuery();
             }
 
-            SetInternalFields(Server, DbName);
-            Publishing.DataBase.OpenConnection();
+            var cs = $"Data Source={Server};Initial Catalog={DbName};Integrated Security=true";
+            _db = new SqlDbContext(cs);
 
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                "CREATE TABLE Person(idPerson INT IDENTITY(1,1) PRIMARY KEY, FName NVARCHAR(50));");
-            Publishing.DataBase.ExecuteQueryWithoutResponse(
-                "CREATE TABLE Orders(idOrder INT IDENTITY(1,1) PRIMARY KEY, idPerson INT, dateOrder DATETIME);");
+            _db.ExecuteAsync("CREATE TABLE Person(idPerson INT IDENTITY(1,1) PRIMARY KEY, FName NVARCHAR(50));").Wait();
+            _db.ExecuteAsync("CREATE TABLE Orders(idOrder INT IDENTITY(1,1) PRIMARY KEY, idPerson INT, dateOrder DATETIME);").Wait();
 
-            Publishing.DataBase.ExecuteQueryWithoutResponse("INSERT INTO Person(FName) VALUES('A');");
-            string id = Publishing.DataBase.ExecuteQuery("SELECT idPerson FROM Person");
+            _db.ExecuteAsync("INSERT INTO Person(FName) VALUES('A');").Wait();
+            int id = _db.QueryAsync<int>("SELECT idPerson FROM Person").Result.First();
 
-            Publishing.DataBase.ExecuteQueryWithoutResponse($"INSERT INTO Orders(idPerson,dateOrder) VALUES({id},'2024-01-10'),({id},'2024-01-20'),({id},'2024-02-05')");
+            _db.ExecuteAsync($"INSERT INTO Orders(idPerson,dateOrder) VALUES({id},'2024-01-10'),({id},'2024-01-20'),({id},'2024-02-05')").Wait();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            Publishing.DataBase.CloseConnection();
+            // nothing to dispose
             using (var con = new SqlConnection(MasterConnection))
             {
                 con.Open();
@@ -63,19 +65,12 @@ END";
             }
         }
 
-        private static void SetInternalFields(string server, string db)
-        {
-            var t = typeof(Publishing.DataBase);
-            var serverField = t.GetField("SQLServerName", BindingFlags.NonPublic | BindingFlags.Static);
-            var dbField = t.GetField("dataBaseName", BindingFlags.NonPublic | BindingFlags.Static);
-            serverField?.SetValue(null, server);
-            dbField?.SetValue(null, db);
-        }
 
         [TestMethod]
         public void Statistic_GeneratesSeries()
         {
-            var list = Publishing.DataBase.ExecuteQueryList("SELECT DATENAME(MONTH, dateOrder) AS M, COUNT(*) AS N FROM Orders GROUP BY DATENAME(MONTH, dateOrder) ORDER BY MIN(dateOrder)");
+            var list = DbContextExtensions.QueryStringListAsync(_db,
+                "SELECT DATENAME(MONTH, dateOrder) AS M, COUNT(*) AS N FROM Orders GROUP BY DATENAME(MONTH, dateOrder) ORDER BY MIN(dateOrder)").Result;
             Assert.AreEqual(2, list.Count);
             Assert.AreEqual("January", list[0][0]);
             Assert.AreEqual("2", list[0][1]);

@@ -1,5 +1,4 @@
 using System;
-using Microsoft.Data.SqlClient;
 using Publishing.Core.Interfaces;
 using Publishing.Services;
 using System.Windows.Forms;
@@ -22,18 +21,6 @@ namespace Publishing
             _authService = authService;
             _navigation = navigation;
             InitializeComponent();
-            try
-            {
-                _authService.OpenConnection();
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show(
-                    "Не вдалося з'єднатися з базою: " + ex.Message,
-                    "Помилка",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
         }
 
 
@@ -66,7 +53,6 @@ namespace Publishing
 
         private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            _authService.CloseConnection();
             Application.Exit();
         }
 

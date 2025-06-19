@@ -12,5 +12,7 @@ namespace Publishing.Core.Domain
         public DateTime DateFinish { get; set; }
         public OrderStatus Status { get; set; } = OrderStatus.InProgress;
         public decimal Price { get; set; }
+        public string PersonId { get; set; } = string.Empty;
+        public string Printery { get; set; } = string.Empty;
     }
 }
