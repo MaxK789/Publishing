@@ -11,7 +11,7 @@ The `Publishing.UI` project contains an `appsettings.json` file with a default c
 1. Install the EF Core tools if needed:
 
 ```bash
- dotnet tool install --global dotnet-ef
+ dotnet tool install --global dotnet-ef --version 6.0.*
 ```
 
 2. Add a new migration from the `Publishing.Infrastructure` project directory:
