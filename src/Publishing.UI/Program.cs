@@ -10,7 +10,6 @@ using Publishing.Core.Services;
 using Publishing.Infrastructure;
 using Publishing.Infrastructure.Repositories;
 using Publishing.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace Publishing
 {
@@ -34,13 +33,6 @@ namespace Publishing
             var services = new ServiceCollection();
             ConfigureServices(services);
             Services = services.BuildServiceProvider();
-
-            // apply pending migrations
-            using (var scope = Services.CreateScope())
-            {
-                var ctx = scope.ServiceProvider.GetRequiredService<Publishing.Infrastructure.Migrations.PublishingDbContext>();
-                ctx.Database.Migrate();
-            }
 
             var form = Services.GetRequiredService<loginForm>();
             Application.Run(form);
@@ -71,8 +63,6 @@ namespace Publishing
                 .Build();
 
             services.AddSingleton<IConfiguration>(configuration);
-            services.AddDbContext<Publishing.Infrastructure.Migrations.PublishingDbContext>(
-                options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IDbContext, SqlDbContext>();
             services.AddScoped<ILoginRepository, LoginRepository>();
             services.AddScoped<IAuthService, AuthService>();
