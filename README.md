@@ -6,7 +6,7 @@ This repository hosts a simple publishing workflow demo. Database schema is main
 
 The `Publishing.UI` project contains an `appsettings.json` file with a default connection string pointing to LocalDB.  The project file copies this file to the output directory so both the application and `dotnet ef` commands can use it automatically. During startup a dedicated initializer applies pending EF Core migrations so the schema stays in sync with the models.
 
-The infrastructure project explicitly includes all migration files as `<Compile>` items so they are part of the final assembly. This ensures `Database.MigrateAsync()` can locate migrations during integration tests.
+All EF Core migration files are compiled automatically since .NET SDK includes all `*.cs` files by default. This ensures `Database.MigrateAsync()` can locate migrations during integration tests.
 
 ## Working with migrations
 
