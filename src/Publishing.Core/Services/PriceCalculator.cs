@@ -8,8 +8,15 @@ namespace Publishing.Core.Services
     {
         public decimal Calculate(int pages, int copies, decimal pricePerPage)
         {
-            if (pages < 0 || copies < 0)
-                throw new ArgumentException("Values cannot be negative");
+            if (pages < 0)
+                throw new ArgumentException("Value cannot be negative", nameof(pages));
+            if (copies < 0)
+                throw new ArgumentException("Value cannot be negative", nameof(copies));
+            if (pricePerPage < 0)
+                throw new ArgumentException("Value cannot be negative", nameof(pricePerPage));
+
+            if (pages == 0 || copies == 0 || pricePerPage == 0m)
+                return 0m;
 
             decimal dPages = pages;
             decimal dCopies = copies;
