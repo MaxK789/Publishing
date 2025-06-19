@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Publishing.Core.Interfaces;
@@ -24,6 +26,10 @@ namespace Publishing
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            var culture = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+
             var services = new ServiceCollection();
             ConfigureServices(services);
             Services = services.BuildServiceProvider();
@@ -44,6 +50,7 @@ namespace Publishing
 
         private static void ConfigureServices(ServiceCollection services)
         {
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IStatisticRepository, StatisticRepository>();
             services.AddScoped<IProfileRepository, ProfileRepository>();

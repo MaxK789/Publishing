@@ -3,6 +3,7 @@ using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
 using System.Windows.Forms;
 using Publishing.Services;
+using Microsoft.Extensions.Localization;
 
 namespace Publishing
 {
@@ -10,16 +11,18 @@ namespace Publishing
     {
         private readonly IOrderService _orderService;
         private readonly INavigationService _navigation;
+        private readonly IStringLocalizer<SharedResource> _localizer;
         [Obsolete("Designer only", error: false)]
         public addOrderForm()
         {
             InitializeComponent();
         }
 
-        public addOrderForm(IOrderService orderService, INavigationService navigation)
+        public addOrderForm(IOrderService orderService, INavigationService navigation, IStringLocalizer<SharedResource> localizer)
         {
             _orderService = orderService;
             _navigation = navigation;
+            _localizer = localizer;
             InitializeComponent();
         }
 
@@ -59,13 +62,13 @@ namespace Publishing
         {
             if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
             {
-                MessageBox.Show("pagesNumParse");
+                MessageBox.Show(_localizer["PagesNumParse"]);
                 return;
             }
 
             if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
             {
-                MessageBox.Show("tirageParse");
+                MessageBox.Show(_localizer["TirageParse"]);
                 return;
             }
 
@@ -91,13 +94,13 @@ namespace Publishing
 
             if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
             {
-                MessageBox.Show("pagesNumParse");
+                MessageBox.Show(_localizer["PagesNumParse"]);
                 return;
             }
 
             if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
             {
-                MessageBox.Show("tirageParse");
+                MessageBox.Show(_localizer["TirageParse"]);
                 return;
             }
 
@@ -113,7 +116,7 @@ namespace Publishing
 
             var order = await _orderService.CreateOrderAsync(dto).ConfigureAwait(false);
 
-            MessageBox.Show("Замовлення успішно додано");
+            MessageBox.Show(_localizer["OrderAdded"]);
             totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
 
             _navigation.Navigate<mainForm>(this);

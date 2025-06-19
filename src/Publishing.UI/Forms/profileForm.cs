@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
+using Microsoft.Extensions.Localization;
 
 namespace Publishing
 {
@@ -10,6 +11,7 @@ namespace Publishing
     {
         private readonly INavigationService _navigation;
         private readonly IProfileRepository _profileRepo;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
         [Obsolete("Designer only", error: false)]
         public profileForm()
@@ -17,10 +19,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public profileForm(INavigationService navigation, IProfileRepository profileRepo)
+        public profileForm(INavigationService navigation, IProfileRepository profileRepo, IStringLocalizer<SharedResource> localizer)
         {
             _navigation = navigation;
             _profileRepo = profileRepo;
+            _localizer = localizer;
             InitializeComponent();
         }
 
@@ -43,7 +46,7 @@ namespace Publishing
             bool exists = await _profileRepo.EmailExistsAsync(email).ConfigureAwait(false);
             if (exists)
             {
-                MessageBox.Show("Email вже використовується");
+                MessageBox.Show(_localizer["EmailExists"]);
                 return;
             }
 
@@ -61,7 +64,7 @@ namespace Publishing
                 string pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$";
                 if (!Regex.IsMatch(email, pattern))
                 {
-                    MessageBox.Show("Email is not valid");
+                    MessageBox.Show(_localizer["InvalidEmail"]);
                     return;
                 }
                 count++;
@@ -86,7 +89,7 @@ namespace Publishing
             {
                 await _profileRepo.UpdateAsync(id, fName, lName, email, status, phone, fax, address).ConfigureAwait(false);
 
-                MessageBox.Show("Дані успішно змінено");
+                MessageBox.Show(_localizer["DataChanged"]);
 
                 _navigation.Navigate<mainForm>(this);
             }

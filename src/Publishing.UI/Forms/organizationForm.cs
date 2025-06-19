@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
+using Microsoft.Extensions.Localization;
 
 namespace Publishing
 {
@@ -10,6 +11,7 @@ namespace Publishing
     {
         private readonly INavigationService _navigation;
         private readonly IOrganizationRepository _orgRepo;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
         [Obsolete("Designer only", error: false)]
         public organizationForm()
@@ -17,10 +19,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public organizationForm(INavigationService navigation, IOrganizationRepository orgRepo)
+        public organizationForm(INavigationService navigation, IOrganizationRepository orgRepo, IStringLocalizer<SharedResource> localizer)
         {
             _navigation = navigation;
             _orgRepo = orgRepo;
+            _localizer = localizer;
             InitializeComponent();
         }
 
@@ -50,7 +53,7 @@ namespace Publishing
                 string pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$";
                 if (!Regex.IsMatch(email, pattern))
                 {
-                    MessageBox.Show("Email is not valid");
+                    MessageBox.Show(_localizer["InvalidEmail"]);
                     return;
                 }
 
@@ -59,7 +62,7 @@ namespace Publishing
             else
             {
                 await _orgRepo.UpdateAsync(id, orgName, email, phone, fax, address).ConfigureAwait(false);
-                MessageBox.Show("Дані успішно змінено");
+                MessageBox.Show(_localizer["DataChanged"]);
 
                 _navigation.Navigate<mainForm>(this);
             }

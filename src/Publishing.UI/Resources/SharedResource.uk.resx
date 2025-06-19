@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Resources.Extensions</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Resources.Extensions</value>
+  </resheader>
+  <data name="PagesNumParse" xml:space="preserve">
+    <value>Невірне значення кількості сторінок</value>
+  </data>
+  <data name="TirageParse" xml:space="preserve">
+    <value>Невірний наклад</value>
+  </data>
+  <data name="OrderAdded" xml:space="preserve">
+    <value>Замовлення успішно додано</value>
+  </data>
+  <data name="DeleteOrderId" xml:space="preserve">
+    <value>Видалено idOrder: {0}</value>
+  </data>
+  <data name="WelcomeUser" xml:space="preserve">
+    <value>Вітаємо, {0} ({1})!</value>
+  </data>
+  <data name="InvalidEmailOrPassword" xml:space="preserve">
+    <value>Невірна електронна пошта або пароль</value>
+  </data>
+  <data name="InvalidEmail" xml:space="preserve">
+    <value>Email некоректний</value>
+  </data>
+  <data name="DataChanged" xml:space="preserve">
+    <value>Дані успішно змінено</value>
+  </data>
+  <data name="EmailExists" xml:space="preserve">
+    <value>Email вже використовується</value>
+  </data>
+</root>

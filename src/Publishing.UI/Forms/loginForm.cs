@@ -2,6 +2,7 @@ using System;
 using Publishing.Core.Interfaces;
 using Publishing.Services;
 using System.Windows.Forms;
+using Microsoft.Extensions.Localization;
 
 namespace Publishing
 {
@@ -9,6 +10,7 @@ namespace Publishing
     {
         private readonly IAuthService _authService;
         private readonly INavigationService _navigation;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
         [Obsolete("Designer only", error: false)]
         public loginForm()
@@ -16,10 +18,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public loginForm(IAuthService authService, INavigationService navigation)
+        public loginForm(IAuthService authService, INavigationService navigation, IStringLocalizer<SharedResource> localizer)
         {
             _authService = authService;
             _navigation = navigation;
+            _localizer = localizer;
             InitializeComponent();
         }
 
@@ -38,11 +41,11 @@ namespace Publishing
                 CurrentUser.UserName = user.Name;
 
                 _navigation.Navigate<mainForm>(this);
-                MessageBox.Show("Вітаємо, " + CurrentUser.UserName + " (" + CurrentUser.UserType + ")!");
+                MessageBox.Show(_localizer["WelcomeUser", CurrentUser.UserName, CurrentUser.UserType]);
             }
             else
             {
-                MessageBox.Show("Невірна електронна пошта або пароль");
+                MessageBox.Show(_localizer["InvalidEmailOrPassword"]);
             }
         }
 

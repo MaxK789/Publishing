@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Resources.Extensions</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Resources.Extensions</value>
+  </resheader>
+  <data name="PagesNumParse" xml:space="preserve">
+    <value>Invalid page number</value>
+  </data>
+  <data name="TirageParse" xml:space="preserve">
+    <value>Invalid tirage number</value>
+  </data>
+  <data name="OrderAdded" xml:space="preserve">
+    <value>Order successfully added</value>
+  </data>
+  <data name="DeleteOrderId" xml:space="preserve">
+    <value>Deleted order id {0}</value>
+  </data>
+  <data name="WelcomeUser" xml:space="preserve">
+    <value>Welcome, {0} ({1})!</value>
+  </data>
+  <data name="InvalidEmailOrPassword" xml:space="preserve">
+    <value>Invalid email or password</value>
+  </data>
+  <data name="InvalidEmail" xml:space="preserve">
+    <value>Email is not valid</value>
+  </data>
+  <data name="DataChanged" xml:space="preserve">
+    <value>Data successfully changed</value>
+  </data>
+  <data name="EmailExists" xml:space="preserve">
+    <value>Email already in use</value>
+  </data>
+</root>

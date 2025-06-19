@@ -3,6 +3,7 @@ using System.Data;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
+using Microsoft.Extensions.Localization;
 
 namespace Publishing
 {
@@ -10,6 +11,7 @@ namespace Publishing
     {
         private readonly INavigationService _navigation;
         private readonly IOrderRepository _orderRepo;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
         [Obsolete("Designer only", error: false)]
         public deleteOrderForm()
@@ -17,10 +19,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public deleteOrderForm(INavigationService navigation, IOrderRepository orderRepo)
+        public deleteOrderForm(INavigationService navigation, IOrderRepository orderRepo, IStringLocalizer<SharedResource> localizer)
         {
             _navigation = navigation;
             _orderRepo = orderRepo;
+            _localizer = localizer;
             InitializeComponent();
         }
 
@@ -32,7 +35,7 @@ namespace Publishing
 
                 await _orderRepo.DeleteAsync(idToDelete).ConfigureAwait(false);
 
-                MessageBox.Show("Видалено idOrder: " + idToDelete.ToString());
+                MessageBox.Show(string.Format(_localizer["DeleteOrderId"], idToDelete));
 
                 dataGridView1.Rows.RemoveAt(e.RowIndex);
             }

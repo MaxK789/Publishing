@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Publishing.Core.Interfaces;
 using Publishing.Services;
+using Microsoft.Extensions.Localization;
 
 namespace Publishing
 {
@@ -11,6 +12,7 @@ namespace Publishing
     {
         private readonly IAuthService _authService;
         private readonly INavigationService _navigation;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
         [Obsolete("Designer only", error: false)]
         public registrationForm()
@@ -18,10 +20,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public registrationForm(IAuthService authService, INavigationService navigation)
+        public registrationForm(IAuthService authService, INavigationService navigation, IStringLocalizer<SharedResource> localizer)
         {
             _authService = authService;
             _navigation = navigation;
+            _localizer = localizer;
             InitializeComponent();
         }
 
@@ -39,7 +42,7 @@ namespace Publishing
             string pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$";
             if (!Regex.IsMatch(email, pattern))
             {
-                MessageBox.Show("Email is not valid");
+                MessageBox.Show(_localizer["InvalidEmail"]);
                 return;
             }
             string status = statusBox.SelectedItem?.ToString();
@@ -58,7 +61,7 @@ namespace Publishing
                 CurrentUser.UserName = user.Name;
 
                 _navigation.Navigate<mainForm>(this);
-                MessageBox.Show("Вітаємо, " + CurrentUser.UserName + " (" + CurrentUser.UserType + ")!");
+                MessageBox.Show(_localizer["WelcomeUser", CurrentUser.UserName, CurrentUser.UserType]);
             }
             catch (Exception ex)
             {
