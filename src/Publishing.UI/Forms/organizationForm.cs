@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Publishing
 {
@@ -161,7 +162,7 @@ namespace Publishing
         private void організаціяToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Hide();
-            organizationForm orgF = new organizationForm();
+            var orgF = Program.Services.GetRequiredService<organizationForm>();
             orgF.Show();
         }
 
@@ -172,7 +173,7 @@ namespace Publishing
             CurrentUser.UserType = "";
 
             this.Hide();
-            loginForm logForm = new loginForm();
+            var logForm = Program.Services.GetRequiredService<loginForm>();
             logForm.Show();
         }
     }

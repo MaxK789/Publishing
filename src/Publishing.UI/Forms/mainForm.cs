@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Windows.Forms;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Publishing
 {
@@ -24,7 +25,7 @@ namespace Publishing
             CurrentUser.UserType = "";
 
             this.Hide();
-            loginForm logForm = new loginForm();
+            var logForm = Program.Services.GetRequiredService<loginForm>();
             logForm.Show();
         }
 

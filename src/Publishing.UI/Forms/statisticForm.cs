@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Windows.Forms;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Publishing
 {
@@ -56,7 +57,7 @@ namespace Publishing
             CurrentUser.UserType = "";
 
             this.Hide();
-            loginForm logForm = new loginForm();
+            var logForm = Program.Services.GetRequiredService<loginForm>();
             logForm.Show();
         }
 
@@ -188,7 +189,7 @@ namespace Publishing
             CurrentUser.UserType = "";
 
             this.Hide();
-            loginForm logForm = new loginForm();
+            var logForm = Program.Services.GetRequiredService<loginForm>();
             logForm.Show();
         }
     }

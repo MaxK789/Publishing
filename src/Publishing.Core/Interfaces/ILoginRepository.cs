@@ -9,6 +9,9 @@ namespace Publishing.Core.Interfaces
         string? GetUserId(string email);
         string? GetUserType(string email);
         string? GetUserName(string email);
+        bool EmailExists(string email);
+        int InsertPerson(string fName, string lName, string email, string status);
+        void InsertPassword(string hashedPassword, int personId);
         void CloseConnection();
     }
 }
