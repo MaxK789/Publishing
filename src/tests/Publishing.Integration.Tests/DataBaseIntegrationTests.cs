@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Publishing.Core.Interfaces;
 using Publishing.Infrastructure;
 
@@ -22,6 +23,7 @@ namespace Publishing.Integration.Tests
 
         private IDbContext _db = null!;
         private IDbHelper _helper = null!;
+        private ServiceProvider _serviceProvider = null!;
 
         [TestInitialize]
         public void Setup()
@@ -47,21 +49,31 @@ CREATE DATABASE [{DbName}];";
                     ["ConnectionStrings:DefaultConnection"] = cs
                 })
                 .Build();
-            var factory = new SqlDbConnectionFactory(config);
-            _db = new DapperDbContext(factory);
-            _helper = new DbHelper(_db);
+            var services = new ServiceCollection();
+            services.AddSingleton<IConfiguration>(config);
+            services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
+            services.AddTransient<IDbContext, DapperDbContext>();
+            services.AddTransient<IDbHelper, DbHelper>();
+            services.AddDbContext<AppDbContext>(o => o.UseSqlServer(cs));
+            services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
 
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(cs)
-                .Options;
-            var initializer = new DatabaseInitializer(new AppDbContext(options));
-            initializer.InitializeAsync().Wait();
+            _serviceProvider = services.BuildServiceProvider();
+
+            using var scope = _serviceProvider.CreateScope();
+            scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>()
+                .InitializeAsync().Wait();
+
+            _db = scope.ServiceProvider.GetRequiredService<IDbContext>();
+            _helper = scope.ServiceProvider.GetRequiredService<IDbHelper>();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            // nothing to dispose
+            if (_serviceProvider is not null)
+            {
+                _serviceProvider.Dispose();
+            }
             using (var con = new SqlConnection(MasterConnection))
             {
                 con.Open();

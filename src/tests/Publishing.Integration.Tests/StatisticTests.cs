@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Publishing.Core.Interfaces;
 using Publishing.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Publishing.Integration.Tests
 {
@@ -20,6 +21,7 @@ namespace Publishing.Integration.Tests
 
         private IDbContext _db = null!;
         private IDbHelper _helper = null!;
+        private ServiceProvider _serviceProvider = null!;
 
         [TestInitialize]
         public void Setup()
@@ -45,16 +47,22 @@ CREATE DATABASE [{DbName}];";
                     ["ConnectionStrings:DefaultConnection"] = cs
                 })
                 .Build();
-            var factory = new SqlDbConnectionFactory(config);
-            _db = new DapperDbContext(factory);
-            _helper = new DbHelper(_db);
+            var services = new ServiceCollection();
+            services.AddSingleton<IConfiguration>(config);
+            services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
+            services.AddTransient<IDbContext, DapperDbContext>();
+            services.AddTransient<IDbHelper, DbHelper>();
+            services.AddDbContext<AppDbContext>(o => o.UseSqlServer(cs));
+            services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
 
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(cs)
-                .Options;
-            var efContext = new AppDbContext(options);
-            var initializer = new DatabaseInitializer(efContext);
-            initializer.InitializeAsync().Wait();
+            _serviceProvider = services.BuildServiceProvider();
+
+            using var scope = _serviceProvider.CreateScope();
+            scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>()
+                .InitializeAsync().Wait();
+
+            _db = scope.ServiceProvider.GetRequiredService<IDbContext>();
+            _helper = scope.ServiceProvider.GetRequiredService<IDbHelper>();
 
             _db.ExecuteAsync("INSERT INTO Person(FName,LName,emailPerson,typePerson) VALUES('A','B','x@y.com','user');").Wait();
             int id = _db.QueryAsync<int>("SELECT idPerson FROM Person").Result.First();
@@ -65,7 +73,10 @@ CREATE DATABASE [{DbName}];";
         [TestCleanup]
         public void Cleanup()
         {
-            // nothing to dispose
+            if (_serviceProvider is not null)
+            {
+                _serviceProvider.Dispose();
+            }
             using (var con = new SqlConnection(MasterConnection))
             {
                 con.Open();
