@@ -27,9 +27,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <!-- Ensure EF Core migrations are compiled into the assembly -->
-  <ItemGroup>
-    <Compile Include="Migrations\**\*.cs" />
-  </ItemGroup>
-
 </Project>
