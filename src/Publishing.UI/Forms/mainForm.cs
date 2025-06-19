@@ -77,8 +77,8 @@ namespace Publishing
                 додатиToolStripMenuItem.Visible = false;
             }
 
-            await _orderRepo.UpdateExpiredAsync();
-            DataTable dataTable = await _orderRepo.GetActiveAsync();
+            await _orderRepo.UpdateExpiredAsync().ConfigureAwait(false);
+            DataTable dataTable = await _orderRepo.GetActiveAsync().ConfigureAwait(false);
 
             dataGridView1.DataSource = dataTable;
         }

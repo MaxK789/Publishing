@@ -43,7 +43,7 @@ namespace Publishing
             string fax = faxTextBox.Text;
             string address = addressTextBox.Text;
 
-            string? checkName = await _orgRepo.GetNameIfExistsAsync(orgName);
+            string? checkName = await _orgRepo.GetNameIfExistsAsync(orgName).ConfigureAwait(false);
 
             if (!orgName.Equals(checkName))
             {
@@ -54,11 +54,11 @@ namespace Publishing
                     return;
                 }
 
-                await _orgRepo.InsertAsync(orgName, email, phone, fax, address, id);
+                await _orgRepo.InsertAsync(orgName, email, phone, fax, address, id).ConfigureAwait(false);
             }
             else
             {
-                await _orgRepo.UpdateAsync(id, orgName, email, phone, fax, address);
+                await _orgRepo.UpdateAsync(id, orgName, email, phone, fax, address).ConfigureAwait(false);
                 MessageBox.Show("Дані успішно змінено");
 
                 _navigation.Navigate<mainForm>(this);

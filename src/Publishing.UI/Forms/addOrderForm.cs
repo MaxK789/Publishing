@@ -79,7 +79,7 @@ namespace Publishing
                 PersonId = CurrentUser.UserId
             };
 
-            var order = await _orderService.CreateOrderAsync(dto);
+            var order = await _orderService.CreateOrderAsync(dto).ConfigureAwait(false);
             totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
         }
 
@@ -111,7 +111,7 @@ namespace Publishing
                 PersonId = CurrentUser.UserId
             };
 
-            var order = await _orderService.CreateOrderAsync(dto);
+            var order = await _orderService.CreateOrderAsync(dto).ConfigureAwait(false);
 
             MessageBox.Show("Замовлення успішно додано");
             totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
