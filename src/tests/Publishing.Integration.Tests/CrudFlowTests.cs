@@ -60,16 +60,8 @@ CREATE DATABASE [{DbName}];";
 
             _serviceProvider = services.BuildServiceProvider();
             using var scope = _serviceProvider.CreateScope();
-            var ctx = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            var pending = ctx.Database.GetPendingMigrations().ToList();
-            Console.WriteLine($"[CrudFlow] Pending before migrate: {string.Join(", ", pending)}");
-
             scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>()
                 .InitializeAsync().Wait();
-
-            pending = ctx.Database.GetPendingMigrations().ToList();
-            Console.WriteLine($"[CrudFlow] Pending after  migrate: {string.Join(", ", pending)}");
-
             _db = scope.ServiceProvider.GetRequiredService<IDbContext>();
         }
 
