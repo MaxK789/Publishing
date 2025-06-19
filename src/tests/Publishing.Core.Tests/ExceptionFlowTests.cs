@@ -4,6 +4,8 @@ using Publishing.Core.Services;
 using Publishing.Core.DTOs;
 using Publishing.Core.Domain;
 using System;
+using System.Data;
+using System.Threading.Tasks;
 
 namespace Publishing.Core.Tests
 {
@@ -59,8 +61,7 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void OrderService_ThrowsOnNullDto()
+        public async Task OrderService_ThrowsOnNullDto()
         {
             var service = new OrderService(
                 new StubOrderRepository(),
@@ -69,7 +70,8 @@ namespace Publishing.Core.Tests
                 new PriceCalculator(),
                 new StubValidator(),
                 new StubDateTimeProvider());
-            service.CreateOrder(null);
+            await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () =>
+                await service.CreateOrderAsync(null));
         }
     }
 }
