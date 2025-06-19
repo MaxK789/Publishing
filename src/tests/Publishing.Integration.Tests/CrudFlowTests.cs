@@ -9,7 +9,6 @@ using Publishing.Infrastructure;
 using BCrypt.Net;
 using Publishing.Core.Services;
 using Publishing.Infrastructure.Repositories;
-using Publishing.Infrastructure.DataAccess;
 
 namespace Publishing.Integration.Tests
 {
@@ -20,6 +19,8 @@ namespace Publishing.Integration.Tests
         private const string DbName = "PublishingCrud";
 
         private static string MasterConnection => $"Data Source={Server};Initial Catalog=master;Integrated Security=true";
+
+        private IDbContext _db = null!;
 
         [TestInitialize]
         public void Setup()
