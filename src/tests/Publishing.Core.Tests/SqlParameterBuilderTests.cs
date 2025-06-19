@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System;
 using Microsoft.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Data;
 
 namespace Publishing.Core.Tests
 {

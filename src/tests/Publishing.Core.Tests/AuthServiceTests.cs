@@ -3,6 +3,8 @@ using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using Publishing.Core.DTOs;
 using BCrypt.Net;
+using System.Threading.Tasks;
+using System.Data;
 
 namespace Publishing.Core.Tests
 {

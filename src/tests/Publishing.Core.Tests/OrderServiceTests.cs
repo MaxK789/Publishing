@@ -4,6 +4,8 @@ using Publishing.Core.Domain;
 using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using System;
+using System.Threading.Tasks;
+using System.Data;
 
 namespace Publishing.Core.Tests
 {
