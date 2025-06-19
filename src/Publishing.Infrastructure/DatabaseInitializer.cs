@@ -14,7 +14,10 @@ namespace Publishing.Infrastructure
 
         public Task InitializeAsync()
         {
-            return _context.Database.MigrateAsync();
+            // For simpler integration testing we ensure the schema exists
+            // rather than running migrations. This works because the model is
+            // kept in sync with EF Core 6.
+            return _context.Database.EnsureCreatedAsync();
         }
     }
 }
