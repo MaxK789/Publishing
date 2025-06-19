@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using System;
 using BCrypt.Net;
 using Publishing.Core.DTOs;

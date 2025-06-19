@@ -1,8 +1,7 @@
 using System.Threading.Tasks;
-using Publishing.Core.DTOs;
-
 namespace Publishing.Core.Interfaces
 {
+    using Publishing.Core.DTOs;
 
     public interface IAuthService
     {
