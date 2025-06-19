@@ -55,7 +55,7 @@ namespace Publishing
                 організаціяToolStripMenuItem.Visible = false;
         }
 
-        private void calculateButton_Click(object sender, EventArgs e)
+        private async void calculateButton_Click(object sender, EventArgs e)
         {
             if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
             {
@@ -79,11 +79,11 @@ namespace Publishing
                 PersonId = CurrentUser.UserId
             };
 
-            var order = _orderService.CreateOrder(dto);
+            var order = await _orderService.CreateOrderAsync(dto).ConfigureAwait(false);
             totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
         }
 
-        private void orderButton_Click(object sender, EventArgs e)
+        private async void orderButton_Click(object sender, EventArgs e)
         {
             string type = typeBox.SelectedItem?.ToString();
             if (type == null)
@@ -111,7 +111,7 @@ namespace Publishing
                 PersonId = CurrentUser.UserId
             };
 
-            var order = _orderService.CreateOrder(dto);
+            var order = await _orderService.CreateOrderAsync(dto).ConfigureAwait(false);
 
             MessageBox.Show("Замовлення успішно додано");
             totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();

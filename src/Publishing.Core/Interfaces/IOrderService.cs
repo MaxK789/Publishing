@@ -1,10 +1,11 @@
 using Publishing.Core.Domain;
 using Publishing.Core.DTOs;
+using System.Threading.Tasks;
 
 namespace Publishing.Core.Interfaces
 {
     public interface IOrderService
     {
-        Order CreateOrder(CreateOrderDto dto);
+        Task<Order> CreateOrderAsync(CreateOrderDto dto);
     }
 }
