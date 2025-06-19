@@ -36,39 +36,32 @@ namespace Publishing
 
         private async void changeButton_Click(object sender, EventArgs e)
         {
-            try
+            string id = CurrentUser.UserId;
+            string orgName = orgNameTextBox.Text;
+            string email = emailTextBox.Text;            
+            string phone = phoneTextBox.Text;
+            string fax = faxTextBox.Text;
+            string address = addressTextBox.Text;
+
+            string? checkName = await _orgRepo.GetNameIfExistsAsync(orgName);
+
+            if (!orgName.Equals(checkName))
             {
-                string id = CurrentUser.UserId;
-                string orgName = orgNameTextBox.Text;
-                string email = emailTextBox.Text;
-                string phone = phoneTextBox.Text;
-                string fax = faxTextBox.Text;
-                string address = addressTextBox.Text;
-
-                string? checkName = await _orgRepo.GetNameIfExistsAsync(orgName);
-
-                if (!orgName.Equals(checkName))
+                string pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$";
+                if (!Regex.IsMatch(email, pattern))
                 {
-                    string pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$";
-                    if (!Regex.IsMatch(email, pattern))
-                    {
-                        MessageBox.Show("Email is not valid");
-                        return;
-                    }
-
-                    await _orgRepo.InsertAsync(orgName, email, phone, fax, address, id);
+                    MessageBox.Show("Email is not valid");
+                    return;
                 }
-                else
-                {
-                    await _orgRepo.UpdateAsync(id, orgName, email, phone, fax, address);
-                    MessageBox.Show("Дані успішно змінено");
 
-                    _navigation.Navigate<mainForm>(this);
-                }
+                await _orgRepo.InsertAsync(orgName, email, phone, fax, address, id);
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                await _orgRepo.UpdateAsync(id, orgName, email, phone, fax, address);
+                MessageBox.Show("Дані успішно змінено");
+
+                _navigation.Navigate<mainForm>(this);
             }
         }
 
