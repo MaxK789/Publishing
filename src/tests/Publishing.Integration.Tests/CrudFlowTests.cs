@@ -47,7 +47,8 @@ CREATE DATABASE [{DbName}];";
                     ["ConnectionStrings:DefaultConnection"] = cs
                 })
                 .Build();
-            _db = new SqlDbContext(config);
+            var factory = new SqlDbConnectionFactory(config);
+            _db = new SqlDbContext(factory);
 
             // create minimal schema
             _db.ExecuteAsync(

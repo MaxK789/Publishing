@@ -18,6 +18,7 @@ namespace Publishing.Integration.Tests
         private static string MasterConnection => $"Data Source={Server};Initial Catalog=master;Integrated Security=true";
 
         private IDbContext _db = null!;
+        private IDbHelper _helper = null!;
 
         [TestInitialize]
         public void Setup()
@@ -43,7 +44,9 @@ CREATE DATABASE [{DbName}];";
                     ["ConnectionStrings:DefaultConnection"] = cs
                 })
                 .Build();
-            _db = new SqlDbContext(config);
+            var factory = new SqlDbConnectionFactory(config);
+            _db = new SqlDbContext(factory);
+            _helper = new DbHelper(_db);
 
             _db.ExecuteAsync("CREATE TABLE Person(idPerson INT IDENTITY(1,1) PRIMARY KEY, FName NVARCHAR(50));").Wait();
             _db.ExecuteAsync("CREATE TABLE Orders(idOrder INT IDENTITY(1,1) PRIMARY KEY, idPerson INT, dateOrder DATETIME);").Wait();
@@ -76,7 +79,7 @@ END";
         [TestMethod]
         public void Statistic_GeneratesSeries()
         {
-            var list = DbContextExtensions.QueryStringListAsync(_db,
+            var list = _helper.QueryStringListAsync(
                 "SELECT DATENAME(MONTH, dateOrder) AS M, COUNT(*) AS N FROM Orders GROUP BY DATENAME(MONTH, dateOrder) ORDER BY MIN(dateOrder)").Result;
             Assert.AreEqual(2, list.Count);
             Assert.AreEqual("January", list[0][0]);
