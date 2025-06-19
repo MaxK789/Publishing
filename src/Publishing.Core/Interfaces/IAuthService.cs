@@ -4,7 +4,7 @@ namespace Publishing.Core.Interfaces
 
     public interface IAuthService
     {
-        Task<UserDto?> AuthenticateAsync(string email, string password);
-        Task<UserDto> RegisterAsync(string firstName, string lastName, string email, string status, string password);
+        UserDto? Authenticate(string email, string password);
+        UserDto Register(string firstName, string lastName, string email, string status, string password);
     }
 }

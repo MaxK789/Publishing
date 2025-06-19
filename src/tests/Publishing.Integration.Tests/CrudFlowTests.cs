@@ -10,7 +10,6 @@ using Publishing.Infrastructure;
 using BCrypt.Net;
 using Publishing.Core.Services;
 using Publishing.Infrastructure.Repositories;
-using System.Threading.Tasks;
 
 namespace Publishing.Integration.Tests
 {
@@ -89,7 +88,7 @@ END";
         }
 
         [TestMethod]
-        public async Task Login_SetsCurrentUser()
+        public void Login_SetsCurrentUser()
         {
             string hash = BCrypt.Net.BCrypt.HashPassword("pass", 11);
             _db.ExecuteAsync("INSERT INTO Person(FName,LName,emailPerson,typePerson) VALUES('A','B','c@d.com','user');").Wait();
@@ -97,7 +96,7 @@ END";
             _db.ExecuteAsync($"INSERT INTO Pass(password,idPerson) VALUES('{hash}', {id})").Wait();
 
             var service = new AuthService(new LoginRepository(_db));
-            var user = await service.AuthenticateAsync("c@d.com", "pass");
+            var user = service.Authenticate("c@d.com", "pass");
 
             Assert.IsNotNull(user);
             Assert.AreEqual(id, user!.Id);
