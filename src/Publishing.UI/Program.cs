@@ -28,6 +28,9 @@ namespace Publishing
             ConfigureServices(services);
             Services = services.BuildServiceProvider();
 
+            var migrator = Services.GetRequiredService<IDatabaseInitializer>();
+            migrator.Initialize();
+
             var form = Services.GetRequiredService<loginForm>();
             Application.Run(form);
 
@@ -62,6 +65,7 @@ namespace Publishing
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<INavigationService, NavigationService>();
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IDatabaseInitializer, DatabaseMigrator>();
             services.AddTransient<loginForm>();
             services.AddTransient<registrationForm>();
             services.AddTransient<addOrderForm>();
