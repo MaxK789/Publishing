@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using System.Linq;
 using Publishing.Core.Interfaces;
@@ -38,7 +39,13 @@ CREATE DATABASE [{DbName}];";
             }
 
             var cs = $"Data Source={Server};Initial Catalog={DbName};Integrated Security=true";
-            _db = new SqlDbContext(cs);
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    ["ConnectionStrings:DefaultConnection"] = cs
+                })
+                .Build();
+            _db = new SqlDbContext(config);
         }
 
         [TestCleanup]
