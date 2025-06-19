@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.22" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.22" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.22" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Publishing.Core\Publishing.Core.csproj" />
