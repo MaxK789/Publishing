@@ -24,12 +24,12 @@ namespace Publishing
         }
 
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
             string email = emailTextBox.Text;
             string password = passwordTextBox.Text;
 
-            var user = _authService.Authenticate(email, password);
+            var user = await _authService.AuthenticateAsync(email, password).ConfigureAwait(false);
 
             if (user != null)
             {
