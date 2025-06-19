@@ -21,8 +21,14 @@ namespace Publishing
         [STAThread]
         static void Main()
         {
+            Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            // Global handlers for unhandled exceptions
+            Application.ThreadException += (s, e) => ShowGlobalException(e.Exception);
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+                ShowGlobalException(e.ExceptionObject as Exception);
 
             var services = new ServiceCollection();
             ConfigureServices(services);
@@ -67,6 +73,19 @@ namespace Publishing
             services.AddTransient<profileForm>();
             services.AddTransient<organizationForm>();
             services.AddTransient<statisticForm>();
+        }
+
+        private static void ShowGlobalException(Exception? ex)
+        {
+            if (ex == null) return;
+            // MessageBoxOptions.ServiceNotification shows the dialog above all windows
+            MessageBox.Show(
+                ex.ToString(),
+                "Unhandled Exception",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error,
+                MessageBoxDefaultButton.Button1,
+                MessageBoxOptions.ServiceNotification);
         }
     }
 }
