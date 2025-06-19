@@ -6,7 +6,7 @@ namespace Publishing.Infrastructure.Entities
     public class Order
     {
         public int Id { get; set; }
-        public int ProductId { get; set; }
+        public int? ProductId { get; set; }
         public int PersonId { get; set; }
         public string NamePrintery { get; set; } = string.Empty;
         public DateTime DateOrder { get; set; }

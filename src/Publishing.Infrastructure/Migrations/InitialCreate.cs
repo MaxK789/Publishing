@@ -74,7 +74,7 @@ namespace Publishing.Infrastructure.Migrations
                 {
                     idOrder = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    idProduct = table.Column<int>(nullable: false),
+                    idProduct = table.Column<int>(nullable: true),
                     idPerson = table.Column<int>(nullable: false),
                     namePrintery = table.Column<string>(nullable: false),
                     dateOrder = table.Column<DateTime>(nullable: false),

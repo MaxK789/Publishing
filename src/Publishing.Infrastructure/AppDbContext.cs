@@ -62,7 +62,9 @@ namespace Publishing.Infrastructure
                 entity.ToTable("Orders");
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasColumnName("idOrder");
-                entity.Property(e => e.ProductId).HasColumnName("idProduct");
+                entity.Property(e => e.ProductId)
+                      .HasColumnName("idProduct")
+                      .IsRequired(false);
                 entity.Property(e => e.PersonId).HasColumnName("idPerson");
                 entity.Property(e => e.NamePrintery).HasColumnName("namePrintery");
                 entity.Property(e => e.DateOrder).HasColumnName("dateOrder");
