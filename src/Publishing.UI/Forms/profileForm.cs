@@ -40,7 +40,7 @@ namespace Publishing
             string fax = faxTextBox.Text;
             string address = addressTextBox.Text;
 
-            bool exists = await _profileRepo.EmailExistsAsync(email);
+            bool exists = await _profileRepo.EmailExistsAsync(email).ConfigureAwait(false);
             if (exists)
             {
                 MessageBox.Show("Email вже використовується");
@@ -84,7 +84,7 @@ namespace Publishing
             }
             if (count > 0)
             {
-                await _profileRepo.UpdateAsync(id, fName, lName, email, status, phone, fax, address);
+                await _profileRepo.UpdateAsync(id, fName, lName, email, status, phone, fax, address).ConfigureAwait(false);
 
                 MessageBox.Show("Дані успішно змінено");
 
