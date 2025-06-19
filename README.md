@@ -14,7 +14,7 @@ The `Publishing.UI` project contains an `appsettings.json` file with a default c
  dotnet tool install --global dotnet-ef --version 6.0.*
 ```
 
-2. Add a new migration from the `Publishing.Infrastructure` project directory:
+2. Add a new migration from the `Publishing.Infrastructure` project directory. For the first migration, name it `InitialCreate`:
 
 ```bash
  dotnet ef migrations add <MigrationName> --project src/Publishing.Infrastructure --output-dir Migrations
