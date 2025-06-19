@@ -26,23 +26,30 @@ namespace Publishing
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            string email = emailTextBox.Text;
-            string password = passwordTextBox.Text;
-
-            var user = await _authService.AuthenticateAsync(email, password);
-
-            if (user != null)
+            try
             {
-                CurrentUser.UserId = user.Id;
-                CurrentUser.UserType = user.Type;
-                CurrentUser.UserName = user.Name;
+                string email = emailTextBox.Text;
+                string password = passwordTextBox.Text;
 
-                _navigation.Navigate<mainForm>(this);
-                MessageBox.Show("Вітаємо, " + CurrentUser.UserName + " (" + CurrentUser.UserType + ")!");
+                var user = await _authService.AuthenticateAsync(email, password);
+
+                if (user != null)
+                {
+                    CurrentUser.UserId = user.Id;
+                    CurrentUser.UserType = user.Type;
+                    CurrentUser.UserName = user.Name;
+
+                    _navigation.Navigate<mainForm>(this);
+                    MessageBox.Show("Вітаємо, " + CurrentUser.UserName + " (" + CurrentUser.UserType + ")!");
+                }
+                else
+                {
+                    MessageBox.Show("Невірна електронна пошта або пароль");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Невірна електронна пошта або пароль");
+                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

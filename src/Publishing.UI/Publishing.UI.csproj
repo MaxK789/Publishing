@@ -20,6 +20,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="WinForms.DataVisualization" Version="1.10.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient.SNI.x64" Version="5.1.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient.SNI.x86" Version="5.1.0" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="appsettings.json">

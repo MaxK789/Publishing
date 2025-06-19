@@ -31,64 +31,71 @@ namespace Publishing
 
         private async void changeButton_Click(object sender, EventArgs e)
         {
-            string id = CurrentUser.UserId;
-            string fName = FNameTextBox.Text;
-            string lName = LNameTextBox.Text;
-            string email = emailTextBox.Text;
-            string status = statusBox.SelectedItem?.ToString();
-            string phone = phoneTextBox.Text;
-            string fax = faxTextBox.Text;
-            string address = addressTextBox.Text;
+            try
+            {
+                string id = CurrentUser.UserId;
+                string fName = FNameTextBox.Text;
+                string lName = LNameTextBox.Text;
+                string email = emailTextBox.Text;
+                string status = statusBox.SelectedItem?.ToString();
+                string phone = phoneTextBox.Text;
+                string fax = faxTextBox.Text;
+                string address = addressTextBox.Text;
 
-            bool exists = await _profileRepo.EmailExistsAsync(email);
-            if (exists)
-            {
-                MessageBox.Show("Email вже використовується");
-                return;
-            }
-
-            int count = 0;
-            if (fName != "")
-            {
-                count++;
-            }
-            if (lName != "")
-            {
-                count++;
-            }
-            if (email != "")
-            {
-                string pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$";
-                if (!Regex.IsMatch(email, pattern))
+                bool exists = await _profileRepo.EmailExistsAsync(email);
+                if (exists)
                 {
-                    MessageBox.Show("Email is not valid");
+                    MessageBox.Show("Email вже використовується");
                     return;
                 }
-                count++;
-            }
-            if (status != null)
-            {
-                count++;
-            }
-            if (phone != "")
-            {
-                count++;
-            }
-            if (fax != "")
-            {
-                count++;
-            }
-            if (address != "")
-            {
-                count++;
-            }
-            if (count > 0)
-            {
-                await _profileRepo.UpdateAsync(id, fName, lName, email, status, phone, fax, address);
 
-                MessageBox.Show("Дані успішно змінено");
+                int count = 0;
+                if (fName != "")
+                {
+                    count++;
+                }
+                if (lName != "")
+                {
+                    count++;
+                }
+                if (email != "")
+                {
+                    string pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$";
+                    if (!Regex.IsMatch(email, pattern))
+                    {
+                        MessageBox.Show("Email is not valid");
+                        return;
+                    }
+                    count++;
+                }
+                if (status != null)
+                {
+                    count++;
+                }
+                if (phone != "")
+                {
+                    count++;
+                }
+                if (fax != "")
+                {
+                    count++;
+                }
+                if (address != "")
+                {
+                    count++;
+                }
+                if (count > 0)
+                {
+                    await _profileRepo.UpdateAsync(id, fName, lName, email, status, phone, fax, address);
 
-                _navigation.Navigate<mainForm>(this);
+                    MessageBox.Show("Дані успішно змінено");
+
+                    _navigation.Navigate<mainForm>(this);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

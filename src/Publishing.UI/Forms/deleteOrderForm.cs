@@ -26,15 +26,22 @@ namespace Publishing
 
         private async void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == dataGridView1.Columns["DeleteColumn"].Index && e.RowIndex >= 0)
+            try
             {
-                int idToDelete = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["idOrder"].Value);
+                if (e.ColumnIndex == dataGridView1.Columns["DeleteColumn"].Index && e.RowIndex >= 0)
+                {
+                    int idToDelete = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["idOrder"].Value);
 
-                await _orderRepo.DeleteAsync(idToDelete);
+                    await _orderRepo.DeleteAsync(idToDelete);
 
-                MessageBox.Show("Видалено idOrder: " + idToDelete.ToString());
+                    MessageBox.Show("Видалено idOrder: " + idToDelete.ToString());
 
-                dataGridView1.Rows.RemoveAt(e.RowIndex);
+                    dataGridView1.Rows.RemoveAt(e.RowIndex);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -64,46 +71,53 @@ namespace Publishing
 
         private async void deleteOrderForm_Load(object sender, EventArgs e)
         {
-            string id = CurrentUser.UserId;
-
-            if (CurrentUser.UserType == "контактна особа")
-                організаціяToolStripMenuItem.Visible = true;
-            else
-                організаціяToolStripMenuItem.Visible = false;
-
-            if (CurrentUser.UserType != "admin")
+            try
             {
-                статистикаToolStripMenuItem.Visible = false;
-                змінитиДаніToolStripMenuItem.Visible = true;
+                string id = CurrentUser.UserId;
 
-                DataTable dataTable = await _orderRepo.GetByPersonAsync(id);
+                if (CurrentUser.UserType == "контактна особа")
+                    організаціяToolStripMenuItem.Visible = true;
+                else
+                    організаціяToolStripMenuItem.Visible = false;
 
-                dataGridView1.DataSource = dataTable;
+                if (CurrentUser.UserType != "admin")
+                {
+                    статистикаToolStripMenuItem.Visible = false;
+                    змінитиДаніToolStripMenuItem.Visible = true;
 
-                DataGridViewLinkColumn linkColumn = new DataGridViewLinkColumn();
-                dataGridView1.Columns.Add(linkColumn);
-                linkColumn.HeaderText = "Delete";
-                linkColumn.Name = "DeleteColumn";
-                linkColumn.Text = "Delete";
-                linkColumn.UseColumnTextForLinkValue = true;
+                    DataTable dataTable = await _orderRepo.GetByPersonAsync(id);
 
+                    dataGridView1.DataSource = dataTable;
+
+                    DataGridViewLinkColumn linkColumn = new DataGridViewLinkColumn();
+                    dataGridView1.Columns.Add(linkColumn);
+                    linkColumn.HeaderText = "Delete";
+                    linkColumn.Name = "DeleteColumn";
+                    linkColumn.Text = "Delete";
+                    linkColumn.UseColumnTextForLinkValue = true;
+
+                }
+                else
+                {
+                    додатиToolStripMenuItem.Visible = false;
+                    статистикаToolStripMenuItem.Visible = true;
+                    змінитиДаніToolStripMenuItem.Visible = false;
+
+                    DataTable dataTable = await _orderRepo.GetAllAsync();
+
+                    dataGridView1.DataSource = dataTable;
+
+                    DataGridViewLinkColumn linkColumn = new DataGridViewLinkColumn();
+                    dataGridView1.Columns.Add(linkColumn);
+                    linkColumn.HeaderText = "Delete";
+                    linkColumn.Name = "DeleteColumn";
+                    linkColumn.Text = "Delete";
+                    linkColumn.UseColumnTextForLinkValue = true;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                додатиToolStripMenuItem.Visible = false;
-                статистикаToolStripMenuItem.Visible = true;
-                змінитиДаніToolStripMenuItem.Visible = false;
-
-                DataTable dataTable = await _orderRepo.GetAllAsync();
-
-                dataGridView1.DataSource = dataTable;
-
-                DataGridViewLinkColumn linkColumn = new DataGridViewLinkColumn();
-                dataGridView1.Columns.Add(linkColumn);
-                linkColumn.HeaderText = "Delete";
-                linkColumn.Name = "DeleteColumn";
-                linkColumn.Text = "Delete";
-                linkColumn.UseColumnTextForLinkValue = true;
+                MessageBox.Show(ex.ToString(), "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
