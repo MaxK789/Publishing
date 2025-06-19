@@ -1,4 +1,5 @@
 using System;
+using BCrypt.Net;
 using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
 
