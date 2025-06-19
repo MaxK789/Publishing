@@ -2,7 +2,6 @@ using System;
 using Publishing.Core.Domain;
 using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
-using System.Threading.Tasks;
 
 namespace Publishing.Core.Services
 {
@@ -31,7 +30,7 @@ namespace Publishing.Core.Services
             _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
 
-        public async Task<Order> CreateOrderAsync(CreateOrderDto dto)
+        public Order CreateOrder(CreateOrderDto dto)
         {
             if (dto is null)
                 throw new ArgumentNullException(nameof(dto));
@@ -54,7 +53,7 @@ namespace Publishing.Core.Services
                 Printery = dto.Printery
             };
 
-            await SaveOrderAsync(order).ConfigureAwait(false);
+            SaveOrder(order);
             return order;
         }
 
@@ -76,13 +75,10 @@ namespace Publishing.Core.Services
             return (start, finish);
         }
 
-        private Task SaveOrderAsync(Order order)
+        private void SaveOrder(Order order)
         {
-            return Task.Run(() =>
-            {
-                _orderRepository.Save(order);
-                _logger.LogInformation($"Order for product {order.Name} saved.");
-            });
+            _orderRepository.Save(order);
+            _logger.LogInformation($"Order for product {order.Name} saved.");
         }
     }
 }
