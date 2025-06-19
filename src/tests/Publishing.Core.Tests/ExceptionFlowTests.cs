@@ -13,6 +13,19 @@ namespace Publishing.Core.Tests
         private class StubOrderRepository : IOrderRepository
         {
             public void Save(Order order) { }
+
+            public Task UpdateExpiredAsync() => Task.CompletedTask;
+
+            public Task<DataTable> GetActiveAsync() =>
+                Task.FromResult(new DataTable());
+
+            public Task<DataTable> GetByPersonAsync(string personId) =>
+                Task.FromResult(new DataTable());
+
+            public Task<DataTable> GetAllAsync() =>
+                Task.FromResult(new DataTable());
+
+            public Task DeleteAsync(int id) => Task.CompletedTask;
         }
 
         private class StubPrinteryRepository : IPrinteryRepository
