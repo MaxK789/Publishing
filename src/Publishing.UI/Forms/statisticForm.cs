@@ -1,15 +1,27 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Windows.Forms;
-using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
+using Publishing.Core.Interfaces;
 
 namespace Publishing
 {
     public partial class statisticForm : Form
     {
+        private readonly INavigationService _navigation;
+        private readonly IDatabaseClient _db;
+
+        [Obsolete("Designer only", error: false)]
         public statisticForm()
         {
+            InitializeComponent();
+        }
+
+        public statisticForm(INavigationService navigation, IDatabaseClient db)
+        {
+            _navigation = navigation;
+            _db = db;
             InitializeComponent();
         }
 
@@ -18,7 +30,7 @@ namespace Publishing
             authorsBox.Items.Clear();
             authorsBox.Items.Add("Усі");
 
-            List<string[]> authorNames = DataBase.ExecuteQueryList("SELECT DISTINCT (FName + ' ' + LName) " +
+            List<string[]> authorNames = _db.ExecuteQueryList("SELECT DISTINCT (FName + ' ' + LName) " +
                 "AS Author FROM Person P INNER JOIN Orders O ON O.idPerson = P.idPerson");
 
             if (authorNames != null && authorNames.Count > 0)
@@ -34,7 +46,7 @@ namespace Publishing
 
             chart1.Series[0].Points.Clear();
 
-            List<string[]> dataList = DataBase.ExecuteQueryList("SELECT DATENAME(MONTH, dateOrder) AS orderMonth, " +
+            List<string[]> dataList = _db.ExecuteQueryList("SELECT DATENAME(MONTH, dateOrder) AS orderMonth, " +
                 "COUNT(*) AS Number FROM Orders WHERE YEAR(dateOrder) = YEAR(GETDATE()) " +
                 "GROUP BY DATENAME(MONTH, dateOrder)");
 
@@ -46,7 +58,6 @@ namespace Publishing
 
         private void statisticForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            DataBase.CloseConnection();
             Application.Exit();
         }
 
@@ -56,30 +67,24 @@ namespace Publishing
             CurrentUser.UserName = "";
             CurrentUser.UserType = "";
 
-            this.Hide();
-            var logForm = Program.Services.GetRequiredService<loginForm>();
-            logForm.Show();
+            _navigation.Navigate<loginForm>(this);
         }
 
         private void списокToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            mainForm mainForm = new mainForm();
-            mainForm.Show();
+            _navigation.Navigate<mainForm>(this);
         }
 
         private void видалитиToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            this.Hide();
-            deleteOrderForm delF = new deleteOrderForm();
-            delF.Show();
+            _navigation.Navigate<deleteOrderForm>(this);
         }
 
         private void orderCountPerMonthButton_Click(object sender, EventArgs e)
         {
             chart1.Series[0].Points.Clear();
 
-            List<string[]> dataList = DataBase.ExecuteQueryList("SELECT DATENAME(MONTH, dateOrder) AS orderMonth, " +
+            List<string[]> dataList = _db.ExecuteQueryList("SELECT DATENAME(MONTH, dateOrder) AS orderMonth, " +
                 "COUNT(*) AS Number FROM Orders WHERE YEAR(dateOrder) = YEAR(GETDATE()) " +
                 "GROUP BY DATENAME(MONTH, dateOrder)");
 
@@ -95,7 +100,7 @@ namespace Publishing
             {
                 chart1.Series[0].Points.Clear();
 
-                List<string[]> dataList = DataBase.ExecuteQueryList("SELECT (P.FName + ' ' + P.LName) AS Author, " +
+                List<string[]> dataList = _db.ExecuteQueryList("SELECT (P.FName + ' ' + P.LName) AS Author, " +
                     "COUNT(*) AS Number\r\nFROM Orders O INNER JOIN Person P ON P.idPerson = O.idPerson\r\n" +
                     "GROUP BY (P.FName + ' ' + P.LName)");
 
@@ -118,7 +123,7 @@ namespace Publishing
 {
     new SqlParameter("@fullNameAuthor", fullNameAuthor)
 };
-                List<string[]> dataList = DataBase.ExecuteQueryList("SELECT (P.FName + ' ' + P.LName) AS Author, " +
+                List<string[]> dataList = _db.ExecuteQueryList("SELECT (P.FName + ' ' + P.LName) AS Author, " +
                     "COUNT(*) AS Number FROM Orders O INNER JOIN Person P ON P.idPerson = O.idPerson " +
                     "WHERE (P.FName + ' ' + P.LName) = @fullNameAuthor GROUP BY (P.FName + ' ' + P.LName)", parameters);
 
@@ -145,7 +150,7 @@ namespace Publishing
                 new SqlParameter("@EndDate", lDate)
             };
 
-            List<string[]> dataList = DataBase.ExecuteQueryList(
+            List<string[]> dataList = _db.ExecuteQueryList(
                 "SELECT DATENAME(MONTH, dateOrder) AS orderMonth, COUNT(*) AS Number " +
                 "FROM Orders O INNER JOIN Person P ON P.idPerson = O.idPerson " +
                 "WHERE dateOrder BETWEEN @StartDate AND @EndDate " +
@@ -165,7 +170,7 @@ namespace Publishing
         {
             chart1.Series[0].Points.Clear();
 
-            List<string[]> dataList = DataBase.ExecuteQueryList("SELECT (P.FName + ' ' + P.LName) " +
+            List<string[]> dataList = _db.ExecuteQueryList("SELECT (P.FName + ' ' + P.LName) " +
                 "AS Author, Sum(tirage) AS sumTirage\r\nFROM Orders O INNER JOIN Person P " +
                 "ON P.idPerson = O.idPerson\r\nGROUP BY (P.FName + ' ' + P.LName)");
 
@@ -177,9 +182,7 @@ namespace Publishing
 
         private void статистикаToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            statisticForm statF = new statisticForm();
-            statF.Show();
+            _navigation.Navigate<statisticForm>(this);
         }
 
         private void вийтиToolStripMenuItem_Click_1(object sender, EventArgs e)
@@ -188,9 +191,7 @@ namespace Publishing
             CurrentUser.UserName = "";
             CurrentUser.UserType = "";
 
-            this.Hide();
-            var logForm = Program.Services.GetRequiredService<loginForm>();
-            logForm.Show();
+            _navigation.Navigate<loginForm>(this);
         }
     }
 }

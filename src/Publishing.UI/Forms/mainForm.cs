@@ -1,20 +1,31 @@
 ﻿using System;
 using System.Data;
 using System.Windows.Forms;
-using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
+using Publishing.Core.Interfaces;
 
 namespace Publishing
 {
     public partial class mainForm : Form
     {
+        private readonly INavigationService _navigation;
+        private readonly IDatabaseClient _db;
+
+        [Obsolete("Designer only", error: false)]
         public mainForm()
         {
-            InitializeComponent();           
+            InitializeComponent();
+        }
+
+        public mainForm(INavigationService navigation, IDatabaseClient db)
+        {
+            _navigation = navigation;
+            _db = db;
+            InitializeComponent();
         }
 
         private void mainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            DataBase.CloseConnection();
             Application.Exit();
         }
 
@@ -24,37 +35,27 @@ namespace Publishing
             CurrentUser.UserName = "";
             CurrentUser.UserType = "";
 
-            this.Hide();
-            var logForm = Program.Services.GetRequiredService<loginForm>();
-            logForm.Show();
+            _navigation.Navigate<loginForm>(this);
         }
 
         private void змінитиДаніToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            profileForm profForm = new profileForm();
-            profForm.Show();
+            _navigation.Navigate<profileForm>(this);
         }
 
         private void списокToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            mainForm mainForm = new mainForm();
-            mainForm.Show();
+            _navigation.Navigate<mainForm>(this);
         }
 
         private void додатиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            addOrderForm adF = new addOrderForm();
-            adF.Show();
+            _navigation.Navigate<addOrderForm>(this);
         }
 
         private void видалитиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            deleteOrderForm delF = new deleteOrderForm();
-            delF.Show();
+            _navigation.Navigate<deleteOrderForm>(this);
         }
 
         private void mainForm_Load(object sender, EventArgs e)
@@ -76,10 +77,10 @@ namespace Publishing
                 додатиToolStripMenuItem.Visible = false;
             }
 
-            DataBase.ExecuteQueryWithoutResponse("UPDATE Orders SET statusOrder = 'завершено' " +
+            _db.ExecuteQueryWithoutResponse("UPDATE Orders SET statusOrder = 'завершено' " +
                 "WHERE statusOrder <> 'завершено' AND dateFinish < GETDATE()");
 
-            DataTable dataTable = DataBase.ExecuteQueryToDataTable("SELECT O.namePrintery, " +
+            DataTable dataTable = _db.ExecuteQueryToDataTable("SELECT O.namePrintery, " +
                 "Prod.typeProduct, Prod.nameProduct, Per.FName, Per.LName, O.dateOrder, O.dateStart, " +
                 "O.dateFinish, O.statusOrder, O.price FROM(Orders O INNER JOIN Product Prod ON " +
                 "Prod.idProduct = O.idProduct ) INNER JOIN Person Per ON Per.idPerson = Prod.idPerson " +
@@ -90,16 +91,12 @@ namespace Publishing
 
         private void статистикаToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            statisticForm statF = new statisticForm();
-            statF.Show();
+            _navigation.Navigate<statisticForm>(this);
         }
 
         private void організаціяToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            organizationForm orgF = new organizationForm();
-            orgF.Show();
+            _navigation.Navigate<organizationForm>(this);
         }
     }
 }

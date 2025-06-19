@@ -1,36 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
+using Publishing.Core.DTOs;
+using Publishing.Core.Interfaces;
 using System.Windows.Forms;
-using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
 
 namespace Publishing
 {
     public partial class addOrderForm : Form
     {
+        private readonly IOrderService _orderService;
+        private readonly INavigationService _navigation;
+        [Obsolete("Designer only", error: false)]
         public addOrderForm()
         {
             InitializeComponent();
         }
 
+        public addOrderForm(IOrderService orderService, INavigationService navigation)
+        {
+            _orderService = orderService;
+            _navigation = navigation;
+            InitializeComponent();
+        }
+
         private void addOrderForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            DataBase.CloseConnection();
             Application.Exit();
         }
 
         private void змінитиДаніToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            profileForm profForm = new profileForm();
-            profForm.Show();
+            _navigation.Navigate<profileForm>(this);
         }
 
         private void списокToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            mainForm mainForm = new mainForm();
-            mainForm.Show();
+            _navigation.Navigate<mainForm>(this);
         }
 
         private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)
@@ -39,9 +44,7 @@ namespace Publishing
             CurrentUser.UserName = "";
             CurrentUser.UserType = "";
 
-            this.Hide();
-            var logForm = Program.Services.GetRequiredService<loginForm>();
-            logForm.Show();
+            _navigation.Navigate<loginForm>(this);
         }
 
         private void addOrderForm_Load(object sender, EventArgs e)
@@ -54,205 +57,82 @@ namespace Publishing
 
         private void calculateButton_Click(object sender, EventArgs e)
         {
-            string pages = pageNumTextBox.Text;
-            if (int.TryParse(pages, out int pageNum))
-            { }
-            else
+            if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
             {
                 MessageBox.Show("pagesNumParse");
                 return;
             }
-            string tirage = tirageTextBox.Text;
-            if (int.TryParse(tirage, out int tirageNum))
-            { }
-            else
+
+            if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
             {
                 MessageBox.Show("tirageParse");
                 return;
             }
-            string printery = printeryBox.SelectedItem?.ToString();
-            if (printery == null)
+
+            var dto = new CreateOrderDto
             {
-                return;
-            }
+                Type = typeBox.SelectedItem?.ToString() ?? string.Empty,
+                Name = nameProductTextBox.Text,
+                Pages = pageNum,
+                Tirage = tirageNum
+            };
 
-            int totalPagesNum = pageNum * tirageNum;
-
-            int price;
-
-            if (int.TryParse(DataBase.ExecuteQuery("SELECT pricePerPage FROM Printery"), out int pricePerPage))
-            {
-                price = pricePerPage * totalPagesNum;
-            }
-            else
-            {
-                MessageBox.Show("priceParse");
-                return;
-            }
-
-            totalPriceLabel.Text = "Кінцева ціна:" + price.ToString();
+            var order = _orderService.CreateOrder(dto);
+            totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
         }
 
         private void orderButton_Click(object sender, EventArgs e)
         {
             string type = typeBox.SelectedItem?.ToString();
-            string nameProduct = nameProductTextBox.Text;
-            string pages = pageNumTextBox.Text;
-            if(int.TryParse(pages, out int pageNum))
-            { }
-            else
+            if (type == null)
+                return;
+
+            if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
             {
                 MessageBox.Show("pagesNumParse");
                 return;
             }
-            string tirage = tirageTextBox.Text;
-            if (int.TryParse(tirage, out int tirageNum))
-            { }
-            else
+
+            if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
             {
                 MessageBox.Show("tirageParse");
                 return;
             }
-            string printery = printeryBox.SelectedItem?.ToString();
-            if (type == null || printery == null)
+
+            var dto = new CreateOrderDto
             {
-                return;
-            }
-            DateTime currentDate = DateTime.Now;
-
-            DateTime startDate = currentDate.AddDays(1);
-
-
-            int totalPagesNum = pageNum * tirageNum;
-
-            List<SqlParameter> parametersForPrintery = new List<SqlParameter>
-            {
-                new SqlParameter("@printery", printery)
+                Type = type,
+                Name = nameProductTextBox.Text,
+                Pages = pageNum,
+                Tirage = tirageNum
             };
 
-            string query = "SELECT pagesPerDay FROM Printery WHERE namePrintery = @printery";
-            string pagesPerDay = DataBase.ExecuteQuery(query, parametersForPrintery);
-
-            if (int.TryParse(pagesPerDay, out int ppd))
-            {
-            }
-            else
-            {
-                MessageBox.Show("pagesPerDayParse");
-                return;
-            }
-
-            double num = totalPagesNum / ppd;
-            if (ppd > 0)
-                num = Math.Ceiling(num);            
-
-            DateTime endDate = currentDate.AddDays(num);
-
-            string statusOrder = "в роботі";
-
-            int price;
-
-            if (int.TryParse(DataBase.ExecuteQuery("SELECT pricePerPage FROM Printery"), out int pricePerPage))
-            {
-                price = pricePerPage * totalPagesNum;
-            }
-            else
-            {
-                MessageBox.Show("priceParse");
-                return;
-            }
-
-            string idPerson = CurrentUser.UserId;
-
-                List<SqlParameter> parametersForCheckName = new List<SqlParameter>
-            {
-                new SqlParameter("@type", type),
-                new SqlParameter("@nameProduct", nameProduct),
-                new SqlParameter("@idPerson", idPerson),
-                new SqlParameter("@pages", pages)
-            };
-
-            string checkName = DataBase.ExecuteQuery("SELECT nameProduct FROM Product " +
-                "WHERE typeProduct = @type AND nameProduct = @nameProduct AND idPerson = @idPerson AND " +
-                "pagesNum = @pages", parametersForCheckName);
-
-            if (!nameProduct.Equals(checkName))
-            {
-                List<SqlParameter> parametersForProduct = new List<SqlParameter>
-                {
-                    new SqlParameter("@type", type),
-                    new SqlParameter("@nameProduct", nameProduct),
-                    new SqlParameter("@pages", pages),
-                    new SqlParameter("@idPerson", idPerson)
-                };
-
-                DataBase.ExecuteQueryWithoutResponse("INSERT INTO Product(typeProduct, idPerson, " +
-                    "nameProduct, pagesNum) VALUES (@type, @idPerson, @nameProduct, @pages)", parametersForProduct);
-            }
-
-            List<SqlParameter> parametersForidProduct = new List<SqlParameter>
-            {
-                new SqlParameter("@type", type),
-                new SqlParameter("@nameProduct", nameProduct),
-                new SqlParameter("@pages", pages),
-                new SqlParameter("@idPerson", idPerson)
-            };
-
-            string idProduct = DataBase.ExecuteQuery("SELECT idProduct FROM Product WHERE typeProduct = @type " +
-                "AND nameProduct = @nameProduct AND idPerson = @idPerson " +
-                "AND pagesNum = @pages", parametersForidProduct);
-
-
-            List<SqlParameter> parametersForOrder = new List<SqlParameter>
-            {
-                new SqlParameter("@tirage", tirageNum),
-                new SqlParameter("@pritery", printery),
-                new SqlParameter("@dateOrder", currentDate),
-                new SqlParameter("@dateStart", startDate),
-                new SqlParameter("@dateFinish", endDate),
-                new SqlParameter("@statusOrder", statusOrder),
-                new SqlParameter("@price", price),
-                new SqlParameter("@idProduct", idProduct),
-                new SqlParameter("@idPerson", idPerson)
-            };
-
-            DataBase.ExecuteQueryWithoutResponse("INSERT INTO Orders(idProduct, idPerson, namePrintery, " +
-                "dateOrder, dateStart, dateFinish, statusOrder, tirage, price) VALUES (@idProduct, @idPerson, " +
-                "@pritery, @dateOrder, @dateStart, @dateFinish, @statusOrder, @tirage, @price)", parametersForOrder);
+            var order = _orderService.CreateOrder(dto);
 
             MessageBox.Show("Замовлення успішно додано");
+            totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
 
-            this.Hide();
-            mainForm mainForm = new mainForm();
-            mainForm.Show();
+            _navigation.Navigate<mainForm>(this);
         }
 
         private void змінитиДаніToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            this.Hide();
-            profileForm profForm = new profileForm();
-            profForm.Show();
+            _navigation.Navigate<profileForm>(this);
         }
 
         private void додатиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            addOrderForm adF = new addOrderForm();
-            adF.Show();
+            _navigation.Navigate<addOrderForm>(this);
         }
 
         private void видалитиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            deleteOrderForm delF = new deleteOrderForm();
-            delF.Show();
+            _navigation.Navigate<deleteOrderForm>(this);
         }
 
         private void організаціяToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            organizationForm orgF = new organizationForm();
-            orgF.Show();
+            _navigation.Navigate<organizationForm>(this);
         }
     }
 }

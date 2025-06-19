@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using Microsoft.Data.SqlClient;
 using Publishing.Core.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
 using System.Windows.Forms;
 
 namespace Publishing
@@ -9,10 +9,18 @@ namespace Publishing
     public partial class loginForm : Form
     {
         private readonly IAuthService _authService;
+        private readonly INavigationService _navigation;
 
-        public loginForm(IAuthService authService)
+        [Obsolete("Designer only", error: false)]
+        public loginForm()
+        {
+            InitializeComponent();
+        }
+
+        public loginForm(IAuthService authService, INavigationService navigation)
         {
             _authService = authService;
+            _navigation = navigation;
             InitializeComponent();
             try
             {
@@ -42,9 +50,7 @@ namespace Publishing
                 CurrentUser.UserType = user.Type;
                 CurrentUser.UserName = user.Name;
 
-                this.Hide();
-                mainForm mainForm = new mainForm();
-                mainForm.Show();
+                _navigation.Navigate<mainForm>(this);
                 MessageBox.Show("Вітаємо, " + CurrentUser.UserName + " (" + CurrentUser.UserType + ")!");
             }
             else
@@ -55,9 +61,7 @@ namespace Publishing
 
         private void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            this.Hide();
-            var regForm = Program.Services.GetRequiredService<registrationForm>();
-            regForm.Show();
+            _navigation.Navigate<registrationForm>(this);
         }
 
         private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)

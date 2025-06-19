@@ -3,15 +3,27 @@ using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using System.Windows.Forms;
-using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
+using Publishing.Core.Interfaces;
 
 namespace Publishing
 {
     public partial class deleteOrderForm : Form
     {
+        private readonly INavigationService _navigation;
+        private readonly IDatabaseClient _db;
+
+        [Obsolete("Designer only", error: false)]
         public deleteOrderForm()
         {
-            InitializeComponent();            
+            InitializeComponent();
+        }
+
+        public deleteOrderForm(INavigationService navigation, IDatabaseClient db)
+        {
+            _navigation = navigation;
+            _db = db;
+            InitializeComponent();
         }
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -25,7 +37,7 @@ namespace Publishing
                     new SqlParameter("@id", idToDelete)
                 };
 
-                DataBase.ExecuteQueryWithoutResponse("DELETE FROM Orders WHERE idOrder = @id", parameters);
+                _db.ExecuteQueryWithoutResponse("DELETE FROM Orders WHERE idOrder = @id", parameters);
 
                 MessageBox.Show("Видалено idOrder: " + idToDelete.ToString());
 
@@ -35,22 +47,17 @@ namespace Publishing
 
         private void deleteOrderForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            DataBase.CloseConnection();
             Application.Exit();
         }
 
         private void змінитиДаніToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            profileForm profForm = new profileForm();
-            profForm.Show();
+            _navigation.Navigate<profileForm>(this);
         }
 
         private void списокToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            mainForm mainForm = new mainForm();
-            mainForm.Show();
+            _navigation.Navigate<mainForm>(this);
         }
 
         private void вийтиToolStripMenuItem_Click_1(object sender, EventArgs e)
@@ -59,9 +66,7 @@ namespace Publishing
             CurrentUser.UserName = "";
             CurrentUser.UserType = "";
 
-            this.Hide();
-            var logForm = Program.Services.GetRequiredService<loginForm>();
-            logForm.Show();
+            _navigation.Navigate<loginForm>(this);
         }
 
         private void deleteOrderForm_Load(object sender, EventArgs e)
@@ -83,7 +88,7 @@ namespace Publishing
                     new SqlParameter("@id", id)
                 };
 
-                DataTable dataTable = DataBase.ExecuteQueryToDataTable("SELECT * FROM Orders where idPerson = @id", parameters);
+                DataTable dataTable = _db.ExecuteQueryToDataTable("SELECT * FROM Orders where idPerson = @id", parameters);
 
                 dataGridView1.DataSource = dataTable;
 
@@ -101,7 +106,7 @@ namespace Publishing
                 статистикаToolStripMenuItem.Visible = true;
                 змінитиДаніToolStripMenuItem.Visible = false;
 
-                DataTable dataTable = DataBase.ExecuteQueryToDataTable("SELECT * FROM Orders");
+                DataTable dataTable = _db.ExecuteQueryToDataTable("SELECT * FROM Orders");
 
                 dataGridView1.DataSource = dataTable;
 
@@ -116,30 +121,22 @@ namespace Publishing
 
         private void додатиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            addOrderForm adF = new addOrderForm();
-            adF.Show();
+            _navigation.Navigate<addOrderForm>(this);
         }
 
         private void видалитиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            deleteOrderForm delF = new deleteOrderForm();
-            delF.Show();
+            _navigation.Navigate<deleteOrderForm>(this);
         }
 
         private void змінитиДаніToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            this.Hide();
-            profileForm profForm = new profileForm();
-            profForm.Show();
+            _navigation.Navigate<profileForm>(this);
         }
 
         private void статистикаToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            statisticForm statF = new statisticForm();
-            statF.Show();
+            _navigation.Navigate<statisticForm>(this);
         }
     }
 }
