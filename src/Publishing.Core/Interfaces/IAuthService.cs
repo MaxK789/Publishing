@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 namespace Publishing.Core.Interfaces
 {
     using Publishing.Core.DTOs;
