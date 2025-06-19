@@ -4,8 +4,6 @@ using Publishing.Core.Domain;
 using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using System;
-using System.Data;
-using System.Threading.Tasks;
 
 namespace Publishing.Core.Tests
 {
@@ -56,7 +54,7 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        public async Task CreateOrder_ReturnsFilledOrder()
+        public void CreateOrder_ReturnsFilledOrder()
         {
             var orderRepo = new StubOrderRepository();
             var printeryRepo = new StubPrinteryRepository();
@@ -69,7 +67,7 @@ namespace Publishing.Core.Tests
                 new StubDateTimeProvider());
             var dto = new CreateOrderDto { Type = "book", Name = "Intro", Pages = 10, Tirage = 3 };
 
-            var order = await service.CreateOrderAsync(dto);
+            var order = service.CreateOrder(dto);
 
             Assert.AreEqual(dto.Type, order.Type);
             Assert.AreEqual(dto.Name, order.Name);
@@ -82,35 +80,35 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        public async Task CreateOrder_InvalidPages_Throws()
+        [ExpectedException(typeof(ArgumentException))]
+        public void CreateOrder_InvalidPages_Throws()
         {
             var orderRepo = new StubOrderRepository();
             var printeryRepo = new StubPrinteryRepository();
             var service = new OrderService(orderRepo, printeryRepo, new StubLogger(), new PriceCalculator(), new PassThroughValidator(), new StubDateTimeProvider());
             var dto = new CreateOrderDto { Pages = -1, Tirage = 1 };
-            await Assert.ThrowsExceptionAsync<ArgumentException>(async () =>
-                await service.CreateOrderAsync(dto));
+            service.CreateOrder(dto);
         }
 
         [TestMethod]
-        public async Task CreateOrder_NullDto_Throws()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CreateOrder_NullDto_Throws()
         {
             var orderRepo = new StubOrderRepository();
             var printeryRepo = new StubPrinteryRepository();
             var service = new OrderService(orderRepo, printeryRepo, new StubLogger(), new PriceCalculator(), new PassThroughValidator(), new StubDateTimeProvider());
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () =>
-                await service.CreateOrderAsync(null));
+            service.CreateOrder(null);
         }
 
         [TestMethod]
-        public async Task CreateOrder_RespectsCustomPricePerPage()
+        public void CreateOrder_RespectsCustomPricePerPage()
         {
             var orderRepo = new StubOrderRepository();
             var printeryRepo = new StubPrinteryRepository { PricePerPage = 3m };
             var service = new OrderService(orderRepo, printeryRepo, new StubLogger(), new PriceCalculator(), new PassThroughValidator(), new StubDateTimeProvider());
             var dto = new CreateOrderDto { Pages = 2, Tirage = 2 };
 
-            var order = await service.CreateOrderAsync(dto);
+            var order = service.CreateOrder(dto);
 
             Assert.AreEqual(12m, order.Price);
         }
