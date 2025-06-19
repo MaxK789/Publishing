@@ -15,11 +15,7 @@ namespace Publishing.Core.Tests
         private class StubOrderRepository : IOrderRepository
         {
             public Order? SavedOrder { get; private set; }
-            public Task SaveAsync(Order order)
-            {
-                SavedOrder = order;
-                return Task.CompletedTask;
-            }
+            public void Save(Order order) => SavedOrder = order;
 
             public Task UpdateExpiredAsync() => Task.CompletedTask;
 
@@ -60,7 +56,7 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        public async Task CreateOrderAsync_SavesCorrectOrder()
+        public async Task CreateOrder_ReturnsFilledOrder()
         {
             var orderRepo = new StubOrderRepository();
             var printeryRepo = new StubPrinteryRepository();
@@ -86,7 +82,7 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        public async Task CreateOrderAsync_InvalidPages_Throws()
+        public async Task CreateOrder_InvalidPages_Throws()
         {
             var orderRepo = new StubOrderRepository();
             var printeryRepo = new StubPrinteryRepository();
@@ -97,7 +93,7 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        public async Task CreateOrderAsync_NullDto_Throws()
+        public async Task CreateOrder_NullDto_Throws()
         {
             var orderRepo = new StubOrderRepository();
             var printeryRepo = new StubPrinteryRepository();
@@ -107,7 +103,7 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        public async Task CreateOrderAsync_RespectsCustomPricePerPage()
+        public async Task CreateOrder_RespectsCustomPricePerPage()
         {
             var orderRepo = new StubOrderRepository();
             var printeryRepo = new StubPrinteryRepository { PricePerPage = 3m };
