@@ -10,7 +10,7 @@ namespace Publishing.Infrastructure.Migrations
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.22");
 
             modelBuilder.Entity<Person>(entity =>
             {
