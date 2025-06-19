@@ -35,11 +35,11 @@ namespace Publishing
             ConfigureServices(services);
             Services = services.BuildServiceProvider();
 
+            // apply pending migrations
             using (var scope = Services.CreateScope())
             {
-                scope.ServiceProvider
-                    .GetRequiredService<IDatabaseInitializer>()
-                    .Initialize();
+                var ctx = scope.ServiceProvider.GetRequiredService<Publishing.Infrastructure.Migrations.PublishingDbContext>();
+                ctx.Database.Migrate();
             }
 
             var form = Services.GetRequiredService<loginForm>();
@@ -73,7 +73,6 @@ namespace Publishing
             services.AddSingleton<IConfiguration>(configuration);
             services.AddDbContext<Publishing.Infrastructure.Migrations.PublishingDbContext>(
                 options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-            services.AddScoped<IDatabaseInitializer, DatabaseInitializer>();
             services.AddScoped<IDbContext, SqlDbContext>();
             services.AddScoped<ILoginRepository, LoginRepository>();
             services.AddScoped<IAuthService, AuthService>();
