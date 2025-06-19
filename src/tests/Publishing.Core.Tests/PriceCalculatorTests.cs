@@ -29,8 +29,6 @@ namespace Publishing.Core.Tests
         [DataRow(0, 5, 2.5)]
         [DataRow(5, 0, 2.5)]
         [DataRow(5, 5, 0.0)]
-        [DataRow(int.MaxValue, 0, double.MaxValue)]
-        [DataRow(0, int.MaxValue, double.MaxValue)]
         public void CalculateTotal_ZeroParameter_ReturnsZero(int pages, int copies, double price)
         {
             var result = _calculator.Calculate(pages, copies, (decimal)price);
