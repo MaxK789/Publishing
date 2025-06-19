@@ -15,14 +15,14 @@ namespace Publishing.Core.Services
         }
 
 
-        public async Task<UserDto?> AuthenticateAsync(string email, string password)
+        public UserDto? Authenticate(string email, string password)
         {
-            string? hash = await _repo.GetHashedPasswordAsync(email).ConfigureAwait(false);
+            string? hash = _repo.GetHashedPassword(email);
             if (hash != null && BCrypt.Net.BCrypt.Verify(password, hash))
             {
-                string? id = await _repo.GetUserIdAsync(email).ConfigureAwait(false);
-                string? type = await _repo.GetUserTypeAsync(email).ConfigureAwait(false);
-                string? name = await _repo.GetUserNameAsync(email).ConfigureAwait(false);
+                string? id = _repo.GetUserId(email);
+                string? type = _repo.GetUserType(email);
+                string? name = _repo.GetUserName(email);
                 if (id != null && type != null && name != null)
                 {
                     return new UserDto(id, name, type);
@@ -31,15 +31,15 @@ namespace Publishing.Core.Services
             return null;
         }
 
-        public async Task<UserDto> RegisterAsync(string firstName, string lastName, string email, string status, string password)
+        public UserDto Register(string firstName, string lastName, string email, string status, string password)
         {
-            if (await _repo.EmailExistsAsync(email).ConfigureAwait(false))
+            if (_repo.EmailExists(email))
                 throw new InvalidOperationException("Email already used");
             string hashed = BCrypt.Net.BCrypt.HashPassword(password, 11);
-            int id = await _repo.InsertPersonAsync(firstName, lastName, email, status).ConfigureAwait(false);
+            int id = _repo.InsertPerson(firstName, lastName, email, status);
             if (id == 0)
                 throw new InvalidOperationException("Failed to insert person");
-            await _repo.InsertPasswordAsync(hashed, id).ConfigureAwait(false);
+            _repo.InsertPassword(hashed, id);
             return new UserDto(id.ToString(), firstName, status);
         }
     }

@@ -17,17 +17,17 @@ namespace Publishing.Core.Tests
             public string? Name { get; set; } = "name";
             public bool EmailExistsReturn { get; set; }
 
-            public Task<string?> GetHashedPasswordAsync(string email) => Task.FromResult(StoredHash);
-            public Task<string?> GetUserIdAsync(string email) => Task.FromResult(Id);
-            public Task<string?> GetUserTypeAsync(string email) => Task.FromResult(Type);
-            public Task<string?> GetUserNameAsync(string email) => Task.FromResult(Name);
-            public Task<bool> EmailExistsAsync(string email) => Task.FromResult(EmailExistsReturn);
-            public Task<int> InsertPersonAsync(string f, string l, string e, string s) => Task.FromResult(5);
-            public Task InsertPasswordAsync(string h, int id) => Task.CompletedTask;
+            public string? GetHashedPassword(string email) => StoredHash;
+            public string? GetUserId(string email) => Id;
+            public string? GetUserType(string email) => Type;
+            public string? GetUserName(string email) => Name;
+            public bool EmailExists(string email) => EmailExistsReturn;
+            public int InsertPerson(string f, string l, string e, string s) => 5;
+            public void InsertPassword(string h, int id) { }
         }
 
         [TestMethod]
-        public async Task Authenticate_ReturnsUserDto()
+        public void Authenticate_ReturnsUserDto()
         {
             var repo = new StubLoginRepository
             {
@@ -35,7 +35,7 @@ namespace Publishing.Core.Tests
             };
             var service = new AuthService(repo);
 
-            var user = await service.AuthenticateAsync("e", "pwd");
+            var user = service.Authenticate("e", "pwd");
 
             Assert.IsNotNull(user);
             Assert.AreEqual(repo.Id, user!.Id);
@@ -44,12 +44,12 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        public async Task Register_ReturnsNewUser()
+        public void Register_ReturnsNewUser()
         {
             var repo = new StubLoginRepository();
             var service = new AuthService(repo);
 
-            var user = await service.RegisterAsync("F", "L", "e@e.com", "type", "pass");
+            var user = service.Register("F", "L", "e@e.com", "type", "pass");
 
             Assert.AreEqual("5", user.Id);
             Assert.AreEqual("F", user.Name);
@@ -58,15 +58,15 @@ namespace Publishing.Core.Tests
 
         [TestMethod]
         [ExpectedException(typeof(System.InvalidOperationException))]
-        public async Task Register_EmailExists_Throws()
+        public void Register_EmailExists_Throws()
         {
             var repo = new StubLoginRepository { EmailExistsReturn = true };
             var service = new AuthService(repo);
-            await service.RegisterAsync("F", "L", "e@e.com", "t", "p");
+            service.Register("F", "L", "e@e.com", "t", "p");
         }
 
         [TestMethod]
-        public async Task Authenticate_WrongPassword_ReturnsNull()
+        public void Authenticate_WrongPassword_ReturnsNull()
         {
             var repo = new StubLoginRepository
             {
@@ -74,7 +74,7 @@ namespace Publishing.Core.Tests
             };
             var svc = new AuthService(repo);
 
-            var user = await svc.AuthenticateAsync("e", "wrong");
+            var user = svc.Authenticate("e", "wrong");
 
             Assert.IsNull(user);
         }
