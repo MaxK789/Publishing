@@ -26,6 +26,15 @@ public class LoggingDbConnection : DbConnection
     public override System.Data.ConnectionState State => _inner.State;
     public override void Open() => _inner.Open();
 
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _inner.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+
     protected override DbCommand CreateDbCommand() => new LoggingDbCommand(_inner.CreateCommand(), _logger);
 }
 
