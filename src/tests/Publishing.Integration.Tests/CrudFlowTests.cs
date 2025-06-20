@@ -42,6 +42,7 @@ namespace Publishing.Integration.Tests
                 .Build();
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
+            services.AddTransient<ILogger, LoggerService>();
             services.AddTransient<IDbConnectionFactory, SqliteDbConnectionFactory>();
             services.AddTransient<IDbContext, DapperDbContext>();
             services.AddDbContext<AppDbContext>(o => o.UseSqlite(cs));

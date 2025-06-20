@@ -38,6 +38,7 @@ namespace Publishing.Integration.Tests
                 .Build();
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
+            services.AddTransient<ILogger, LoggerService>();
             services.AddTransient<IDbConnectionFactory, SqliteDbConnectionFactory>();
             services.AddTransient<IDbContext, DapperDbContext>();
             services.AddTransient<IDbHelper, DbHelper>();
