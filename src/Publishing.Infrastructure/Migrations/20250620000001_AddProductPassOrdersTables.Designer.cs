@@ -2,15 +2,16 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Publishing.Infrastructure.Entities;
 
 namespace Publishing.Infrastructure.Migrations
 {
-    // Snapshot includes tables for Person, Pass, Product and Orders
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250620000001_AddProductPassOrdersTables")]
+    partial class AddProductPassOrdersTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "6.0.22");
 
