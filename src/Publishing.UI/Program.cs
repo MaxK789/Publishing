@@ -69,6 +69,7 @@ namespace Publishing
             services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateOrderHandler).Assembly));
             services.AddValidatorsFromAssemblyContaining<CreateOrderValidator>();
+            services.AddValidatorsFromAssemblyContaining<EmailValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             var configuration = new ConfigurationBuilder()

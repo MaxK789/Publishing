@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Text.RegularExpressions;
+using Publishing.AppLayer.Validators;
+using FluentValidation;
 using System.Threading.Tasks;
 using System.Data;
 
@@ -8,8 +9,6 @@ namespace Publishing.Core.Tests
     [TestClass]
     public class EmailValidatorTests
     {
-        private const string Pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$";
-
         [DataTestMethod]
         [DataRow("test@example.com", true)]
         [DataRow("user.name@domain.co", true)]
@@ -17,7 +16,8 @@ namespace Publishing.Core.Tests
         [DataRow("another@invalid", false)]
         public void RegistrationForm_EmailValidation(string email, bool expected)
         {
-            bool result = Regex.IsMatch(email, Pattern);
+            var validator = new EmailValidator();
+            bool result = validator.Validate(email).IsValid;
             Assert.AreEqual(expected, result);
         }
 
@@ -26,7 +26,8 @@ namespace Publishing.Core.Tests
         [DataRow("wrong@address", false)]
         public void OrganizationForm_EmailValidation(string email, bool expected)
         {
-            bool result = Regex.IsMatch(email, Pattern);
+            var validator = new EmailValidator();
+            bool result = validator.Validate(email).IsValid;
             Assert.AreEqual(expected, result);
         }
     }
