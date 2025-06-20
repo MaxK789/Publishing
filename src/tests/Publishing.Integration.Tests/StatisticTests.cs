@@ -1,23 +1,22 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Publishing.Core.Interfaces;
 using Publishing.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using System.IO;
 
 namespace Publishing.Integration.Tests
 {
     [TestClass]
     public class StatisticTests
     {
-        private const string Server = @"(localdb)\MSSQLLocalDB";
-        private const string DbName = "PublishingStat";
-
-        private static string MasterConnection => $"Data Source={Server};Initial Catalog=master;Integrated Security=true";
+        private static readonly string DbPath = Path.Combine(Path.GetTempPath(), "PublishingStat.db");
+        private static string ConnectionString => $"Data Source={DbPath}";
 
         private IDbContext _db = null!;
         private IDbHelper _helper = null!;
@@ -26,21 +25,11 @@ namespace Publishing.Integration.Tests
         [TestInitialize]
         public void Setup()
         {
-            using (var con = new SqlConnection(MasterConnection))
+            if (File.Exists(DbPath))
             {
-                con.Open();
-                using var cmd = con.CreateCommand();
-                cmd.CommandText = $@"
-IF DB_ID('{DbName}') IS NOT NULL
-BEGIN
-    ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE [{DbName}];
-END
-CREATE DATABASE [{DbName}];";
-                cmd.ExecuteNonQuery();
+                File.Delete(DbPath);
             }
-
-            var cs = $"Data Source={Server};Initial Catalog={DbName};Integrated Security=true";
+            var cs = ConnectionString;
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
@@ -49,10 +38,10 @@ CREATE DATABASE [{DbName}];";
                 .Build();
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
-            services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
+            services.AddTransient<IDbConnectionFactory, SqliteDbConnectionFactory>();
             services.AddTransient<IDbContext, DapperDbContext>();
             services.AddTransient<IDbHelper, DbHelper>();
-            services.AddDbContext<AppDbContext>(o => o.UseSqlServer(cs));
+            services.AddDbContext<AppDbContext>(o => o.UseSqlite(cs));
             services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
 
             _serviceProvider = services.BuildServiceProvider();
@@ -76,17 +65,9 @@ CREATE DATABASE [{DbName}];";
             {
                 _serviceProvider.Dispose();
             }
-            using (var con = new SqlConnection(MasterConnection))
+            if (File.Exists(DbPath))
             {
-                con.Open();
-                using var cmd = con.CreateCommand();
-                cmd.CommandText = $@"
-IF DB_ID('{DbName}') IS NOT NULL
-BEGIN
-    ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE [{DbName}];
-END";
-                cmd.ExecuteNonQuery();
+                File.Delete(DbPath);
             }
         }
 
@@ -95,7 +76,7 @@ END";
         public void Statistic_GeneratesSeries()
         {
             var list = _helper.QueryStringListAsync(
-                "SELECT DATENAME(MONTH, dateOrder) AS M, COUNT(*) AS N FROM Orders GROUP BY DATENAME(MONTH, dateOrder) ORDER BY MIN(dateOrder)").Result;
+                "SELECT CASE strftime('%m', dateOrder) WHEN '01' THEN 'January' WHEN '02' THEN 'February' WHEN '03' THEN 'March' WHEN '04' THEN 'April' WHEN '05' THEN 'May' WHEN '06' THEN 'June' WHEN '07' THEN 'July' WHEN '08' THEN 'August' WHEN '09' THEN 'September' WHEN '10' THEN 'October' WHEN '11' THEN 'November' ELSE 'December' END AS M, COUNT(*) AS N FROM Orders GROUP BY strftime('%m', dateOrder) ORDER BY MIN(dateOrder)").Result;
             Assert.AreEqual(2, list.Count);
             Assert.AreEqual("January", list[0][0]);
             Assert.AreEqual("2", list[0][1]);
