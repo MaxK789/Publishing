@@ -1,4 +1,5 @@
 using FluentValidation;
+using System.Linq;
 
 namespace Publishing.AppLayer.Validators
 {
