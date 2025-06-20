@@ -2,57 +2,107 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Publishing.Core.Interfaces;
+using Dapper;
 
 namespace Publishing.Infrastructure.Repositories
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderRepository : IOrderRepository, IOrderQueries
     {
         private readonly IDbContext _db;
         private readonly IDbHelper _helper;
+        private readonly IUnitOfWork? _uow;
 
-        public OrderRepository(IDbContext db, IDbHelper helper)
+        public OrderRepository(IDbContext db, IDbHelper helper, IUnitOfWork? uow = null)
         {
             _db = db;
             _helper = helper;
+            _uow = uow;
         }
 
-        public void Save(Publishing.Core.Domain.Order order)
+        public async Task SaveAsync(Publishing.Core.Domain.Order order)
         {
             const string selectProduct = @"SELECT idProduct FROM Product WHERE typeProduct = @Type AND nameProduct = @Name AND idPerson = @PersonId AND pagesNum = @Pages";
-            var prodId = _db.QueryAsync<int>(selectProduct, new
+            IEnumerable<int> ids;
+            if (_uow != null)
             {
-                order.Type,
-                order.Name,
-                order.PersonId,
-                order.Pages
-            }).Result.FirstOrDefault();
+                ids = await _uow.Connection.QueryAsync<int>(selectProduct, new
+                {
+                    order.Type,
+                    order.Name,
+                    order.PersonId,
+                    order.Pages
+                }, _uow.Transaction);
+            }
+            else
+            {
+                ids = await _db.QueryAsync<int>(selectProduct, new
+                {
+                    order.Type,
+                    order.Name,
+                    order.PersonId,
+                    order.Pages
+                });
+            }
+            var prodId = ids.FirstOrDefault();
 
             if (prodId == 0)
             {
                 const string insertProd = @"INSERT INTO Product(idPerson,typeProduct,nameProduct,pagesNum) VALUES(@PersonId,@Type,@Name,@Pages); SELECT CAST(SCOPE_IDENTITY() as int);";
-                prodId = _db.QueryAsync<int>(insertProd, new
+                IEnumerable<int> prodIds;
+                if (_uow != null)
                 {
-                    order.PersonId,
-                    order.Type,
-                    order.Name,
-                    order.Pages
-                }).Result.First();
+                    prodIds = await _uow.Connection.QueryAsync<int>(insertProd, new
+                    {
+                        order.PersonId,
+                        order.Type,
+                        order.Name,
+                        order.Pages
+                    }, _uow.Transaction);
+                }
+                else
+                {
+                    prodIds = await _db.QueryAsync<int>(insertProd, new
+                    {
+                        order.PersonId,
+                        order.Type,
+                        order.Name,
+                        order.Pages
+                    });
+                }
+                prodId = prodIds.First();
             }
 
             const string sql = @"INSERT INTO Orders(idProduct,idPerson,namePrintery,dateOrder,dateStart,dateFinish,statusOrder,tirage,price)
                                    VALUES(@ProdId,@PersonId,@Printery,GETDATE(),@DateStart,@DateFinish,@Status,@Tirage,@Price)";
 
-            _db.ExecuteAsync(sql, new
+            if (_uow != null)
             {
-                ProdId = prodId,
-                order.PersonId,
-                Printery = order.Printery,
-                order.DateStart,
-                order.DateFinish,
-                Status = order.Status.ToString(),
-                order.Tirage,
-                order.Price
-            }).Wait();
+                await _uow.Connection.ExecuteAsync(sql, new
+                {
+                    ProdId = prodId,
+                    order.PersonId,
+                    Printery = order.Printery,
+                    order.DateStart,
+                    order.DateFinish,
+                    Status = order.Status.ToString(),
+                    order.Tirage,
+                    order.Price
+                }, _uow.Transaction);
+            }
+            else
+            {
+                await _db.ExecuteAsync(sql, new
+                {
+                    ProdId = prodId,
+                    order.PersonId,
+                    Printery = order.Printery,
+                    order.DateStart,
+                    order.DateFinish,
+                    Status = order.Status.ToString(),
+                    order.Tirage,
+                    order.Price
+                });
+            }
         }
 
         public Task UpdateExpiredAsync()

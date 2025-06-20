@@ -5,6 +5,7 @@ using Publishing.Core.Interfaces;
 
 namespace Publishing.Core.Services
 {
+    [Obsolete("Use CQRS handlers")] 
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
@@ -77,7 +78,7 @@ namespace Publishing.Core.Services
 
         private void SaveOrder(Order order)
         {
-            _orderRepository.Save(order);
+            _orderRepository.SaveAsync(order).GetAwaiter().GetResult();
             _logger.LogInformation($"Order for product {order.Name} saved.");
         }
     }

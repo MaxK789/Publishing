@@ -18,5 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Publishing.Core\Publishing.Core.csproj" />
     <ProjectReference Include="..\..\Publishing.Infrastructure\Publishing.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Publishing.Application\Publishing.Application.csproj" />
   </ItemGroup>
 </Project>

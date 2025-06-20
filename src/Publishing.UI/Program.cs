@@ -10,6 +10,12 @@ using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using Publishing.Infrastructure;
 using Publishing.Infrastructure.Repositories;
+using Publishing.Infrastructure.Queries;
+using MediatR;
+using Publishing.Application.Handlers;
+using Publishing.Application.Validators;
+using Publishing.Application.Behaviors;
+using FluentValidation;
 using Publishing.Services;
 
 namespace Publishing
@@ -50,6 +56,8 @@ namespace Publishing
         private static void ConfigureServices(ServiceCollection services)
         {
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IOrderQueries, OrderQueries>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IStatisticRepository, StatisticRepository>();
             services.AddScoped<IProfileRepository, ProfileRepository>();
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
@@ -59,6 +67,9 @@ namespace Publishing
             services.AddScoped<IPriceCalculator, PriceCalculator>();
             services.AddScoped<IOrderValidator, OrderValidator>();
             services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateOrderHandler).Assembly));
+            services.AddValidatorsFromAssemblyContaining<CreateOrderValidator>();
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
@@ -77,7 +88,6 @@ namespace Publishing
             services.AddScoped<ILoginRepository, LoginRepository>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<INavigationService, NavigationService>();
-            services.AddScoped<IOrderService, OrderService>();
             services.AddTransient<loginForm>();
             services.AddTransient<registrationForm>();
             services.AddTransient<addOrderForm>();

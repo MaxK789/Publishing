@@ -14,7 +14,7 @@ namespace Publishing.Core.Tests
     {
         private class StubOrderRepository : IOrderRepository
         {
-            public void Save(Order order) { }
+            public Task SaveAsync(Order order) => Task.CompletedTask;
 
             public Task UpdateExpiredAsync() => Task.CompletedTask;
 
