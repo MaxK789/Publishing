@@ -26,7 +26,7 @@ namespace Publishing
 
         private void profileForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Application.Exit();
+            System.Windows.Forms.Application.Exit();
         }
 
         private async void changeButton_Click(object sender, EventArgs e)
