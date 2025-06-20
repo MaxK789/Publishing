@@ -1,17 +1,18 @@
 ﻿using System;
-using FluentValidation;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
+using Publishing.Core.DTOs;
+using System.Resources;
 
 namespace Publishing
 {
     public partial class profileForm : Form
     {
         private readonly INavigationService _navigation;
-        private readonly IProfileRepository _profileRepo;
+        private readonly IProfileService _profileService;
         private readonly IUserSession _session;
-        private readonly IValidator<string> _validator;
+        private readonly ResourceManager _resources = new ResourceManager("Publishing.UI.Resources.Resources", typeof(profileForm).Assembly);
 
         [Obsolete("Designer only", error: false)]
         public profileForm()
@@ -19,12 +20,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public profileForm(INavigationService navigation, IProfileRepository profileRepo, IUserSession session, IValidator<string> validator)
+        public profileForm(INavigationService navigation, IProfileService profileService, IUserSession session)
         {
             _navigation = navigation;
-            _profileRepo = profileRepo;
+            _profileService = profileService;
             _session = session;
-            _validator = validator;
             InitializeComponent();
         }
 
@@ -35,64 +35,21 @@ namespace Publishing
 
         private async void changeButton_Click(object sender, EventArgs e)
         {
-            string id = _session.UserId;
-            string fName = FNameTextBox.Text;
-            string lName = LNameTextBox.Text;
-            string email = emailTextBox.Text;
-            string status = statusBox.SelectedItem?.ToString();
-            string phone = phoneTextBox.Text;
-            string fax = faxTextBox.Text;
-            string address = addressTextBox.Text;
+            var dto = new UpdateProfileDto
+            {
+                Id = _session.UserId,
+                FirstName = FNameTextBox.Text,
+                LastName = LNameTextBox.Text,
+                Email = emailTextBox.Text,
+                Status = statusBox.SelectedItem?.ToString(),
+                Phone = phoneTextBox.Text,
+                Fax = faxTextBox.Text,
+                Address = addressTextBox.Text
+            };
 
-            bool exists = await _profileRepo.EmailExistsAsync(email).ConfigureAwait(false);
-            if (exists)
-            {
-                MessageBox.Show("Email вже використовується");
-                return;
-            }
-
-            int count = 0;
-            if (fName != "")
-            {
-                count++;
-            }
-            if (lName != "")
-            {
-                count++;
-            }
-            if (email != "")
-            {
-                if (!_validator.Validate(email).IsValid)
-                {
-                    MessageBox.Show("Email is not valid");
-                    return;
-                }
-                count++;
-            }
-            if (status != null)
-            {
-                count++;
-            }
-            if (phone != "")
-            {
-                count++;
-            }
-            if (fax != "")
-            {
-                count++;
-            }
-            if (address != "")
-            {
-                count++;
-            }
-            if (count > 0)
-            {
-                await _profileRepo.UpdateAsync(id, fName, lName, email, status, phone, fax, address).ConfigureAwait(false);
-
-                MessageBox.Show("Дані успішно змінено");
-
-                _navigation.Navigate<mainForm>(this);
-            }
+            await _profileService.UpdateAsync(dto).ConfigureAwait(false);
+            MessageBox.Show(_resources.GetString("DataUpdated") ?? "Success");
+            _navigation.Navigate<mainForm>(this);
         }
 
         private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)

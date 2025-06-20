@@ -61,6 +61,7 @@ namespace Publishing
             services.AddScoped<IStatisticRepository, StatisticRepository>();
             services.AddScoped<IProfileRepository, ProfileRepository>();
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+            services.AddScoped<IOrganizationService, OrganizationService>();
             services.AddScoped<IPrinteryRepository, PrinteryRepository>();
             services.AddScoped<ILogger, LoggerService>();
             services.AddScoped<IDiscountPolicy, StandardDiscountPolicy>();
@@ -70,7 +71,8 @@ namespace Publishing
             services.AddSingleton<IUserSession, UserSession>();
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateOrderHandler).Assembly));
             services.AddValidatorsFromAssemblyContaining<EmailValidator>();
-            services.AddSingleton<IValidator<string>, EmailValidator>();
+            services.AddTransient<IValidator<string>, EmailValidator>();
+            services.AddTransient<PhoneFaxValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             var configuration = new ConfigurationBuilder()
@@ -92,6 +94,8 @@ namespace Publishing
             services.AddScoped<IDbHelper, DbHelper>();
             services.AddScoped<ILoginRepository, LoginRepository>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IProfileService, ProfileService>();
+            services.AddScoped<IRegistrationService, RegistrationService>();
             services.AddScoped<INavigationService, NavigationService>();
             services.AddTransient<loginForm>();
             services.AddTransient<registrationForm>();
