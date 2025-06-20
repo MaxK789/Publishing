@@ -50,7 +50,7 @@ namespace Publishing
                 Address = addressTextBox.Text
             };
 
-            await _service.UpdateAsync(dto).ConfigureAwait(false);
+            await _service.UpdateAsync(dto);
             MessageBox.Show(_resources.GetString("DataUpdated") ?? "Success");
             _navigation.Navigate<mainForm>(this);
         }

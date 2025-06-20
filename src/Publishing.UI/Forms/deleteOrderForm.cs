@@ -32,7 +32,7 @@ namespace Publishing
             {
                 int idToDelete = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["idOrder"].Value);
 
-                await _orderRepo.DeleteAsync(idToDelete).ConfigureAwait(false);
+                await _orderRepo.DeleteAsync(idToDelete);
 
                 MessageBox.Show("Видалено idOrder: " + idToDelete.ToString());
 
@@ -78,7 +78,7 @@ namespace Publishing
                 статистикаToolStripMenuItem.Visible = false;
                 змінитиДаніToolStripMenuItem.Visible = true;
 
-                DataTable dataTable = await _orderRepo.GetByPersonAsync(id).ConfigureAwait(false);
+                    DataTable dataTable = await _orderRepo.GetByPersonAsync(id);
 
                 dataGridView1.DataSource = dataTable;
 
@@ -96,7 +96,7 @@ namespace Publishing
                 статистикаToolStripMenuItem.Visible = true;
                 змінитиДаніToolStripMenuItem.Visible = false;
 
-                DataTable dataTable = await _orderRepo.GetAllAsync().ConfigureAwait(false);
+                    DataTable dataTable = await _orderRepo.GetAllAsync();
 
                 dataGridView1.DataSource = dataTable;
 
