@@ -12,7 +12,7 @@ namespace Publishing
         private readonly INavigationService _navigation;
         private readonly IOrganizationService _service;
         private readonly IUserSession _session;
-        private readonly ResourceManager _resources = new ResourceManager("Publishing.UI.Resources.Resources", typeof(organizationForm).Assembly);
+        private readonly ResourceManager _resources = new ResourceManager("Publishing.Resources.Resources", typeof(organizationForm).Assembly);
 
         [Obsolete("Designer only", error: false)]
         public organizationForm()

@@ -16,7 +16,7 @@ namespace Publishing
         private readonly IMediator _mediator;
         private readonly INavigationService _navigation;
         private readonly IUserSession _session;
-        private readonly ResourceManager _resources = new ResourceManager("Publishing.UI.Resources.Resources", typeof(addOrderForm).Assembly);
+        private readonly ResourceManager _resources = new ResourceManager("Publishing.Resources.Resources", typeof(addOrderForm).Assembly);
         [Obsolete("Designer only", error: false)]
         public addOrderForm()
         {
