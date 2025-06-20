@@ -10,6 +10,7 @@ namespace Publishing
     {
         private readonly INavigationService _navigation;
         private readonly IProfileRepository _profileRepo;
+        private readonly IUserSession _session;
 
         [Obsolete("Designer only", error: false)]
         public profileForm()
@@ -17,10 +18,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public profileForm(INavigationService navigation, IProfileRepository profileRepo)
+        public profileForm(INavigationService navigation, IProfileRepository profileRepo, IUserSession session)
         {
             _navigation = navigation;
             _profileRepo = profileRepo;
+            _session = session;
             InitializeComponent();
         }
 
@@ -31,7 +33,7 @@ namespace Publishing
 
         private async void changeButton_Click(object sender, EventArgs e)
         {
-            string id = CurrentUser.UserId;
+            string id = _session.UserId;
             string fName = FNameTextBox.Text;
             string lName = LNameTextBox.Text;
             string email = emailTextBox.Text;
@@ -94,9 +96,9 @@ namespace Publishing
 
         private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CurrentUser.UserId = "";
-            CurrentUser.UserName = "";
-            CurrentUser.UserType = "";
+            _session.UserId = string.Empty;
+            _session.UserName = string.Empty;
+            _session.UserType = string.Empty;
 
             _navigation.Navigate<loginForm>(this);
         }
@@ -108,7 +110,7 @@ namespace Publishing
 
         private void profileForm_Load(object sender, EventArgs e)
         {
-            if (CurrentUser.UserType == "контактна особа")
+            if (_session.UserType == "контактна особа")
                 організаціяToolStripMenuItem.Visible = true;
             else
                 організаціяToolStripMenuItem.Visible = false;

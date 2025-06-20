@@ -10,6 +10,7 @@ namespace Publishing
     {
         private readonly INavigationService _navigation;
         private readonly IStatisticRepository _statRepo;
+        private readonly IUserSession _session;
 
         [Obsolete("Designer only", error: false)]
         public statisticForm()
@@ -17,10 +18,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public statisticForm(INavigationService navigation, IStatisticRepository statRepo)
+        public statisticForm(INavigationService navigation, IStatisticRepository statRepo, IUserSession session)
         {
             _navigation = navigation;
             _statRepo = statRepo;
+            _session = session;
             InitializeComponent();
         }
 
@@ -59,9 +61,9 @@ namespace Publishing
 
         private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CurrentUser.UserId = "";
-            CurrentUser.UserName = "";
-            CurrentUser.UserType = "";
+            _session.UserId = string.Empty;
+            _session.UserName = string.Empty;
+            _session.UserType = string.Empty;
 
             _navigation.Navigate<loginForm>(this);
         }
@@ -161,9 +163,9 @@ namespace Publishing
 
         private void вийтиToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            CurrentUser.UserId = "";
-            CurrentUser.UserName = "";
-            CurrentUser.UserType = "";
+            _session.UserId = string.Empty;
+            _session.UserName = string.Empty;
+            _session.UserType = string.Empty;
 
             _navigation.Navigate<loginForm>(this);
         }

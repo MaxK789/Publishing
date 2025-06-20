@@ -10,6 +10,7 @@ namespace Publishing
     {
         private readonly INavigationService _navigation;
         private readonly IOrderRepository _orderRepo;
+        private readonly IUserSession _session;
 
         [Obsolete("Designer only", error: false)]
         public mainForm()
@@ -17,10 +18,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public mainForm(INavigationService navigation, IOrderRepository orderRepo)
+        public mainForm(INavigationService navigation, IOrderRepository orderRepo, IUserSession session)
         {
             _navigation = navigation;
             _orderRepo = orderRepo;
+            _session = session;
             InitializeComponent();
         }
 
@@ -31,9 +33,9 @@ namespace Publishing
 
         private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CurrentUser.UserId = "";
-            CurrentUser.UserName = "";
-            CurrentUser.UserType = "";
+            _session.UserId = string.Empty;
+            _session.UserName = string.Empty;
+            _session.UserType = string.Empty;
 
             _navigation.Navigate<loginForm>(this);
         }
@@ -60,12 +62,12 @@ namespace Publishing
 
         private async void mainForm_Load(object sender, EventArgs e)
         {
-            if (CurrentUser.UserType == "контактна особа")
+            if (_session.UserType == "контактна особа")
                 організаціяToolStripMenuItem.Visible = true;
             else
                 організаціяToolStripMenuItem.Visible = false;
 
-            if (CurrentUser.UserType != "admin")
+            if (_session.UserType != "admin")
             {
                 статистикаToolStripMenuItem.Visible = false;
                 змінитиДаніToolStripMenuItem.Visible = true;

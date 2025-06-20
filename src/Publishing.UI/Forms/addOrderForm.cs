@@ -13,6 +13,7 @@ namespace Publishing
     {
         private readonly IMediator _mediator;
         private readonly INavigationService _navigation;
+        private readonly IUserSession _session;
         private readonly ResourceManager _resources = new ResourceManager("Publishing.UI.Resources.Resources", typeof(addOrderForm).Assembly);
         [Obsolete("Designer only", error: false)]
         public addOrderForm()
@@ -20,10 +21,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public addOrderForm(IMediator mediator, INavigationService navigation)
+        public addOrderForm(IMediator mediator, INavigationService navigation, IUserSession session)
         {
             _mediator = mediator;
             _navigation = navigation;
+            _session = session;
             InitializeComponent();
         }
 
@@ -44,16 +46,16 @@ namespace Publishing
 
         private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CurrentUser.UserId = "";
-            CurrentUser.UserName = "";
-            CurrentUser.UserType = "";
+            _session.UserId = string.Empty;
+            _session.UserName = string.Empty;
+            _session.UserType = string.Empty;
 
             _navigation.Navigate<loginForm>(this);
         }
 
         private void addOrderForm_Load(object sender, EventArgs e)
         {
-            if (CurrentUser.UserType == "контактна особа")
+            if (_session.UserType == "контактна особа")
                 організаціяToolStripMenuItem.Visible = true;
             else
                 організаціяToolStripMenuItem.Visible = false;
@@ -80,7 +82,7 @@ namespace Publishing
                 Pages = pageNum,
                 Tirage = tirageNum,
                 Printery = printeryBox.SelectedItem?.ToString() ?? string.Empty,
-                PersonId = CurrentUser.UserId
+                PersonId = _session.UserId
             };
 
             var command = new CreateOrderCommand(dto.Type, dto.Name, dto.Pages, dto.Tirage, dto.PersonId, dto.Printery);
@@ -113,7 +115,7 @@ namespace Publishing
                 Pages = pageNum,
                 Tirage = tirageNum,
                 Printery = printeryBox.SelectedItem?.ToString() ?? string.Empty,
-                PersonId = CurrentUser.UserId
+                PersonId = _session.UserId
             };
 
             var command = new CreateOrderCommand(dto.Type, dto.Name, dto.Pages, dto.Tirage, dto.PersonId, dto.Printery);

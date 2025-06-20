@@ -67,6 +67,7 @@ namespace Publishing
             services.AddScoped<IPriceCalculator, PriceCalculator>();
             services.AddScoped<IOrderValidator, OrderValidator>();
             services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
+            services.AddScoped<IUserSession, UserSession>();
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateOrderHandler).Assembly));
             services.AddValidatorsFromAssemblyContaining<CreateOrderValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
