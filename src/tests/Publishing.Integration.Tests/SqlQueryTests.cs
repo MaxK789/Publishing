@@ -12,42 +12,32 @@ using Dapper;
 using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using System;
+using System.IO;
 
 namespace Publishing.Integration.Tests;
 
 [TestClass]
 public class SqlQueryTests
 {
-    private const string Server = @"(localdb)\MSSQLLocalDB";
-    private const string DbName = "SqlQueryTest";
-    private static string MasterConnection => $"Data Source={Server};Initial Catalog=master;Integrated Security=true";
+    private static readonly string DbPath = Path.Combine(Path.GetTempPath(), "SqlQueryTest.db");
     private ServiceProvider _sp = null!;
     private string _cs = null!;
 
     [TestInitialize]
     public void Init()
     {
-        using (var con = new SqlConnection(MasterConnection))
+        if (File.Exists(DbPath))
         {
-            con.Open();
-            using var cmd = con.CreateCommand();
-            cmd.CommandText = $@"
-IF DB_ID('{DbName}') IS NOT NULL
-BEGIN
-    ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE [{DbName}];
-END
-CREATE DATABASE [{DbName}];";
-            cmd.ExecuteNonQuery();
+            File.Delete(DbPath);
         }
-        _cs = $"Data Source={Server};Initial Catalog={DbName};Integrated Security=true";
+        _cs = $"Data Source={DbPath}";
 
         var services = new ServiceCollection();
         services.AddTransient<ILogger, LoggerService>();
         services.AddSingleton<IDbConnectionFactory>(sp =>
-            new SqlDbConnectionFactory(new TestConfiguration(_cs), sp.GetRequiredService<ILogger>()));
+            new SqliteDbConnectionFactory(new TestConfiguration(_cs), sp.GetRequiredService<ILogger>()));
         services.AddTransient<IDbContext, DapperDbContext>();
         services.AddMemoryCache();
         services.AddSingleton<QueryDispatcher>();
@@ -64,16 +54,10 @@ CREATE DATABASE [{DbName}];";
     public void Cleanup()
     {
         if (_sp != null) _sp.Dispose();
-        using var con = new SqlConnection(MasterConnection);
-        con.Open();
-        using var cmd = con.CreateCommand();
-        cmd.CommandText = $@"
-IF DB_ID('{DbName}') IS NOT NULL
-BEGIN
-    ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE [{DbName}];
-END";
-        cmd.ExecuteNonQuery();
+        if (File.Exists(DbPath))
+        {
+            File.Delete(DbPath);
+        }
     }
 
     [TestMethod]

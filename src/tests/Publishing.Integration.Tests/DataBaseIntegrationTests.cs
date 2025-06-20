@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
@@ -10,16 +10,15 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Publishing.Core.Interfaces;
 using Publishing.Infrastructure;
+using System.IO;
 
 namespace Publishing.Integration.Tests
 {
     [TestClass]
     public class DataBaseIntegrationTests
     {
-        private const string Server = @"(localdb)\MSSQLLocalDB";
-        private const string DbName = "PublishingTest";
-
-        private static string MasterConnection => $"Data Source={Server};Initial Catalog=master;Integrated Security=true";
+        private static readonly string DbPath = Path.Combine(Path.GetTempPath(), "PublishingTest.db");
+        private static string ConnectionString => $"Data Source={DbPath}";
 
         private IDbContext _db = null!;
         private IDbHelper _helper = null!;
@@ -28,21 +27,11 @@ namespace Publishing.Integration.Tests
         [TestInitialize]
         public void Setup()
         {
-            using (var con = new SqlConnection(MasterConnection))
+            if (File.Exists(DbPath))
             {
-                con.Open();
-                using var cmd = con.CreateCommand();
-                cmd.CommandText = $@"
-IF DB_ID('{DbName}') IS NOT NULL
-BEGIN
-    ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE [{DbName}];
-END
-CREATE DATABASE [{DbName}];";
-                cmd.ExecuteNonQuery();
+                File.Delete(DbPath);
             }
-
-            var cs = $"Data Source={Server};Initial Catalog={DbName};Integrated Security=true";
+            var cs = ConnectionString;
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
@@ -51,10 +40,10 @@ CREATE DATABASE [{DbName}];";
                 .Build();
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
-            services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
+            services.AddTransient<IDbConnectionFactory, SqliteDbConnectionFactory>();
             services.AddTransient<IDbContext, DapperDbContext>();
             services.AddTransient<IDbHelper, DbHelper>();
-            services.AddDbContext<AppDbContext>(o => o.UseSqlServer(cs));
+            services.AddDbContext<AppDbContext>(o => o.UseSqlite(cs));
             services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
 
             _serviceProvider = services.BuildServiceProvider();
@@ -74,17 +63,9 @@ CREATE DATABASE [{DbName}];";
             {
                 _serviceProvider.Dispose();
             }
-            using (var con = new SqlConnection(MasterConnection))
+            if (File.Exists(DbPath))
             {
-                con.Open();
-                using var cmd = con.CreateCommand();
-                cmd.CommandText = $@"
-IF DB_ID('{DbName}') IS NOT NULL
-BEGIN
-    ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE [{DbName}];
-END";
-                cmd.ExecuteNonQuery();
+                File.Delete(DbPath);
             }
         }
 
@@ -99,7 +80,7 @@ END";
         [TestMethod]
         public void ExecuteQuery_InsertAndSelect_ReturnsValue()
         {
-            _db.ExecuteAsync("CREATE TABLE Settings(id INT IDENTITY(1,1), value INT)").Wait();
+            _db.ExecuteAsync("CREATE TABLE Settings(id INTEGER PRIMARY KEY AUTOINCREMENT, value INT)").Wait();
             _db.ExecuteAsync("INSERT INTO Settings(value) VALUES(42)").Wait();
             var result = _db.QueryAsync<int>("SELECT value FROM Settings WHERE id = 1").Result.First();
             Assert.AreEqual(42, result);

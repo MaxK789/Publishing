@@ -2,7 +2,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -19,10 +20,8 @@ namespace Publishing.Integration.Tests
     [TestClass]
     public class CrudFlowTests
     {
-        private const string Server = @"(localdb)\MSSQLLocalDB";
-        private const string DbName = "PublishingCrud";
-
-        private static string MasterConnection => $"Data Source={Server};Initial Catalog=master;Integrated Security=true";
+        private static readonly string DbPath = Path.Combine(Path.GetTempPath(), "PublishingCrud.db");
+        private static string ConnectionString => $"Data Source={DbPath}";
 
         private IDbContext _db = null!;
         private ServiceProvider _serviceProvider = null!;
@@ -30,21 +29,11 @@ namespace Publishing.Integration.Tests
         [TestInitialize]
         public void Setup()
         {
-            using (var con = new SqlConnection(MasterConnection))
+            if (File.Exists(DbPath))
             {
-                con.Open();
-                using var cmd = con.CreateCommand();
-                cmd.CommandText = $@"
-IF DB_ID('{DbName}') IS NOT NULL
-BEGIN
-    ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE [{DbName}];
-END
-CREATE DATABASE [{DbName}];";
-                cmd.ExecuteNonQuery();
+                File.Delete(DbPath);
             }
-
-            var cs = $"Data Source={Server};Initial Catalog={DbName};Integrated Security=true";
+            var cs = ConnectionString;
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
@@ -53,9 +42,9 @@ CREATE DATABASE [{DbName}];";
                 .Build();
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
-            services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
+            services.AddTransient<IDbConnectionFactory, SqliteDbConnectionFactory>();
             services.AddTransient<IDbContext, DapperDbContext>();
-            services.AddDbContext<AppDbContext>(o => o.UseSqlServer(cs));
+            services.AddDbContext<AppDbContext>(o => o.UseSqlite(cs));
             services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
             services.AddTransient<ILoginRepository, LoginRepository>();
 
@@ -73,17 +62,9 @@ CREATE DATABASE [{DbName}];";
             {
                 _serviceProvider.Dispose();
             }
-            using (var con = new SqlConnection(MasterConnection))
+            if (File.Exists(DbPath))
             {
-                con.Open();
-                using var cmd = con.CreateCommand();
-                cmd.CommandText = $@"
-IF DB_ID('{DbName}') IS NOT NULL
-BEGIN
-    ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE [{DbName}];
-END";
-                cmd.ExecuteNonQuery();
+                File.Delete(DbPath);
             }
         }
 
@@ -120,7 +101,7 @@ END";
             _db.ExecuteAsync($"INSERT INTO Product(idPerson,typeProduct,nameProduct,pagesNum) VALUES({id},'book','Title',10)").Wait();
             int idProd = _db.QueryAsync<int>("SELECT idProduct FROM Product WHERE nameProduct='Title'").Result.First();
 
-            _db.ExecuteAsync($"INSERT INTO Orders(idProduct,idPerson,namePrintery,dateOrder,dateStart,dateFinish,statusOrder,tirage,price) VALUES({idProd},{id},'P',GETDATE(),GETDATE(),GETDATE(),'в роботі',5,50)").Wait();
+            _db.ExecuteAsync($"INSERT INTO Orders(idProduct,idPerson,namePrintery,dateOrder,dateStart,dateFinish,statusOrder,tirage,price) VALUES({idProd},{id},'P','2024-01-01','2024-01-01','2024-01-01','в роботі',5,50)").Wait();
             int count = _db.QueryAsync<int>("SELECT COUNT(*) FROM Orders").Result.First();
             Assert.AreEqual(1, count);
         }
@@ -132,7 +113,7 @@ END";
             int id = _db.QueryAsync<int>("SELECT idPerson FROM Person WHERE emailPerson='g@h.com'").Result.First();
             _db.ExecuteAsync($"INSERT INTO Product(idPerson,typeProduct,nameProduct,pagesNum) VALUES({id},'book','Del',10)").Wait();
             int idProd = _db.QueryAsync<int>("SELECT idProduct FROM Product WHERE nameProduct='Del'").Result.First();
-            _db.ExecuteAsync($"INSERT INTO Orders(idProduct,idPerson,namePrintery,dateOrder,dateStart,dateFinish,statusOrder,tirage,price) VALUES({idProd},{id},'P',GETDATE(),GETDATE(),GETDATE(),'в роботі',5,50)").Wait();
+            _db.ExecuteAsync($"INSERT INTO Orders(idProduct,idPerson,namePrintery,dateOrder,dateStart,dateFinish,statusOrder,tirage,price) VALUES({idProd},{id},'P','2024-01-01','2024-01-01','2024-01-01','в роботі',5,50)").Wait();
             int idOrder = _db.QueryAsync<int>("SELECT idOrder FROM Orders").Result.First();
 
             _db.ExecuteAsync("DELETE FROM Orders WHERE idOrder=@id", new { id = idOrder }).Wait();
