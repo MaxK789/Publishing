@@ -14,7 +14,7 @@ namespace Publishing.Infrastructure.Entities
         public DateTime DateFinish { get; set; }
         public string Status { get; set; } = string.Empty;
         public int Tirage { get; set; }
-        public int Price { get; set; }
+        public decimal Price { get; set; }
 
         public Person Person { get; set; } = null!;
         public Product Product { get; set; } = null!;
