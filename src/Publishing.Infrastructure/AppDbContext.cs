@@ -81,7 +81,7 @@ namespace Publishing.Infrastructure
                 entity.HasOne(e => e.Person)
                       .WithMany(p => p.Orders)
                       .HasForeignKey(e => e.PersonId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

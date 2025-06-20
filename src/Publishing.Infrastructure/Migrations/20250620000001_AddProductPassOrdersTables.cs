@@ -80,7 +80,7 @@ namespace Publishing.Infrastructure.Migrations
                         column: x => x.idProduct,
                         principalTable: "Product",
                         principalColumn: "idProduct",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateIndex(
