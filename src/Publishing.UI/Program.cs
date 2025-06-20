@@ -12,9 +12,9 @@ using Publishing.Infrastructure;
 using Publishing.Infrastructure.Repositories;
 using Publishing.Infrastructure.Queries;
 using MediatR;
-using Publishing.Application.Handlers;
-using Publishing.Application.Validators;
-using Publishing.Application.Behaviors;
+using Publishing.AppLayer.Handlers;
+using Publishing.AppLayer.Validators;
+using Publishing.AppLayer.Behaviors;
 using FluentValidation;
 using Publishing.Services;
 

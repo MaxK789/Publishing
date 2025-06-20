@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publishing.Infrastructure",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publishing.Services", "src\Publishing.Services\Publishing.Services.csproj", "{FF727600-00AE-423C-BBDF-79CE9A936887}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publishing.Application", "src\Publishing.Application\Publishing.Application.csproj", "{9B9E0E43-9D97-4EC5-90DF-5FF262EE6237}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publishing.AppLayer", "src\Publishing.Application\Publishing.Application.csproj", "{9B9E0E43-9D97-4EC5-90DF-5FF262EE6237}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Publishing.Application.Commands;
-using Publishing.Application.Handlers;
-using Publishing.Application.Validators;
+using Publishing.AppLayer.Commands;
+using Publishing.AppLayer.Handlers;
+using Publishing.AppLayer.Validators;
 using Publishing.Core.Domain;
 using Publishing.Core.Interfaces;
 using Publishing.Core.Services;

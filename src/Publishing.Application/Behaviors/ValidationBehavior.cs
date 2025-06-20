@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 
-namespace Publishing.Application.Behaviors
+namespace Publishing.AppLayer.Behaviors
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : notnull

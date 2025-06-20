@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <RootNamespace>Publishing.AppLayer</RootNamespace>
+    <AssemblyName>Publishing.AppLayer</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MediatR" Version="12.1.1" />
