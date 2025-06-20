@@ -20,6 +20,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Publishing.Infrastructure\Publishing.Infrastructure.csproj" />
+    <ProjectReference Include="../../Publishing.Infrastructure/Publishing.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
