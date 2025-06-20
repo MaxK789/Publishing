@@ -6,7 +6,10 @@ namespace Publishing.AppLayer.Validators
     {
         public EmailValidator()
         {
-            RuleFor(x => x).NotEmpty().EmailAddress();
+            RuleFor(x => x)
+                .NotEmpty()
+                // require domain part to contain a dot
+                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
         }
     }
 }
