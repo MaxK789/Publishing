@@ -78,6 +78,9 @@ namespace Publishing
                 .AddJsonFile("appsettings.json", optional: false)
                 .Build();
 
+            System.Diagnostics.Debug.WriteLine(
+                "Connection string: " + configuration.GetConnectionString("DefaultConnection"));
+
             services.AddSingleton<IConfiguration>(configuration);
             services.AddDbContext<AppDbContext>(o =>
                 o.UseSqlServer(
