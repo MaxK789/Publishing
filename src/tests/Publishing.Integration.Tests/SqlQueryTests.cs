@@ -119,13 +119,17 @@ END";
         Assert.AreEqual(0, count);
     }
 
-    private record RawSqlCommand(string SqlText) : SqlCommand
+    private class RawSqlCommand : Publishing.Infrastructure.DataAccess.SqlCommand
     {
+        public RawSqlCommand(string sqlText) { SqlText = sqlText; }
+        private string SqlText { get; }
         public override string Sql => SqlText;
     }
 
-    private record RawScalarQuery<T>(string SqlText) : SqlQuery<T>
+    private class RawScalarQuery<T> : Publishing.Infrastructure.DataAccess.SqlQuery<T>
     {
+        public RawScalarQuery(string sqlText) { SqlText = sqlText; }
+        private string SqlText { get; }
         public override string Sql => SqlText;
         public override T Map(IDataReader reader) => (T)reader.GetValue(0);
     }
