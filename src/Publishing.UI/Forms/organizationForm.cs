@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.RegularExpressions;
+using FluentValidation;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
@@ -11,6 +11,7 @@ namespace Publishing
         private readonly INavigationService _navigation;
         private readonly IOrganizationRepository _orgRepo;
         private readonly IUserSession _session;
+        private readonly IValidator<string> _validator;
 
         [Obsolete("Designer only", error: false)]
         public organizationForm()
@@ -18,11 +19,12 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public organizationForm(INavigationService navigation, IOrganizationRepository orgRepo, IUserSession session)
+        public organizationForm(INavigationService navigation, IOrganizationRepository orgRepo, IUserSession session, IValidator<string> validator)
         {
             _navigation = navigation;
             _orgRepo = orgRepo;
             _session = session;
+            _validator = validator;
             InitializeComponent();
         }
 
@@ -49,8 +51,7 @@ namespace Publishing
 
             if (!orgName.Equals(checkName))
             {
-                string pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$";
-                if (!Regex.IsMatch(email, pattern))
+                if (!_validator.Validate(email).IsValid)
                 {
                     MessageBox.Show("Email is not valid");
                     return;
