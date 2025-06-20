@@ -6,6 +6,7 @@ using Publishing.Core.Interfaces;
 
 namespace Publishing.Infrastructure.Repositories
 {
+    [Obsolete("Replaced by query objects")]
     public class LoginRepository : ILoginRepository
     {
         private readonly IDbContext _db;

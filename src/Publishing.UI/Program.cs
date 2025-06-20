@@ -10,7 +10,7 @@ using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using Publishing.Infrastructure;
 using Publishing.Infrastructure.Repositories;
-using Publishing.Infrastructure.Queries;
+using Publishing.Infrastructure.DataAccess;
 using MediatR;
 using Publishing.AppLayer.Handlers;
 using Publishing.AppLayer.Validators;
@@ -69,6 +69,7 @@ namespace Publishing
             services.AddScoped<IOrderValidator, OrderValidator>();
             services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
             services.AddSingleton<IUserSession, UserSession>();
+            services.AddMemoryCache();
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateOrderHandler).Assembly));
             services.AddValidatorsFromAssemblyContaining<EmailValidator>();
             services.AddTransient<IValidator<string>, EmailValidator>();
@@ -90,6 +91,13 @@ namespace Publishing
                     configuration.GetConnectionString("DefaultConnection"),
                     b => b.MigrationsAssembly("Publishing.Infrastructure")));
             services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
+            services.AddSingleton<QueryDispatcher>();
+            services.AddSingleton<IQueryDispatcher>(sp =>
+                new MemoryCacheQueryDispatcher(
+                    sp.GetRequiredService<QueryDispatcher>(),
+                    sp.GetRequiredService<IMemoryCache>(),
+                    TimeSpan.FromMinutes(10)));
+            services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
             services.AddTransient<IDbContext, DapperDbContext>();
             services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
             services.AddScoped<IDbHelper, DbHelper>();

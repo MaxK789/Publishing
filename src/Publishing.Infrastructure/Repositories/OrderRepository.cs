@@ -6,6 +6,7 @@ using Dapper;
 
 namespace Publishing.Infrastructure.Repositories
 {
+    [Obsolete("Replaced by query objects")]
     public class OrderRepository : IOrderRepository, IOrderQueries
     {
         private readonly IDbContext _db;
