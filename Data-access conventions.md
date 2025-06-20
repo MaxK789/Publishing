@@ -29,7 +29,26 @@ Unit tests should verify that the SQL string of a query matches the expected sta
 ```csharp
 var cached = new MemoryCacheQueryDispatcher(inner, cache, TimeSpan.FromMinutes(10));
 ```
+The cache duration depends on how frequently the underlying data changes. A short
+TTL of five to ten minutes is usually enough for reference tables that rarely
+change.
 
 ## Integration testing
 
-Integration tests spin up a SQL Server container with Testcontainers and execute the query objects against a real database to validate SQL syntax.
+Most integration tests run against a temporary SQLite database file. This avoids
+starting a SQL Server container and keeps the execution time under a few
+seconds. SQLite is fast but does not implement the full SQL Server dialect, so
+passing tests here do not guarantee your queries will behave identically under
+SQL Server. For scenarios that rely on SQL Server–specific features (like
+`SCOPE_IDENTITY()` or `GETDATE()`), add separate tests that use Testcontainers
+to spin up a real SQL Server instance.
+
+## Testing strategy
+
+* **Unit tests** use the EF Core InMemory provider to validate repository logic
+  without touching a real database.
+* **Integration tests** rely on SQLite files to exercise migrations and query
+  objects quickly. Tests requiring SQL Server syntax should use Testcontainers.
+* **Smoke tests** run a minimal set of queries against either the in-memory
+  provider or SQLite to verify the application starts correctly before a full
+  test pass.

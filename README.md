@@ -58,9 +58,16 @@ In CI pipelines you can apply migrations automatically using:
 dotnet ef database update --project src/Publishing.Infrastructure
 ```
 
-A GitHub Actions workflow under `.github/workflows/ci.yml` demonstrates how to build the solution, run tests and apply migrations automatically during CI.
-The workflow installs the EF Core CLI tool and runs on Windows runners so that SQL
-Server LocalDB is available.
+A GitHub Actions workflow under `.github/workflows/ci.yml` demonstrates how to build the solution and run tests automatically during CI.
+The job now runs on Linux and uses a temporary SQLite database so no SQL Server instance is required.
+
+## Testing
+
+* **Unit tests** run with the EF Core InMemory provider.
+* **Integration tests** use SQLite files for speed. SQLite's SQL dialect differs
+  from SQL Server, so passing tests here should be treated as a quick sanity
+  check rather than proof that all queries work with SQL Server.
+* A few tests run against SQL Server via Testcontainers when T-SQL features are involved.
 
 ## Price calculation and discounts
 
