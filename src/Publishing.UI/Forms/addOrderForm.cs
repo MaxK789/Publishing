@@ -3,22 +3,26 @@ using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
 using System.Windows.Forms;
 using Publishing.Services;
+using MediatR;
+using Publishing.Application.Commands;
+using System.Resources;
 
 namespace Publishing
 {
     public partial class addOrderForm : Form
     {
-        private readonly IOrderService _orderService;
+        private readonly IMediator _mediator;
         private readonly INavigationService _navigation;
+        private readonly ResourceManager _resources = new ResourceManager("Publishing.UI.Resources.Resources", typeof(addOrderForm).Assembly);
         [Obsolete("Designer only", error: false)]
         public addOrderForm()
         {
             InitializeComponent();
         }
 
-        public addOrderForm(IOrderService orderService, INavigationService navigation)
+        public addOrderForm(IMediator mediator, INavigationService navigation)
         {
-            _orderService = orderService;
+            _mediator = mediator;
             _navigation = navigation;
             InitializeComponent();
         }
@@ -55,17 +59,17 @@ namespace Publishing
                 організаціяToolStripMenuItem.Visible = false;
         }
 
-        private void calculateButton_Click(object sender, EventArgs e)
+        private async void calculateButton_Click(object sender, EventArgs e)
         {
             if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
             {
-                MessageBox.Show("pagesNumParse");
+                MessageBox.Show(_resources.GetString("PagesParseError") ?? "Error");
                 return;
             }
 
             if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
             {
-                MessageBox.Show("tirageParse");
+                MessageBox.Show(_resources.GetString("TirageParseError") ?? "Error");
                 return;
             }
 
@@ -79,11 +83,12 @@ namespace Publishing
                 PersonId = CurrentUser.UserId
             };
 
-            var order = _orderService.CreateOrder(dto);
+            var command = new CreateOrderCommand(dto.Type, dto.Name, dto.Pages, dto.Tirage, dto.PersonId, dto.Printery);
+            var order = await _mediator.Send(command);
             totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
         }
 
-        private void orderButton_Click(object sender, EventArgs e)
+        private async void orderButton_Click(object sender, EventArgs e)
         {
             string type = typeBox.SelectedItem?.ToString();
             if (type == null)
@@ -91,13 +96,13 @@ namespace Publishing
 
             if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
             {
-                MessageBox.Show("pagesNumParse");
+                MessageBox.Show(_resources.GetString("PagesParseError") ?? "Error");
                 return;
             }
 
             if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
             {
-                MessageBox.Show("tirageParse");
+                MessageBox.Show(_resources.GetString("TirageParseError") ?? "Error");
                 return;
             }
 
@@ -111,9 +116,10 @@ namespace Publishing
                 PersonId = CurrentUser.UserId
             };
 
-            var order = _orderService.CreateOrder(dto);
+            var command = new CreateOrderCommand(dto.Type, dto.Name, dto.Pages, dto.Tirage, dto.PersonId, dto.Printery);
+            var order = await _mediator.Send(command);
 
-            MessageBox.Show("Замовлення успішно додано");
+            MessageBox.Show(_resources.GetString("OrderAdded") ?? "Success");
             totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
 
             _navigation.Navigate<mainForm>(this);

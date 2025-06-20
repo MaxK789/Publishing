@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="OrderAdded" xml:space="preserve">
+    <value>Order successfully created</value>
+  </data>
+  <data name="PagesParseError" xml:space="preserve">
+    <value>Invalid page count</value>
+  </data>
+  <data name="TirageParseError" xml:space="preserve">
+    <value>Invalid tirage</value>
+  </data>
+</root>

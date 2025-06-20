@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="OrderAdded" xml:space="preserve">
+    <value>Замовлення успішно додано</value>
+  </data>
+  <data name="PagesParseError" xml:space="preserve">
+    <value>Невірна кількість сторінок</value>
+  </data>
+  <data name="TirageParseError" xml:space="preserve">
+    <value>Невірний тираж</value>
+  </data>
+</root>
