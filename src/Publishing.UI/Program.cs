@@ -78,6 +78,7 @@ namespace Publishing
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false)
+                .AddEnvironmentVariables()
                 .Build();
 
             System.Diagnostics.Debug.WriteLine(

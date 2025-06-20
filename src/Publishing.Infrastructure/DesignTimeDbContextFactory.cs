@@ -14,6 +14,7 @@ namespace Publishing.Infrastructure
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(uiDir)
                 .AddJsonFile("appsettings.json", optional: false)
+                .AddEnvironmentVariables()
                 .Build();
 
             var builder = new DbContextOptionsBuilder<AppDbContext>();
