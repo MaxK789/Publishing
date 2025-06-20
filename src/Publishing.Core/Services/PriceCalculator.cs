@@ -6,6 +6,13 @@ namespace Publishing.Core.Services
 {
     public class PriceCalculator : IPriceCalculator
     {
+        private readonly IDiscountPolicy _discountPolicy;
+
+        public PriceCalculator(IDiscountPolicy discountPolicy)
+        {
+            _discountPolicy = discountPolicy ?? throw new ArgumentNullException(nameof(discountPolicy));
+        }
+
         public decimal Calculate(int pages, int copies, decimal pricePerPage)
         {
             if (pages < 0)
@@ -25,7 +32,7 @@ namespace Publishing.Core.Services
             {
                 decimal result = pricePerPage * dPages;
                 result = result * dCopies;
-                return result;
+                return _discountPolicy.ApplyDiscount(pages, copies, result);
             }
         }
     }

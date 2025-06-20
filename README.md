@@ -45,3 +45,15 @@ dotnet ef database update --project src/Publishing.Infrastructure
 A GitHub Actions workflow under `.github/workflows/ci.yml` demonstrates how to build the solution, run tests and apply migrations automatically during CI.
 The workflow installs the EF Core CLI tool and runs on Windows runners so that SQL
 Server LocalDB is available.
+
+## Price calculation and discounts
+
+Orders use a `PriceCalculator` service to determine the final cost. This calculator resolves an `IDiscountPolicy` from the DI container so different promotions can adjust the base price. Register the default policy in `Program.cs`:
+
+```csharp
+services.AddScoped<IDiscountPolicy, StandardDiscountPolicy>();
+```
+
+New strategies can be provided by registering a different implementation without touching `PriceCalculator`.
+Components should obtain `PriceCalculator` via dependency injection rather than constructing it directly.
+
