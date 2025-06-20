@@ -30,7 +30,11 @@ namespace Publishing.Integration.Tests
             {
                 File.Delete(_dbPath);
             }
-            var cs = ConnectionString;
+            var builder = new SqliteConnectionStringBuilder(ConnectionString)
+            {
+                Pooling = false
+            };
+            var cs = builder.ToString();
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
