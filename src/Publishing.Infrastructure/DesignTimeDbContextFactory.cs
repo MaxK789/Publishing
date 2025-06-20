@@ -9,8 +9,10 @@ namespace Publishing.Infrastructure
     {
         public AppDbContext CreateDbContext(string[] args)
         {
+            var uiDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "Publishing.UI"));
+
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
+                .SetBasePath(uiDir)
                 .AddJsonFile("appsettings.json", optional: false)
                 .Build();
 
