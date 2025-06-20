@@ -2,14 +2,16 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Publishing.Infrastructure.Entities;
 
 namespace Publishing.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250620000000_AddPersonTable")]
+    partial class AddPersonTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "6.0.22");
 
@@ -79,3 +81,4 @@ namespace Publishing.Infrastructure.Migrations
         }
     }
 }
+
