@@ -15,7 +15,12 @@ public class SqliteDbConnectionFactory : IDbConnectionFactory
 
     public SqliteDbConnectionFactory(IConfiguration configuration, ILogger logger)
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+        var cs = configuration.GetConnectionString("DefaultConnection")!;
+        var builder = new SqliteConnectionStringBuilder(cs)
+        {
+            Pooling = false
+        };
+        _connectionString = builder.ToString();
         _logger = logger;
     }
 
