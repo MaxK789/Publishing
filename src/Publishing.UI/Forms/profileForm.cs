@@ -47,7 +47,7 @@ namespace Publishing
                 Address = addressTextBox.Text
             };
 
-            await _profileService.UpdateAsync(dto).ConfigureAwait(false);
+            await _profileService.UpdateAsync(dto);
             MessageBox.Show(_resources.GetString("DataUpdated") ?? "Success");
             _navigation.Navigate<mainForm>(this);
         }

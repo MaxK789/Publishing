@@ -14,9 +14,10 @@ namespace Publishing.Infrastructure
 
         public Task InitializeAsync()
         {
-            // Apply pending migrations if any exist. This keeps the database
-            // schema in sync with the current EF Core model.
-            return _context.Database.MigrateAsync();
+            // Use EnsureCreated so the initializer can run safely against an
+            // existing database. It creates the schema only if the tables are
+            // missing and is idempotent across multiple calls.
+            return _context.Database.EnsureCreatedAsync();
         }
     }
 }
