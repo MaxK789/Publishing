@@ -21,18 +21,19 @@ namespace Publishing.Integration.Tests;
 [TestClass]
 public class SqlQueryTests
 {
-    private static readonly string DbPath = Path.Combine(Path.GetTempPath(), "SqlQueryTest.db");
+    private string _dbPath = null!;
     private ServiceProvider _sp = null!;
     private string _cs = null!;
 
     [TestInitialize]
     public void Init()
     {
-        if (File.Exists(DbPath))
+        _dbPath = Path.Combine(Path.GetTempPath(), $"SqlQueryTest_{Guid.NewGuid()}.db");
+        if (File.Exists(_dbPath))
         {
-            File.Delete(DbPath);
+            File.Delete(_dbPath);
         }
-        _cs = $"Data Source={DbPath}";
+        _cs = $"Data Source={_dbPath}";
 
         var services = new ServiceCollection();
         services.AddTransient<ILogger, LoggerService>();
@@ -54,9 +55,9 @@ public class SqlQueryTests
     public void Cleanup()
     {
         if (_sp != null) _sp.Dispose();
-        if (File.Exists(DbPath))
+        if (File.Exists(_dbPath))
         {
-            File.Delete(DbPath);
+            File.Delete(_dbPath);
         }
     }
 
@@ -116,7 +117,7 @@ public class SqlQueryTests
         public RawScalarQuery(string sqlText) { SqlText = sqlText; }
         private string SqlText { get; }
         public override string Sql => SqlText;
-        public override T Map(IDataReader reader) => (T)reader.GetValue(0);
+        public override T Map(IDataReader reader) => (T)Convert.ChangeType(reader.GetValue(0), typeof(T));
     }
 
     private class TestConfiguration : Microsoft.Extensions.Configuration.IConfiguration
