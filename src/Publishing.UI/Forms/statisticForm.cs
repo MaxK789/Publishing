@@ -54,7 +54,7 @@ namespace Publishing
 
         private void statisticForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Application.Exit();
+            System.Windows.Forms.Application.Exit();
         }
 
         private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)

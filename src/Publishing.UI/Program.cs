@@ -28,8 +28,8 @@ namespace Publishing
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            System.Windows.Forms.Application.EnableVisualStyles();
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
 
             var services = new ServiceCollection();
             ConfigureServices(services);
@@ -43,7 +43,7 @@ namespace Publishing
             }
 
             var form = Services.GetRequiredService<loginForm>();
-            Application.Run(form);
+            System.Windows.Forms.Application.Run(form);
 
             if (Services is IDisposable d)
             {

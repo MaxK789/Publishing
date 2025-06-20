@@ -29,7 +29,7 @@ namespace Publishing
 
         private void addOrderForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Application.Exit();
+            System.Windows.Forms.Application.Exit();
         }
 
         private void змінитиДаніToolStripMenuItem_Click(object sender, EventArgs e)

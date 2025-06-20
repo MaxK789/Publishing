@@ -53,7 +53,7 @@ namespace Publishing
 
         private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Application.Exit();
+            System.Windows.Forms.Application.Exit();
         }
 
         private void loginForm_Load(object sender, EventArgs e)

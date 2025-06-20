@@ -68,7 +68,7 @@ namespace Publishing
 
         private void registrationForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Application.Exit();
+            System.Windows.Forms.Application.Exit();
         }
 
         private void registrationForm_Load(object sender, EventArgs e)
