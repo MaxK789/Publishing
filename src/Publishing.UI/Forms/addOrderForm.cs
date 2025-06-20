@@ -16,6 +16,8 @@ namespace Publishing
         private readonly IMediator _mediator;
         private readonly INavigationService _navigation;
         private readonly IUserSession _session;
+        private readonly IPriceCalculator _priceCalculator;
+        private readonly IPrinteryRepository _printeryRepository;
         private readonly ResourceManager _resources = new ResourceManager("Publishing.Resources.Resources", typeof(addOrderForm).Assembly);
         [Obsolete("Designer only", error: false)]
         public addOrderForm()
@@ -23,11 +25,18 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public addOrderForm(IMediator mediator, INavigationService navigation, IUserSession session)
+        public addOrderForm(
+            IMediator mediator,
+            INavigationService navigation,
+            IUserSession session,
+            IPriceCalculator priceCalculator,
+            IPrinteryRepository printeryRepository)
         {
             _mediator = mediator;
             _navigation = navigation;
             _session = session;
+            _priceCalculator = priceCalculator;
+            _printeryRepository = printeryRepository;
             InitializeComponent();
         }
 
@@ -63,7 +72,7 @@ namespace Publishing
                 організаціяToolStripMenuItem.Visible = false;
         }
 
-        private async void calculateButton_Click(object sender, EventArgs e)
+        private void calculateButton_Click(object sender, EventArgs e)
         {
             if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
             {
@@ -77,19 +86,9 @@ namespace Publishing
                 return;
             }
 
-            var dto = new CreateOrderDto
-            {
-                Type = typeBox.SelectedItem?.ToString() ?? string.Empty,
-                Name = nameProductTextBox.Text,
-                Pages = pageNum,
-                Tirage = tirageNum,
-                Printery = printeryBox.SelectedItem?.ToString() ?? string.Empty,
-                PersonId = _session.UserId
-            };
-
-            var command = new CreateOrderCommand(dto.Type, dto.Name, dto.Pages, dto.Tirage, dto.PersonId, dto.Printery);
-            var order = await _mediator.Send(command);
-            totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
+            decimal pricePerPage = _printeryRepository.GetPricePerPage();
+            decimal price = _priceCalculator.Calculate(pageNum, tirageNum, pricePerPage);
+            totalPriceLabel.Text = "Кінцева ціна:" + price.ToString();
         }
 
         private async void orderButton_Click(object sender, EventArgs e)
