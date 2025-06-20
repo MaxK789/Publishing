@@ -2,12 +2,12 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Publishing.Application.Commands;
+using Publishing.AppLayer.Commands;
 using Publishing.Core.Domain;
 using Publishing.Core.Interfaces;
 using FluentValidation;
 
-namespace Publishing.Application.Handlers
+namespace Publishing.AppLayer.Handlers
 {
     public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, Order>
     {

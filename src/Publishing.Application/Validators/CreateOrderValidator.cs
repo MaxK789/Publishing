@@ -1,7 +1,7 @@
 using FluentValidation;
-using Publishing.Application.Commands;
+using Publishing.AppLayer.Commands;
 
-namespace Publishing.Application.Validators
+namespace Publishing.AppLayer.Validators
 {
     public class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
     {

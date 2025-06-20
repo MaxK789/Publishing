@@ -1,7 +1,7 @@
 using MediatR;
 using Publishing.Core.Domain;
 
-namespace Publishing.Application.Commands
+namespace Publishing.AppLayer.Commands
 {
     public record CreateOrderCommand(
         string Type,

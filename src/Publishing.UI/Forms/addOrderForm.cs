@@ -4,7 +4,7 @@ using Publishing.Core.Interfaces;
 using System.Windows.Forms;
 using Publishing.Services;
 using MediatR;
-using Publishing.Application.Commands;
+using Publishing.AppLayer.Commands;
 using System.Resources;
 
 namespace Publishing
