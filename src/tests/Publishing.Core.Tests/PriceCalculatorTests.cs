@@ -14,7 +14,7 @@ namespace Publishing.Core.Tests
         [TestInitialize]
         public void Init()
         {
-            _calculator = new PriceCalculator();
+            _calculator = new PriceCalculator(new StandardDiscountPolicy());
         }
 
         [DataTestMethod]

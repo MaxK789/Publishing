@@ -56,7 +56,7 @@ namespace Publishing.Core.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void PriceCalculator_ThrowsOnNegative()
         {
-            var calc = new PriceCalculator();
+            var calc = new PriceCalculator(new StandardDiscountPolicy());
             calc.Calculate(-5, 2, 2.5m);
         }
 
@@ -68,7 +68,7 @@ namespace Publishing.Core.Tests
                 new StubOrderRepository(),
                 new StubPrinteryRepository(),
                 new StubLogger(),
-                new PriceCalculator(),
+                new PriceCalculator(new StandardDiscountPolicy()),
                 new StubValidator(),
                 new StubDateTimeProvider());
             service.CreateOrder(null);

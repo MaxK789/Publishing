@@ -55,6 +55,7 @@ namespace Publishing
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             services.AddScoped<IPrinteryRepository, PrinteryRepository>();
             services.AddScoped<ILogger, LoggerService>();
+            services.AddScoped<IDiscountPolicy, StandardDiscountPolicy>();
             services.AddScoped<IPriceCalculator, PriceCalculator>();
             services.AddScoped<IOrderValidator, OrderValidator>();
             services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();

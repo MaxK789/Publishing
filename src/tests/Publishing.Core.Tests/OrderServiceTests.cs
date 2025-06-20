@@ -64,7 +64,7 @@ namespace Publishing.Core.Tests
                 orderRepo,
                 printeryRepo,
                 new StubLogger(),
-                new PriceCalculator(),
+                new PriceCalculator(new StandardDiscountPolicy()),
                 new PassThroughValidator(),
                 new StubDateTimeProvider());
             var dto = new CreateOrderDto { Type = "book", Name = "Intro", Pages = 10, Tirage = 3 };
@@ -87,7 +87,7 @@ namespace Publishing.Core.Tests
         {
             var orderRepo = new StubOrderRepository();
             var printeryRepo = new StubPrinteryRepository();
-            var service = new OrderService(orderRepo, printeryRepo, new StubLogger(), new PriceCalculator(), new PassThroughValidator(), new StubDateTimeProvider());
+            var service = new OrderService(orderRepo, printeryRepo, new StubLogger(), new PriceCalculator(new StandardDiscountPolicy()), new PassThroughValidator(), new StubDateTimeProvider());
             var dto = new CreateOrderDto { Pages = -1, Tirage = 1 };
             service.CreateOrder(dto);
         }
@@ -98,7 +98,7 @@ namespace Publishing.Core.Tests
         {
             var orderRepo = new StubOrderRepository();
             var printeryRepo = new StubPrinteryRepository();
-            var service = new OrderService(orderRepo, printeryRepo, new StubLogger(), new PriceCalculator(), new PassThroughValidator(), new StubDateTimeProvider());
+            var service = new OrderService(orderRepo, printeryRepo, new StubLogger(), new PriceCalculator(new StandardDiscountPolicy()), new PassThroughValidator(), new StubDateTimeProvider());
             service.CreateOrder(null);
         }
 
@@ -107,7 +107,7 @@ namespace Publishing.Core.Tests
         {
             var orderRepo = new StubOrderRepository();
             var printeryRepo = new StubPrinteryRepository { PricePerPage = 3m };
-            var service = new OrderService(orderRepo, printeryRepo, new StubLogger(), new PriceCalculator(), new PassThroughValidator(), new StubDateTimeProvider());
+            var service = new OrderService(orderRepo, printeryRepo, new StubLogger(), new PriceCalculator(new StandardDiscountPolicy()), new PassThroughValidator(), new StubDateTimeProvider());
             var dto = new CreateOrderDto { Pages = 2, Tirage = 2 };
 
             var order = service.CreateOrder(dto);
