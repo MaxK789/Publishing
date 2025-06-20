@@ -4,6 +4,7 @@ using FluentValidation;
 using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
+using Publishing.AppLayer.Validators;
 
 namespace Publishing.Core.Tests
 {
@@ -13,7 +14,7 @@ namespace Publishing.Core.Tests
         private class StubAuthService : IAuthService
         {
             public RegisterUserDto? Passed;
-            public UserDto ReturnUser = new UserDto { Id = "1", Name = "N", Type = "t" };
+            public UserDto ReturnUser = new UserDto("1", "N", "t");
 
             public Task<UserDto?> AuthenticateAsync(string email, string password)
                 => Task.FromResult<UserDto?>(null);
