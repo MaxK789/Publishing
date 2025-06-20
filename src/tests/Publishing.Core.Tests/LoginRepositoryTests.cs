@@ -39,11 +39,11 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        public void GetHashedPassword_UsesDatabaseClient()
+        public async Task GetHashedPassword_UsesDatabaseClient()
         {
             var db = new StubDbClient();
             var repo = new LoginRepository(db);
-            repo.GetHashedPassword("a@a.com");
+            await repo.GetHashedPasswordAsync("a@a.com");
             Assert.IsNotNull(db.LastQuery);
             StringAssert.Contains(db.LastQuery!, "password");
             Assert.IsNotNull(db.LastParams);
@@ -53,12 +53,12 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        public void EmailExists_ReturnsTrue_WhenEmailFound()
+        public async Task EmailExists_ReturnsTrue_WhenEmailFound()
         {
             var db = new StubDbClient { ExecuteResult = "x@y.com" };
             var repo = new LoginRepository(db);
 
-            bool exists = repo.EmailExists("x@y.com");
+            bool exists = await repo.EmailExistsAsync("x@y.com");
 
             Assert.IsTrue(exists);
             StringAssert.Contains(db.LastQuery!, "emailPerson = @Email");
@@ -69,12 +69,12 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        public void InsertPerson_ReturnsInsertedId()
+        public async Task InsertPerson_ReturnsInsertedId()
         {
             var db = new StubDbClient { ExecuteResult = 7 };
             var repo = new LoginRepository(db);
 
-            int id = repo.InsertPerson("F", "L", "e", "s");
+            int id = await repo.InsertPersonAsync("F", "L", "e", "s");
 
             Assert.AreEqual(7, id);
             StringAssert.Contains(db.LastQuery!, "INSERT INTO Person");
@@ -85,12 +85,12 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
-        public void InsertPassword_UsesExecuteQueryWithoutResponse()
+        public async Task InsertPassword_UsesExecuteQueryWithoutResponse()
         {
             var db = new StubDbClient();
             var repo = new LoginRepository(db);
 
-            repo.InsertPassword("hash", 3);
+            await repo.InsertPasswordAsync("hash", 3);
 
             Assert.IsNotNull(db.LastNonQuery);
             StringAssert.Contains(db.LastNonQuery!, "INSERT INTO Pass");
