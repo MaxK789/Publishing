@@ -1,3 +1,4 @@
+#if WINDOWS
 namespace Publishing.Services
 {
     using System;
@@ -8,3 +9,4 @@ namespace Publishing.Services
         void Navigate<T>(Form current) where T : Form;
     }
 }
+#endif

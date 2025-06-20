@@ -1,3 +1,4 @@
+#if WINDOWS
 namespace Publishing.Services
 {
     using System;
@@ -21,3 +22,4 @@ namespace Publishing.Services
         }
     }
 }
+#endif
