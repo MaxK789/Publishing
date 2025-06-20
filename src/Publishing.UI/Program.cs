@@ -11,6 +11,8 @@ using Publishing.Core.Services;
 using Publishing.Infrastructure;
 using Publishing.Infrastructure.Repositories;
 using Publishing.Infrastructure.DataAccess;
+using Publishing.Infrastructure.Queries;
+using Microsoft.Extensions.Caching.Memory;
 using MediatR;
 using Publishing.AppLayer.Handlers;
 using Publishing.AppLayer.Validators;
