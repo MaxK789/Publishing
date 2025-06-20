@@ -8,7 +8,7 @@
     <PackageReference Include="FluentValidation" Version="11.8.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Publishing.Core\Publishing.Core.csproj" />
-    <ProjectReference Include="..\Publishing.Infrastructure\Publishing.Infrastructure.csproj" />
+    <ProjectReference Include="../Publishing.Core/Publishing.Core.csproj" />
+    <ProjectReference Include="../Publishing.Infrastructure/Publishing.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

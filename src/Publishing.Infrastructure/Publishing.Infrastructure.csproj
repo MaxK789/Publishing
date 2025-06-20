@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DataAccess\" />
-    <Folder Include="DI\" />
-    <Folder Include="Repositories\" />
-    <ProjectReference Include="..\Publishing.Core\Publishing.Core.csproj" />
+    <Folder Include="DataAccess/" />
+    <Folder Include="DI/" />
+    <Folder Include="Repositories/" />
+    <ProjectReference Include="../Publishing.Core/Publishing.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
@@ -29,7 +29,7 @@
 
   <!-- Ensure EF Core migrations are compiled into the assembly -->
   <ItemGroup>
-    <Compile Update="Migrations\**\*.cs" />
+    <Compile Update="Migrations/**/*.cs" />
   </ItemGroup>
 
 </Project>
