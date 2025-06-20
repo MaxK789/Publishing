@@ -9,4 +9,7 @@
   <data name="TirageParseError" xml:space="preserve">
     <value>Невірний тираж</value>
   </data>
+  <data name="DataUpdated" xml:space="preserve">
+    <value>Дані успішно змінено</value>
+  </data>
 </root>

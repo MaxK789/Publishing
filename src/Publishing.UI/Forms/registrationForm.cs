@@ -1,18 +1,17 @@
 using System;
 using System.Collections.Generic;
-using FluentValidation;
 using System.Windows.Forms;
 using Publishing.Core.Interfaces;
+using Publishing.Core.DTOs;
 using Publishing.Services;
 
 namespace Publishing
 {
     public partial class registrationForm : Form
     {
-        private readonly IAuthService _authService;
+        private readonly IRegistrationService _service;
         private readonly INavigationService _navigation;
         private readonly IUserSession _session;
-        private readonly IValidator<string> _validator;
 
         [Obsolete("Designer only", error: false)]
         public registrationForm()
@@ -20,12 +19,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public registrationForm(IAuthService authService, INavigationService navigation, IUserSession session, IValidator<string> validator)
+        public registrationForm(IRegistrationService service, INavigationService navigation, IUserSession session)
         {
-            _authService = authService;
+            _service = service;
             _navigation = navigation;
             _session = session;
-            _validator = validator;
             InitializeComponent();
         }
 
@@ -37,25 +35,18 @@ namespace Publishing
 
         private async void LoginButton_Click(object sender, EventArgs e)
         {
-            string fName = FNameTextBox.Text;
-            string lName = LNameTextBox.Text;
-            string email = emailTextBox.Text;
-            if (!_validator.Validate(email).IsValid)
+            var dto = new RegisterUserDto
             {
-                MessageBox.Show("Email is not valid");
-                return;
-            }
-            string status = statusBox.SelectedItem?.ToString();
-            string password = passwordTextBox.Text;
-
-            if (status == null)
-            {
-                return;
-            }
+                FirstName = FNameTextBox.Text,
+                LastName = LNameTextBox.Text,
+                Email = emailTextBox.Text,
+                Status = statusBox.SelectedItem?.ToString(),
+                Password = passwordTextBox.Text
+            };
 
             try
             {
-                var user = await _authService.RegisterAsync(fName, lName, email, status, password);
+                var user = await _service.RegisterAsync(dto);
                 _session.UserId = user.Id;
                 _session.UserType = user.Type;
                 _session.UserName = user.Name;

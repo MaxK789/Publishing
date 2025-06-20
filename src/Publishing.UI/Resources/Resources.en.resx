@@ -9,4 +9,7 @@
   <data name="TirageParseError" xml:space="preserve">
     <value>Invalid tirage</value>
   </data>
+  <data name="DataUpdated" xml:space="preserve">
+    <value>Data successfully updated</value>
+  </data>
 </root>

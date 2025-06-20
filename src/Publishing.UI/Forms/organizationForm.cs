@@ -1,17 +1,18 @@
 ﻿using System;
-using FluentValidation;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
+using Publishing.Core.DTOs;
+using System.Resources;
 
 namespace Publishing
 {
     public partial class organizationForm : Form
     {
         private readonly INavigationService _navigation;
-        private readonly IOrganizationRepository _orgRepo;
+        private readonly IOrganizationService _service;
         private readonly IUserSession _session;
-        private readonly IValidator<string> _validator;
+        private readonly ResourceManager _resources = new ResourceManager("Publishing.UI.Resources.Resources", typeof(organizationForm).Assembly);
 
         [Obsolete("Designer only", error: false)]
         public organizationForm()
@@ -19,12 +20,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public organizationForm(INavigationService navigation, IOrganizationRepository orgRepo, IUserSession session, IValidator<string> validator)
+        public organizationForm(INavigationService navigation, IOrganizationService service, IUserSession session)
         {
             _navigation = navigation;
-            _orgRepo = orgRepo;
+            _service = service;
             _session = session;
-            _validator = validator;
             InitializeComponent();
         }
 
@@ -40,32 +40,19 @@ namespace Publishing
 
         private async void changeButton_Click(object sender, EventArgs e)
         {
-            string id = _session.UserId;
-            string orgName = orgNameTextBox.Text;
-            string email = emailTextBox.Text;            
-            string phone = phoneTextBox.Text;
-            string fax = faxTextBox.Text;
-            string address = addressTextBox.Text;
-
-            string? checkName = await _orgRepo.GetNameIfExistsAsync(orgName).ConfigureAwait(false);
-
-            if (!orgName.Equals(checkName))
+            var dto = new UpdateOrganizationDto
             {
-                if (!_validator.Validate(email).IsValid)
-                {
-                    MessageBox.Show("Email is not valid");
-                    return;
-                }
+                Id = _session.UserId,
+                Name = orgNameTextBox.Text,
+                Email = emailTextBox.Text,
+                Phone = phoneTextBox.Text,
+                Fax = faxTextBox.Text,
+                Address = addressTextBox.Text
+            };
 
-                await _orgRepo.InsertAsync(orgName, email, phone, fax, address, id).ConfigureAwait(false);
-            }
-            else
-            {
-                await _orgRepo.UpdateAsync(id, orgName, email, phone, fax, address).ConfigureAwait(false);
-                MessageBox.Show("Дані успішно змінено");
-
-                _navigation.Navigate<mainForm>(this);
-            }
+            await _service.UpdateAsync(dto).ConfigureAwait(false);
+            MessageBox.Show(_resources.GetString("DataUpdated") ?? "Success");
+            _navigation.Navigate<mainForm>(this);
         }
 
         private void списокToolStripMenuItem_Click(object sender, EventArgs e)
