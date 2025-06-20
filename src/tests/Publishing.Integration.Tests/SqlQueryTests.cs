@@ -1,5 +1,3 @@
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Containers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Publishing.Infrastructure.DataAccess;
 using Publishing.Infrastructure;
@@ -14,27 +12,41 @@ using Dapper;
 using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
+using Microsoft.Data.SqlClient;
 
 namespace Publishing.Integration.Tests;
 
 [TestClass]
 public class SqlQueryTests
 {
-    private TestcontainerDatabase _dbContainer = null!;
+    private const string Server = @"(localdb)\MSSQLLocalDB";
+    private const string DbName = "SqlQueryTest";
+    private static string MasterConnection => $"Data Source={Server};Initial Catalog=master;Integrated Security=true";
     private ServiceProvider _sp = null!;
+    private string _cs = null!;
 
     [TestInitialize]
-    public async Task Init()
+    public void Init()
     {
-        _dbContainer = new TestcontainersBuilder<MsSqlTestcontainer>()
-            .WithDatabase(new MsSqlTestcontainerConfiguration())
-            .Build();
-        await _dbContainer.StartAsync();
+        using (var con = new SqlConnection(MasterConnection))
+        {
+            con.Open();
+            using var cmd = con.CreateCommand();
+            cmd.CommandText = $@"
+IF DB_ID('{DbName}') IS NOT NULL
+BEGIN
+    ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE [{DbName}];
+END
+CREATE DATABASE [{DbName}];";
+            cmd.ExecuteNonQuery();
+        }
+        _cs = $"Data Source={Server};Initial Catalog={DbName};Integrated Security=true";
 
         var services = new ServiceCollection();
         services.AddTransient<ILogger, LoggerService>();
         services.AddSingleton<IDbConnectionFactory>(sp =>
-            new SqlDbConnectionFactory(new TestConfiguration(_dbContainer.ConnectionString), sp.GetRequiredService<ILogger>()));
+            new SqlDbConnectionFactory(new TestConfiguration(_cs), sp.GetRequiredService<ILogger>()));
         services.AddTransient<IDbContext, DapperDbContext>();
         services.AddMemoryCache();
         services.AddSingleton<QueryDispatcher>();
@@ -48,10 +60,19 @@ public class SqlQueryTests
     }
 
     [TestCleanup]
-    public async Task Cleanup()
+    public void Cleanup()
     {
         if (_sp != null) _sp.Dispose();
-        if (_dbContainer != null) await _dbContainer.StopAsync();
+        using var con = new SqlConnection(MasterConnection);
+        con.Open();
+        using var cmd = con.CreateCommand();
+        cmd.CommandText = $@"
+IF DB_ID('{DbName}') IS NOT NULL
+BEGIN
+    ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE [{DbName}];
+END";
+        cmd.ExecuteNonQuery();
     }
 
     [TestMethod]

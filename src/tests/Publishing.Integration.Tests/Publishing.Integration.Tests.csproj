@@ -18,7 +18,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.22">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="DotNet.Testcontainers" Version="1.7.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../Publishing.Infrastructure/Publishing.Infrastructure.csproj" />
