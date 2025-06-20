@@ -16,12 +16,12 @@ All EF Core migration files must be compiled so `Database.MigrateAsync()` can lo
 
 ### Custom Connection String
 
-`src/Publishing.UI/appsettings.json` defines `ConnectionStrings:DefaultConnection`. Update this value to point to a different SQL Server instance:
+`src/Publishing.UI/appsettings.json` defines `ConnectionStrings:DefaultConnection`. Update this value to point to a different SQL Server instance. The default connection string now includes `TrustServerCertificate=True` to suppress SSL certificate warnings when using a self-signed SQL Server certificate:
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Data Source=My-PC;Initial Catalog=Publishing;Integrated Security=true"
+    "DefaultConnection": "Data Source=My-PC;Initial Catalog=Publishing;Integrated Security=true;TrustServerCertificate=True"
   }
 }
 ```
