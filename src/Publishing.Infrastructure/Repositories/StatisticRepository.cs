@@ -5,6 +5,7 @@ using Publishing.Core.Interfaces;
 
 namespace Publishing.Infrastructure.Repositories
 {
+    [Obsolete("Replaced by query objects")]
     public class StatisticRepository : IStatisticRepository
     {
         private readonly IDbHelper _helper;
