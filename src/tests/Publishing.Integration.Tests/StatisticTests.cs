@@ -15,8 +15,8 @@ namespace Publishing.Integration.Tests
     [TestClass]
     public class StatisticTests
     {
-        private static readonly string DbPath = Path.Combine(Path.GetTempPath(), "PublishingStat.db");
-        private static string ConnectionString => $"Data Source={DbPath}";
+        private string _dbPath = null!;
+        private string ConnectionString => $"Data Source={_dbPath}";
 
         private IDbContext _db = null!;
         private IDbHelper _helper = null!;
@@ -25,9 +25,10 @@ namespace Publishing.Integration.Tests
         [TestInitialize]
         public void Setup()
         {
-            if (File.Exists(DbPath))
+            _dbPath = Path.Combine(Path.GetTempPath(), $"PublishingStat_{Guid.NewGuid()}.db");
+            if (File.Exists(_dbPath))
             {
-                File.Delete(DbPath);
+                File.Delete(_dbPath);
             }
             var cs = ConnectionString;
             var config = new ConfigurationBuilder()
@@ -66,9 +67,9 @@ namespace Publishing.Integration.Tests
             {
                 _serviceProvider.Dispose();
             }
-            if (File.Exists(DbPath))
+            if (File.Exists(_dbPath))
             {
-                File.Delete(DbPath);
+                File.Delete(_dbPath);
             }
         }
 
