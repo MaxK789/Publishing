@@ -12,7 +12,7 @@ namespace Publishing
         private readonly INavigationService _navigation;
         private readonly IProfileService _profileService;
         private readonly IUserSession _session;
-        private readonly ResourceManager _resources = new ResourceManager("Publishing.UI.Resources.Resources", typeof(profileForm).Assembly);
+        private readonly ResourceManager _resources = new ResourceManager("Publishing.Resources.Resources", typeof(profileForm).Assembly);
 
         [Obsolete("Designer only", error: false)]
         public profileForm()

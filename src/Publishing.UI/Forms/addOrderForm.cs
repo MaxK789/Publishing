@@ -6,6 +6,8 @@ using Publishing.Services;
 using MediatR;
 using Publishing.AppLayer.Commands;
 using System.Resources;
+using FluentValidation;
+using System.Linq;
 
 namespace Publishing
 {
@@ -14,7 +16,7 @@ namespace Publishing
         private readonly IMediator _mediator;
         private readonly INavigationService _navigation;
         private readonly IUserSession _session;
-        private readonly ResourceManager _resources = new ResourceManager("Publishing.UI.Resources.Resources", typeof(addOrderForm).Assembly);
+        private readonly ResourceManager _resources = new ResourceManager("Publishing.Resources.Resources", typeof(addOrderForm).Assembly);
         [Obsolete("Designer only", error: false)]
         public addOrderForm()
         {
@@ -119,12 +121,23 @@ namespace Publishing
             };
 
             var command = new CreateOrderCommand(dto.Type, dto.Name, dto.Pages, dto.Tirage, dto.PersonId, dto.Printery);
-            var order = await _mediator.Send(command);
+            try
+            {
+                var order = await _mediator.Send(command);
 
-            MessageBox.Show(_resources.GetString("OrderAdded") ?? "Success");
-            totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
+                MessageBox.Show(_resources.GetString("OrderAdded") ?? "Success");
+                totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
 
-            _navigation.Navigate<mainForm>(this);
+                _navigation.Navigate<mainForm>(this);
+            }
+            catch (ValidationException ex)
+            {
+                MessageBox.Show(string.Join("\n", ex.Errors.Select(e => e.ErrorMessage)), "Validation error");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+            }
         }
 
         private void змінитиДаніToolStripMenuItem_Click_1(object sender, EventArgs e)
