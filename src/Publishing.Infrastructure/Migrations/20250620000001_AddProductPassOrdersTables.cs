@@ -64,7 +64,7 @@ namespace Publishing.Infrastructure.Migrations
                     dateFinish = table.Column<DateTime>(nullable: false),
                     statusOrder = table.Column<string>(nullable: false),
                     tirage = table.Column<int>(nullable: false),
-                    price = table.Column<int>(nullable: false)
+                    price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
