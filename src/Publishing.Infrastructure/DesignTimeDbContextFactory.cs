@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace Publishing.Infrastructure
 {
@@ -7,10 +9,16 @@ namespace Publishing.Infrastructure
     {
         public AppDbContext CreateDbContext(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+
             var builder = new DbContextOptionsBuilder<AppDbContext>();
-            // Use local SQL Server for design-time services. Replace with actual connection if needed.
-            builder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=Publishing;Trusted_Connection=True;",
+            builder.UseSqlServer(
+                configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName));
+
             return new AppDbContext(builder.Options);
         }
     }
