@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.RegularExpressions;
+using FluentValidation;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
@@ -11,6 +11,7 @@ namespace Publishing
         private readonly INavigationService _navigation;
         private readonly IProfileRepository _profileRepo;
         private readonly IUserSession _session;
+        private readonly IValidator<string> _validator;
 
         [Obsolete("Designer only", error: false)]
         public profileForm()
@@ -18,11 +19,12 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public profileForm(INavigationService navigation, IProfileRepository profileRepo, IUserSession session)
+        public profileForm(INavigationService navigation, IProfileRepository profileRepo, IUserSession session, IValidator<string> validator)
         {
             _navigation = navigation;
             _profileRepo = profileRepo;
             _session = session;
+            _validator = validator;
             InitializeComponent();
         }
 
@@ -60,8 +62,7 @@ namespace Publishing
             }
             if (email != "")
             {
-                string pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$";
-                if (!Regex.IsMatch(email, pattern))
+                if (!_validator.Validate(email).IsValid)
                 {
                     MessageBox.Show("Email is not valid");
                     return;
