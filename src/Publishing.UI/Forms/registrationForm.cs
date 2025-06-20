@@ -11,6 +11,7 @@ namespace Publishing
     {
         private readonly IAuthService _authService;
         private readonly INavigationService _navigation;
+        private readonly IUserSession _session;
 
         [Obsolete("Designer only", error: false)]
         public registrationForm()
@@ -18,10 +19,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public registrationForm(IAuthService authService, INavigationService navigation)
+        public registrationForm(IAuthService authService, INavigationService navigation, IUserSession session)
         {
             _authService = authService;
             _navigation = navigation;
+            _session = session;
             InitializeComponent();
         }
 
@@ -53,12 +55,12 @@ namespace Publishing
             try
             {
                 var user = await _authService.RegisterAsync(fName, lName, email, status, password);
-                CurrentUser.UserId = user.Id;
-                CurrentUser.UserType = user.Type;
-                CurrentUser.UserName = user.Name;
+                _session.UserId = user.Id;
+                _session.UserType = user.Type;
+                _session.UserName = user.Name;
 
                 _navigation.Navigate<mainForm>(this);
-                MessageBox.Show("Вітаємо, " + CurrentUser.UserName + " (" + CurrentUser.UserType + ")!");
+                MessageBox.Show($"Вітаємо, {_session.UserName} ({_session.UserType})!");
             }
             catch (Exception ex)
             {
