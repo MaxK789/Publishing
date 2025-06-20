@@ -14,6 +14,20 @@ All EF Core migration files must be compiled so `Database.MigrateAsync()` can lo
 </ItemGroup>
 ```
 
+### Custom Connection String
+
+`src/Publishing.UI/appsettings.json` defines `ConnectionStrings:DefaultConnection`. Update this value to point to a different SQL Server instance:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=My-PC;Initial Catalog=Publishing;Integrated Security=true"
+  }
+}
+```
+
+`Program.cs` also loads environment variables, so you can override the setting at runtime with `ConnectionStrings__DefaultConnection`.
+
 ## Working with migrations
 
 1. Install the EF Core tools if needed:
