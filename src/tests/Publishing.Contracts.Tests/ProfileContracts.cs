@@ -31,17 +31,19 @@ public class ProfileContracts
     [TestMethod]
     public async Task GetProfiles_VerifyContract()
     {
-        await Pact.V3("ProfileService", "Gateway", new PactConfig())
+        var pact = Pact.V3("ProfileService", "Gateway", new PactConfig());
+        pact
             .UponReceiving("A GET request to retrieve profiles")
             .WithRequest(HttpMethod.Get, "/profile/api/profile")
             .WillRespond()
-            .WithStatus(200)
-            .VerifyAsync(async ctx =>
-            {
-                using var client = new HttpClient { BaseAddress = ctx.MockServerUri };
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateJwt());
-                var response = await client.GetAsync("/profile/api/profile");
-                Assert.IsTrue(response.IsSuccessStatusCode);
-            });
+            .WithStatus(200);
+
+        await pact.VerifyAsync(async ctx =>
+        {
+            using var client = new HttpClient { BaseAddress = ctx.MockServerUri };
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateJwt());
+            var response = await client.GetAsync("/profile/api/profile");
+            Assert.IsTrue(response.IsSuccessStatusCode);
+        });
     }
 }

@@ -31,17 +31,19 @@ public class OrganizationContracts
     [TestMethod]
     public async Task GetOrganizations_VerifyContract()
     {
-        await Pact.V3("OrganizationService", "Gateway", new PactConfig())
+        var pact = Pact.V3("OrganizationService", "Gateway", new PactConfig());
+        pact
             .UponReceiving("A GET request to retrieve organizations")
             .WithRequest(HttpMethod.Get, "/organization/api/organization")
             .WillRespond()
-            .WithStatus(200)
-            .VerifyAsync(async ctx =>
-            {
-                using var client = new HttpClient { BaseAddress = ctx.MockServerUri };
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateJwt());
-                var response = await client.GetAsync("/organization/api/organization");
-                Assert.IsTrue(response.IsSuccessStatusCode);
-            });
+            .WithStatus(200);
+
+        await pact.VerifyAsync(async ctx =>
+        {
+            using var client = new HttpClient { BaseAddress = ctx.MockServerUri };
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateJwt());
+            var response = await client.GetAsync("/organization/api/organization");
+            Assert.IsTrue(response.IsSuccessStatusCode);
+        });
     }
 }
