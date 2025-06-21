@@ -3,13 +3,17 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
-# 1.1) Copy the project file and restore dependencies
-COPY ["src/Publishing.Profile.Service/Publishing.Profile.Service.csproj", "Publishing.Profile.Service/"]
-RUN dotnet restore "Publishing.Profile.Service/Publishing.Profile.Service.csproj"
+# 1.1) Copy solution and all csproj for restore
+COPY ["Publishing.sln", "."]
+COPY ["src/Publishing.Core/Publishing.Core.csproj", "src/Publishing.Core/"]
+COPY ["src/Publishing.Infrastructure/Publishing.Infrastructure.csproj", "src/Publishing.Infrastructure/"]
+COPY ["src/Publishing.Application/Publishing.Application.csproj", "src/Publishing.Application/"]
+COPY ["src/Publishing.Profile.Service/Publishing.Profile.Service.csproj", "src/Publishing.Profile.Service/"]
+RUN dotnet restore "Publishing.sln"
 
 # 1.2) Copy the rest of the source and publish
 COPY . .
-WORKDIR "/src/Publishing.Profile.Service"
+WORKDIR "/src/src/Publishing.Profile.Service"
 RUN dotnet publish "Publishing.Profile.Service.csproj" -c Release -o /app/publish
 
 # ------------------------------------------------------------
