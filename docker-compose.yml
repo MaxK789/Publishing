@@ -1,7 +1,8 @@
-version: '3.8'
 services:
   orders:
-    build: ./src/Publishing.Orders.Service
+    build:
+      context: .
+      dockerfile: src/Publishing.Orders.Service/Dockerfile
     ports:
       - "5001:80"
     environment:
@@ -24,7 +25,9 @@ services:
       - micro-net
 
   profile:
-    build: ./src/Publishing.Profile.Service
+    build:
+      context: .
+      dockerfile: src/Publishing.Profile.Service/Dockerfile
     ports:
       - "5002:80"
     environment:
@@ -47,7 +50,9 @@ services:
       - micro-net
 
   organization:
-    build: ./src/Publishing.Organization.Service
+    build:
+      context: .
+      dockerfile: src/Publishing.Organization.Service/Dockerfile
     ports:
       - "5003:80"
     environment:
@@ -70,7 +75,9 @@ services:
       - micro-net
 
   gateway:
-    build: ./src/ApiGateway
+    build:
+      context: .
+      dockerfile: src/ApiGateway/Dockerfile
     ports:
       - "5000:80"
     environment:
