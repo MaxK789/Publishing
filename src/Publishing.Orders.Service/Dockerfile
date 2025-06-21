@@ -3,17 +3,17 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
-# 1.1) Copy solution and all csproj for restore
-COPY ["Publishing.sln", "."]
-COPY ["src/Publishing.Core/Publishing.Core.csproj", "src/Publishing.Core/"]
-COPY ["src/Publishing.Infrastructure/Publishing.Infrastructure.csproj", "src/Publishing.Infrastructure/"]
-COPY ["src/Publishing.Application/Publishing.Application.csproj", "src/Publishing.Application/"]
-COPY ["src/Publishing.Orders.Service/Publishing.Orders.Service.csproj", "src/Publishing.Orders.Service/"]
-RUN dotnet restore "Publishing.sln"
+# 1.1) Copy only the projects needed for Orders.Service
+COPY ["src/Publishing.Core/Publishing.Core.csproj", "Publishing.Core/"]
+COPY ["src/Publishing.Infrastructure/Publishing.Infrastructure.csproj", "Publishing.Infrastructure/"]
+COPY ["src/Publishing.Application/Publishing.Application.csproj", "Publishing.Application/"]
+COPY ["src/Publishing.Orders.Service/Publishing.Orders.Service.csproj", "Publishing.Orders.Service/"]
+# 1.2) Restore only Orders.Service (it will pull its ProjectReferences)
+RUN dotnet restore "Publishing.Orders.Service/Publishing.Orders.Service.csproj"
 
-# 1.2) Copy the remaining source and publish
-COPY . .
-WORKDIR "/src/src/Publishing.Orders.Service"
+# 1.3) Copy rest of source and publish
+COPY src/Publishing.Orders.Service/. "Publishing.Orders.Service/"
+WORKDIR "/src/Publishing.Orders.Service"
 RUN dotnet publish "Publishing.Orders.Service.csproj" -c Release -o /app/publish
 
 # ------------------------------------------------------------
