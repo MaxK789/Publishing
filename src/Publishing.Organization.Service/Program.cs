@@ -39,7 +39,6 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-builder.Services.AddHealthChecks();
 var redisConn = builder.Configuration["REDIS_CONN"];
 if (string.IsNullOrWhiteSpace(redisConn))
     throw new InvalidOperationException("REDIS_CONN environment variable is missing");
@@ -78,6 +77,9 @@ builder.Services.AddOpenTelemetry().WithTracing(b =>
 
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole();
+builder.Services
+    .AddHealthChecks()
+    .AddDbContextCheck<AppDbContext>("Database");
 
 var conn = builder.Configuration["DB_CONN"];
 if (string.IsNullOrWhiteSpace(conn))
@@ -103,6 +105,8 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Map health check endpoint so Docker can check container status
 app.MapHealthChecks("/health");
 
 app.Run();
