@@ -3,13 +3,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
-# 1.1) Copy the project file and restore dependencies
-COPY ["src/ApiGateway/ApiGateway.csproj", "ApiGateway/"]
-RUN dotnet restore "ApiGateway/ApiGateway.csproj"
+# 1.1) Copy solution and all csproj for restore
+COPY ["Publishing.sln", "."]
+COPY ["src/ApiGateway/ApiGateway.csproj", "src/ApiGateway/"]
+RUN dotnet restore "Publishing.sln"
 
 # 1.2) Copy the remaining source and publish
 COPY . .
-WORKDIR "/src/ApiGateway"
+WORKDIR "/src/src/ApiGateway"
 RUN dotnet publish "ApiGateway.csproj" -c Release -o /app/publish
 
 # ------------------------------------------------------------
