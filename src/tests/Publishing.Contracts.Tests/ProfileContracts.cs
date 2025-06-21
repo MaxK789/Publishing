@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PactNet;
+using PactNet.Matchers;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
