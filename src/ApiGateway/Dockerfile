@@ -3,13 +3,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
-# 1.1) Copy only the project needed for ApiGateway
-COPY ["src/ApiGateway/ApiGateway.csproj", "ApiGateway/"]
-# 1.2) Restore only ApiGateway
+# 1.1) Copy dependent projects (code + csproj)
+COPY src/Publishing.Core/.           "Publishing.Core/"
+COPY src/Publishing.Infrastructure/. "Publishing.Infrastructure/"
+COPY src/Publishing.Application/.    "Publishing.Application/"
+
+# 1.2) Copy and restore ApiGateway itself
+COPY src/ApiGateway/. "ApiGateway/"
 RUN dotnet restore "ApiGateway/ApiGateway.csproj"
 
-# 1.3) Copy the remaining source and publish
-COPY src/ApiGateway/. "ApiGateway/"
+# 1.3) Publish
 WORKDIR "/src/ApiGateway"
 RUN dotnet publish "ApiGateway.csproj" -c Release -o /app/publish
 
