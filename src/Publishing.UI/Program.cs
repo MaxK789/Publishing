@@ -37,12 +37,7 @@ namespace Publishing
             ConfigureServices(services);
             Services = services.BuildServiceProvider();
 
-            // Apply any pending EF Core migrations before showing the UI
-            using (var scope = Services.CreateScope())
-            {
-                var init = scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>();
-                init.InitializeAsync().GetAwaiter().GetResult();
-            }
+
 
             var form = Services.GetRequiredService<loginForm>();
             System.Windows.Forms.Application.Run(form);
@@ -101,7 +96,6 @@ namespace Publishing
                     TimeSpan.FromMinutes(10)));
             services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
             services.AddTransient<IDbContext, DapperDbContext>();
-            services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
             services.AddScoped<IDbHelper, DbHelper>();
             services.AddScoped<ILoginRepository, LoginRepository>();
             services.AddScoped<IAuthService, AuthService>();
