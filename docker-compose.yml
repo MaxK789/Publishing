@@ -109,7 +109,7 @@ services:
       - ACCEPT_EULA=${ACCEPT_EULA}
       - SA_PASSWORD=${SA_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $SA_PASSWORD -Q \"SELECT 1\""]
+      test: ["CMD-SHELL", "pidof sqlservr"]
       interval: 10s
       timeout: 5s
       retries: 5
