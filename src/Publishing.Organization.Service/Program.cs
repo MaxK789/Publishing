@@ -3,6 +3,8 @@ using Publishing.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using System;
@@ -77,15 +79,16 @@ builder.Services.AddOpenTelemetry().WithTracing(b =>
 
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole();
-builder.Services
-    .AddHealthChecks()
-    .AddDbContextCheck<AppDbContext>("Database");
 
 var conn = builder.Configuration["DB_CONN"];
 if (string.IsNullOrWhiteSpace(conn))
     throw new InvalidOperationException("DB_CONN environment variable is missing");
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlServer(conn, b => b.MigrationsAssembly("Publishing.Infrastructure")));
+
+builder.Services
+    .AddHealthChecks()
+    .AddDbContextCheck<AppDbContext>("Database");
 
 var app = builder.Build();
 
