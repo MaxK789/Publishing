@@ -15,6 +15,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc9.10" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc9.10" />
     <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-rc9.10" />
+    <PackageReference Include="OpenTelemetry.Extensions.DependencyInjection" Version="1.9.0" />
     <PackageReference Include="MediatR" Version="12.1.1" />
     <ProjectReference Include="..\Publishing.Application\Publishing.Application.csproj" />
   </ItemGroup>
