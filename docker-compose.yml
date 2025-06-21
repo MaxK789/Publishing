@@ -74,9 +74,10 @@ services:
         condition: service_started
     restart: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
       interval: 10s
       timeout: 5s
+      start_period: 15s
       retries: 5
     networks:
       - micro-net
