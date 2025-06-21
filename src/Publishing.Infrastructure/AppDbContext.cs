@@ -72,7 +72,9 @@ namespace Publishing.Infrastructure
                 entity.Property(e => e.DateFinish).HasColumnName("dateFinish");
                 entity.Property(e => e.Status).HasColumnName("statusOrder");
                 entity.Property(e => e.Tirage).HasColumnName("tirage");
-                entity.Property(e => e.Price).HasColumnName("price");
+                entity.Property(e => e.Price)
+                      .HasColumnName("price")
+                      .HasPrecision(18, 2);
                 entity.HasOne(e => e.Product)
                       .WithMany(p => p.Orders)
                       .HasForeignKey(e => e.ProductId)

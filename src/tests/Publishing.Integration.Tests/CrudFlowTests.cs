@@ -27,7 +27,7 @@ namespace Publishing.Integration.Tests
         private ServiceProvider _serviceProvider = null!;
 
         [TestInitialize]
-        public void Setup()
+        public async Task Setup()
         {
             _dbPath = Path.Combine(Path.GetTempPath(), $"PublishingCrud_{Guid.NewGuid()}.db");
             if (File.Exists(_dbPath))
@@ -56,8 +56,8 @@ namespace Publishing.Integration.Tests
 
             _serviceProvider = services.BuildServiceProvider();
             using var scope = _serviceProvider.CreateScope();
-            scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>()
-                .InitializeAsync().Wait();
+            await scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>()
+                .InitializeAsync();
             _db = scope.ServiceProvider.GetRequiredService<IDbContext>();
         }
 
