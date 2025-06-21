@@ -31,19 +31,17 @@ public class OrderContracts
     [TestMethod]
     public async Task GetOrders_VerifyContract()
     {
-        var pact = Pact.V3("OrdersService", "Gateway", new PactConfig());
-        pact
+        await Pact.V3("OrdersService", "Gateway", new PactConfig())
             .UponReceiving("A GET request to retrieve orders")
             .WithRequest(HttpMethod.Get, "/orders/api/orders")
             .WillRespond()
-            .WithStatus(200);
-
-        await pact.VerifyAsync(async ctx =>
-        {
-            using var client = new HttpClient { BaseAddress = ctx.MockServerUri };
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateJwt());
-            var response = await client.GetAsync("/orders/api/orders");
-            Assert.IsTrue(response.IsSuccessStatusCode);
-        });
+            .WithStatus(200)
+            .VerifyAsync(async ctx =>
+            {
+                using var client = new HttpClient { BaseAddress = ctx.MockServerUri };
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateJwt());
+                var response = await client.GetAsync("/orders/api/orders");
+                Assert.IsTrue(response.IsSuccessStatusCode);
+            });
     }
 }
