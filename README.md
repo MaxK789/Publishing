@@ -91,7 +91,7 @@ docker-compose up --build
 ```
 
 The API gateway project under `src/ApiGateway` routes requests to the services. Swagger is enabled for each service at `/swagger` and health checks are exposed at `/health`.
-Copy `.env.example` to `.env` and adjust the connection strings and JWT settings before starting the stack. Required variables are `DB_CONN`, `REDIS_CONN`, `JWT__Issuer`, `JWT__Audience` and `JWT__SigningKey`.
+Copy `.env.example` to `.env` and adjust the connection strings and JWT settings before starting the stack. Required variables are `SA_PASSWORD`, `ACCEPT_EULA`, `DB_CONN`, `REDIS_CONN`, `JWT__Issuer`, `JWT__Audience` and `JWT__SigningKey`.
 The issuer, audience and signing key must match the values used to sign JWT tokens consumed by the services.
 All API routes require an `Authorization: Bearer <token>` header containing a JWT signed with the configured key.
 When browsing Swagger, use the **Authorize** button to provide a token for authenticated requests.
