@@ -11,36 +11,12 @@ using OpenTelemetry.Trace;
 using MediatR;
 using Publishing.AppLayer.Handlers;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Publishing.Orders.Service.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header
-    });
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
-        {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-            {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
-});
+builder.Services.AddCustomSwagger();
 var redisConn = builder.Configuration["REDIS_CONN"];
 if (string.IsNullOrWhiteSpace(redisConn))
     throw new InvalidOperationException("REDIS_CONN environment variable is missing");
@@ -88,10 +64,15 @@ builder.Services.AddDbContext<AppDbContext>(o =>
 
 builder.Services
     .AddHealthChecks()
-    .AddDbContextCheck<AppDbContext>("Database");
+    .AddDatabaseHealthChecks();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -105,4 +86,4 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
 
-app.Run();
+await app.RunAsync();
