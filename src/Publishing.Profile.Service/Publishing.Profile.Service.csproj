@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Publishing.Core\Publishing.Core.csproj" />
+    <ProjectReference Include="..\Publishing.Infrastructure\Publishing.Infrastructure.csproj" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.8.2" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.8.2" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc9.10" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc9.10" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-rc9.10" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="12.1.1" />
+    <ProjectReference Include="..\Publishing.Application\Publishing.Application.csproj" />
+  </ItemGroup>
+</Project>

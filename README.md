@@ -80,3 +80,21 @@ services.AddScoped<IDiscountPolicy, StandardDiscountPolicy>();
 New strategies can be provided by registering a different implementation without touching `PriceCalculator`.
 Components should obtain `PriceCalculator` via dependency injection rather than constructing it directly.
 
+
+## Microservices setup
+
+Each service resides in `src/Publishing.<Name>.Service` with its own `Dockerfile`.
+Start the whole stack using:
+
+```bash
+docker-compose up --build
+```
+
+The API gateway project under `src/ApiGateway` routes requests to the services. Swagger is enabled for each service at `/swagger` and health checks are exposed at `/health`.
+Copy `.env.example` to `.env` and adjust the connection strings and JWT settings before starting the stack. Required variables are `DB_CONN`, `REDIS_CONN`, `JWT__Issuer`, `JWT__Audience` and `JWT__SigningKey`.
+The issuer, audience and signing key must match the values used to sign JWT tokens consumed by the services.
+All API routes require an `Authorization: Bearer <token>` header containing a JWT signed with the configured key.
+When browsing Swagger, use the **Authorize** button to provide a token for authenticated requests.
+Persistent volumes `db-data` and `redis-data` preserve SQL Server and Redis data between restarts. The services automatically apply EF Core migrations using the `DB_CONN` connection string. All containers join the `micro-net` Docker network so the gateway can resolve service names. Swagger can also be reached through the gateway under `/orders/swagger`, `/profile/swagger` and `/organization/swagger`.
+
+Each service enables Redis caching via `REDIS_CONN`, OpenTelemetry tracing with a console exporter and secures endpoints using CORS and JWT bearer authentication. Contract tests live under `src/tests/Publishing.Contracts.Tests` and verify API compatibility using Pact. These tests run automatically via the `contracts.yml` GitHub Actions workflow.

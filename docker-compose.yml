@@ -1,0 +1,123 @@
+version: '3.8'
+services:
+  orders:
+    build: ./src/Publishing.Orders.Service
+    ports:
+      - "5001:80"
+    environment:
+      - DB_CONN=${DB_CONN}
+      - REDIS_CONN=${REDIS_CONN}
+      - JWT__Issuer=${JWT__Issuer}
+      - JWT__Audience=${JWT__Audience}
+      - JWT__SigningKey=${JWT__SigningKey}
+    depends_on:
+      db:
+        condition: service_started
+      cache:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - micro-net
+
+  profile:
+    build: ./src/Publishing.Profile.Service
+    ports:
+      - "5002:80"
+    environment:
+      - DB_CONN=${DB_CONN}
+      - REDIS_CONN=${REDIS_CONN}
+      - JWT__Issuer=${JWT__Issuer}
+      - JWT__Audience=${JWT__Audience}
+      - JWT__SigningKey=${JWT__SigningKey}
+    depends_on:
+      db:
+        condition: service_started
+      cache:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - micro-net
+
+  organization:
+    build: ./src/Publishing.Organization.Service
+    ports:
+      - "5003:80"
+    environment:
+      - DB_CONN=${DB_CONN}
+      - REDIS_CONN=${REDIS_CONN}
+      - JWT__Issuer=${JWT__Issuer}
+      - JWT__Audience=${JWT__Audience}
+      - JWT__SigningKey=${JWT__SigningKey}
+    depends_on:
+      db:
+        condition: service_started
+      cache:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - micro-net
+
+  gateway:
+    build: ./src/ApiGateway
+    ports:
+      - "5000:80"
+    environment:
+      - REDIS_CONN=${REDIS_CONN}
+      - JWT__Issuer=${JWT__Issuer}
+      - JWT__Audience=${JWT__Audience}
+      - JWT__SigningKey=${JWT__SigningKey}
+    depends_on:
+      orders:
+        condition: service_healthy
+      profile:
+        condition: service_healthy
+      organization:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - micro-net
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Your_password123
+    ports:
+      - "1433:1433"
+    volumes:
+      - db-data:/var/opt/mssql
+    networks:
+      - micro-net
+
+  cache:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - micro-net
+
+networks:
+  micro-net:
+    driver: bridge
+
+volumes:
+  db-data:
+  redis-data:

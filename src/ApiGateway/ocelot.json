@@ -1,0 +1,61 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/orders/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "orders", "Port": 80 } ],
+      "UpstreamPathTemplate": "/orders/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/swagger/v1/swagger.json",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "orders", "Port": 80 } ],
+      "UpstreamPathTemplate": "/orders/swagger",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/profile/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "profile", "Port": 80 } ],
+      "UpstreamPathTemplate": "/profile/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/swagger/v1/swagger.json",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "profile", "Port": 80 } ],
+      "UpstreamPathTemplate": "/profile/swagger",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/org/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "organization", "Port": 80 } ],
+      "UpstreamPathTemplate": "/organization/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/swagger/v1/swagger.json",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "organization", "Port": 80 } ],
+      "UpstreamPathTemplate": "/organization/swagger",
+      "UpstreamHttpMethod": [ "GET" ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5000"
+  }
+}

@@ -1,0 +1,22 @@
+name: Contract Tests
+
+on:
+  push:
+    paths:
+      - 'src/tests/Publishing.Contracts.Tests/**'
+  pull_request:
+    paths:
+      - 'src/tests/Publishing.Contracts.Tests/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - name: Run contract tests
+        run: dotnet test src/tests/Publishing.Contracts.Tests/Publishing.Contracts.Tests.csproj
+
