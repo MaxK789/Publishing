@@ -98,3 +98,11 @@ When browsing Swagger, use the **Authorize** button to provide a token for authe
 Persistent volumes `db-data` and `redis-data` preserve SQL Server and Redis data between restarts. The services automatically apply EF Core migrations using the `DB_CONN` connection string. All containers join the `micro-net` Docker network so the gateway can resolve service names. Swagger can also be reached through the gateway under `/orders/swagger`, `/profile/swagger` and `/organization/swagger`.
 
 Each service enables Redis caching via `REDIS_CONN`, OpenTelemetry tracing with a console exporter and secures endpoints using CORS and JWT bearer authentication. Contract tests live under `src/tests/Publishing.Contracts.Tests` and verify API compatibility using Pact. These tests run automatically via the `contracts.yml` GitHub Actions workflow.
+
+## CI/CD
+
+Several additional GitHub workflows build Docker images for the services and push
+them to Docker Hub. To allow these workflows to authenticate, create repository
+secrets named `DOCKER_USERNAME` and `DOCKER_PASSWORD` containing your Docker Hub
+credentials. Without these secrets the `Login & Push` steps will fail with an
+"incorrect username or password" error.
