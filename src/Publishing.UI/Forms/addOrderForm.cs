@@ -2,22 +2,27 @@
 using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
 using System.Windows.Forms;
-using Publishing.Services;
 using MediatR;
 using Publishing.AppLayer.Commands;
 using System.Resources;
 using FluentValidation;
 using System.Linq;
+using Publishing.Services;
+using Publishing.Services.ErrorHandling;
+using System.Threading.Tasks;
+using AutoMapper;
 
 namespace Publishing
 {
-    public partial class addOrderForm : Form
+    public partial class addOrderForm : BaseForm
     {
         private readonly IMediator _mediator;
-        private readonly INavigationService _navigation;
-        private readonly IUserSession _session;
+        private readonly IOrderInputValidator _inputValidator;
+        private readonly IRoleService _roles;
         private readonly IPriceCalculator _priceCalculator;
         private readonly IPrinteryRepository _printeryRepository;
+        private readonly IErrorHandler _errorHandler;
+        private readonly IMapper _mapper;
         private readonly ResourceManager _resources = new ResourceManager("Publishing.Resources.Resources", typeof(addOrderForm).Assembly);
         [Obsolete("Designer only", error: false)]
         public addOrderForm()
@@ -29,14 +34,21 @@ namespace Publishing
             IMediator mediator,
             INavigationService navigation,
             IUserSession session,
+            IOrderInputValidator inputValidator,
+            IRoleService roles,
             IPriceCalculator priceCalculator,
-            IPrinteryRepository printeryRepository)
+            IPrinteryRepository printeryRepository,
+            IErrorHandler errorHandler,
+            IMapper mapper)
+            : base(session, navigation)
         {
             _mediator = mediator;
-            _navigation = navigation;
-            _session = session;
+            _inputValidator = inputValidator;
+            _roles = roles;
             _priceCalculator = priceCalculator;
             _printeryRepository = printeryRepository;
+            _errorHandler = errorHandler;
+            _mapper = mapper;
             InitializeComponent();
         }
 
@@ -57,32 +69,25 @@ namespace Publishing
 
         private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _session.UserId = string.Empty;
-            _session.UserName = string.Empty;
-            _session.UserType = string.Empty;
-
-            _navigation.Navigate<loginForm>(this);
+            Logout();
         }
 
         private void addOrderForm_Load(object sender, EventArgs e)
         {
-            if (_session.UserType == "контактна особа")
-                організаціяToolStripMenuItem.Visible = true;
-            else
-                організаціяToolStripMenuItem.Visible = false;
+            організаціяToolStripMenuItem.Visible = _roles.IsContactPerson(_session.UserType);
         }
 
         private void calculateButton_Click(object sender, EventArgs e)
         {
             if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
             {
-                MessageBox.Show(_resources.GetString("PagesParseError") ?? "Error");
+                _errorHandler.ShowFriendlyError(_resources.GetString("PagesParseError") ?? "Error");
                 return;
             }
 
             if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
             {
-                MessageBox.Show(_resources.GetString("TirageParseError") ?? "Error");
+                _errorHandler.ShowFriendlyError(_resources.GetString("TirageParseError") ?? "Error");
                 return;
             }
 
@@ -93,50 +98,54 @@ namespace Publishing
 
         private async void orderButton_Click(object sender, EventArgs e)
         {
-            string type = typeBox.SelectedItem?.ToString();
-            if (type == null)
-                return;
-
-            if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
+            if (!TryParseInput(out var dto)) return;
+            try
             {
-                MessageBox.Show(_resources.GetString("PagesParseError") ?? "Error");
-                return;
+                _inputValidator.Validate(dto);
+                await SubmitOrder(dto);
             }
-
-            if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
+            catch (ValidationException ex)
             {
-                MessageBox.Show(_resources.GetString("TirageParseError") ?? "Error");
-                return;
+                _errorHandler.ShowFriendlyError(string.Join("\n", ex.Errors.Select(e => e.ErrorMessage)));
             }
-
-            var dto = new CreateOrderDto
+            catch (Exception ex)
             {
-                Type = type,
+                _errorHandler.Handle(ex);
+            }
+        }
+
+        private bool TryParseInput(out CreateOrderDto dto)
+        {
+            dto = new CreateOrderDto
+            {
+                Type = typeBox.SelectedItem?.ToString() ?? string.Empty,
                 Name = nameProductTextBox.Text,
-                Pages = pageNum,
-                Tirage = tirageNum,
                 Printery = printeryBox.SelectedItem?.ToString() ?? string.Empty,
                 PersonId = _session.UserId
             };
 
-            var command = new CreateOrderCommand(dto.Type, dto.Name, dto.Pages, dto.Tirage, dto.PersonId, dto.Printery);
-            try
+            if (!int.TryParse(pageNumTextBox.Text, out var pages))
             {
-                var order = await _mediator.Send(command);
+                _errorHandler.ShowFriendlyError(_resources.GetString("PagesParseError") ?? "Error");
+                return false;
+            }
+            if (!int.TryParse(tirageTextBox.Text, out var tirage))
+            {
+                _errorHandler.ShowFriendlyError(_resources.GetString("TirageParseError") ?? "Error");
+                return false;
+            }
+            dto.Pages = pages;
+            dto.Tirage = tirage;
+            return true;
+        }
 
-                MessageBox.Show(_resources.GetString("OrderAdded") ?? "Success");
-                totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
-
-                _navigation.Navigate<mainForm>(this);
-            }
-            catch (ValidationException ex)
-            {
-                MessageBox.Show(string.Join("\n", ex.Errors.Select(e => e.ErrorMessage)), "Validation error");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error");
-            }
+        private async Task SubmitOrder(CreateOrderDto dto)
+        {
+            var cmd = _mapper.Map<CreateOrderCommand>(dto);
+            var order = await _mediator.Send(cmd);
+            _errorHandler.ShowFriendlyError(_resources.GetString("OrderAdded") ?? "Success");
+            totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
+            _navigation.Navigate<mainForm>(this);
         }
 
         private void змінитиДаніToolStripMenuItem_Click_1(object sender, EventArgs e)

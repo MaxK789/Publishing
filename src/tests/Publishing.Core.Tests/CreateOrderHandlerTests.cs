@@ -75,6 +75,14 @@ namespace Publishing.Core.Tests
             }
         }
 
+        private class StubOrderEventsPublisher : IOrderEventsPublisher
+        {
+            public event Action<OrderDto>? OrderCreated;
+            public event Action<OrderDto>? OrderUpdated;
+            public void PublishOrderCreated(OrderDto order) => OrderCreated?.Invoke(order);
+            public void PublishOrderUpdated(OrderDto order) => OrderUpdated?.Invoke(order);
+        }
+
         [TestMethod]
         public async Task Handle_ValidCommand_ReturnsOrder()
         {
@@ -82,9 +90,10 @@ namespace Publishing.Core.Tests
             var printery = new StubPrinteryRepository();
             var handler = new CreateOrderHandler(repo, printery,
                 new PriceCalculator(new StandardDiscountPolicy()),
-                new CreateOrderValidator(),
+                new CreateOrderCommandValidator(),
                 new StubDateTimeProvider(),
-                new StubUnitOfWork());
+                new StubUnitOfWork(),
+                new StubOrderEventsPublisher());
             var cmd = new CreateOrderCommand("book","Intro",10,3,"P1","PR");
 
             var result = await handler.Handle(cmd, CancellationToken.None);

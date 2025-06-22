@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using System.Linq;
 using Dapper;
 using Publishing.Core.Interfaces;
+using Publishing.Core.Commands;
 
 namespace Publishing.Infrastructure.Repositories
 {
-    [Obsolete("Replaced by query objects")]
     public class ProfileRepository : IProfileRepository
     {
         private readonly IDbContext _db;
@@ -22,10 +22,10 @@ namespace Publishing.Infrastructure.Repositories
             return res.FirstOrDefault() == email;
         }
 
-        public Task UpdateAsync(string id, string? fName, string? lName, string? email, string? status, string? phone, string? fax, string? address)
+        public Task UpdateAsync(UpdateProfileCommand cmd)
         {
             var parameters = new DynamicParameters();
-            parameters.Add("@id", id);
+            parameters.Add("@id", cmd.Id);
             var sb = new StringBuilder("UPDATE Person SET");
             void Add(string field, string? value, string param)
             {
@@ -35,17 +35,17 @@ namespace Publishing.Infrastructure.Repositories
                     parameters.Add($"@{param}", value);
                 }
             }
-            Add("FName", fName, "FName");
-            Add("LName", lName, "LName");
-            Add("emailPerson", email, "Email");
-            if (!string.IsNullOrEmpty(status))
+            Add("FName", cmd.FirstName, "FName");
+            Add("LName", cmd.LastName, "LName");
+            Add("emailPerson", cmd.Email, "Email");
+            if (!string.IsNullOrEmpty(cmd.Status))
             {
                 sb.Append(" typePerson = @Status,");
-                parameters.Add("@Status", status);
+                parameters.Add("@Status", cmd.Status);
             }
-            Add("phonePerson", phone, "phone");
-            Add("faxPerson", fax, "fax");
-            Add("addressPerson", address, "address");
+            Add("phonePerson", cmd.Phone, "phone");
+            Add("faxPerson", cmd.Fax, "fax");
+            Add("addressPerson", cmd.Address, "address");
             if (sb[sb.Length - 1] == ',')
                 sb.Remove(sb.Length - 1, 1);
             sb.Append(" WHERE idPerson = @id");

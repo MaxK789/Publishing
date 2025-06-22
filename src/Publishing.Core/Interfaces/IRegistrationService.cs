@@ -5,6 +5,6 @@ namespace Publishing.Core.Interfaces
 {
     public interface IRegistrationService
     {
-        Task<UserDto> RegisterAsync(RegisterUserDto dto);
+        Task<AuthResultDto> RegisterAsync(RegisterUserDto dto);
     }
 }

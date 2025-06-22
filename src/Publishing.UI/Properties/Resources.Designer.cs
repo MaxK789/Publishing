@@ -12,9 +12,6 @@ namespace Publishing.Properties
 {
 
 
-    /// <summary>
-    ///   Класс ресурсов со строгим типом для поиска локализованных строк и пр.
-    /// </summary>
     // Этот класс был автоматически создан при помощи StronglyTypedResourceBuilder
     // класс с помощью таких средств, как ResGen или Visual Studio.
     // Для добавления или удаления члена измените файл .ResX, а затем перезапустите ResGen
@@ -34,9 +31,6 @@ namespace Publishing.Properties
         {
         }
 
-        /// <summary>
-        ///   Возврат кэшированного экземпляра ResourceManager, используемого этим классом.
-        /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Resources.ResourceManager ResourceManager
         {
@@ -51,10 +45,6 @@ namespace Publishing.Properties
             }
         }
 
-        /// <summary>
-        ///   Переопределяет свойство CurrentUICulture текущего потока для всех
-        ///   подстановки ресурсов с помощью этого класса ресурсов со строгим типом.
-        /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Globalization.CultureInfo Culture
         {
@@ -67,5 +57,10 @@ namespace Publishing.Properties
                 resourceCulture = value;
             }
         }
+
+        internal static string PagesParseError => ResourceManager.GetString("PagesParseError", resourceCulture);
+        internal static string TirageParseError => ResourceManager.GetString("TirageParseError", resourceCulture);
+        internal static string OrderAdded => ResourceManager.GetString("OrderAdded", resourceCulture);
+        internal static string DataUpdated => ResourceManager.GetString("DataUpdated", resourceCulture);
     }
 }

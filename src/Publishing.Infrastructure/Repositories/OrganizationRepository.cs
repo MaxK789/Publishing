@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using System.Linq;
 using Dapper;
 using Publishing.Core.Interfaces;
+using Publishing.Core.Commands;
 
 namespace Publishing.Infrastructure.Repositories
 {
-    [Obsolete("Replaced by query objects")]
     public class OrganizationRepository : IOrganizationRepository
     {
         private readonly IDbContext _db;
@@ -22,16 +22,16 @@ namespace Publishing.Infrastructure.Repositories
             return res.FirstOrDefault();
         }
 
-        public Task InsertAsync(string name, string email, string phone, string fax, string address, string personId)
+        public Task InsertAsync(CreateOrganizationCommand cmd)
         {
             const string sql = "INSERT INTO Organization(nameOrganization, emailOrganization, phoneOrganization, faxOrganization, addressOrganization, idPerson) VALUES (@orgName, @Email, @phone, @fax, @address, @id)";
-            return _db.ExecuteAsync(sql, new { orgName = name, Email = email, phone, fax, address, id = personId });
+            return _db.ExecuteAsync(sql, new { orgName = cmd.Name, Email = cmd.Email, phone = cmd.Phone, fax = cmd.Fax, address = cmd.Address, id = cmd.PersonId });
         }
 
-        public Task UpdateAsync(string id, string? name, string? email, string? phone, string? fax, string? address)
+        public Task UpdateAsync(UpdateOrganizationCommand cmd)
         {
             var parameters = new DynamicParameters();
-            parameters.Add("@id", id);
+            parameters.Add("@id", cmd.Id);
             var sb = new StringBuilder("UPDATE Organization SET");
             void Add(string field, string? value, string param)
             {
@@ -41,11 +41,11 @@ namespace Publishing.Infrastructure.Repositories
                     parameters.Add($"@{param}", value);
                 }
             }
-            Add("nameOrganization", name, "orgName");
-            Add("emailOrganization", email, "Email");
-            Add("phoneOrganization", phone, "phone");
-            Add("faxOrganization", fax, "fax");
-            Add("addressOrganization", address, "address");
+            Add("nameOrganization", cmd.Name, "orgName");
+            Add("emailOrganization", cmd.Email, "Email");
+            Add("phoneOrganization", cmd.Phone, "phone");
+            Add("faxOrganization", cmd.Fax, "fax");
+            Add("addressOrganization", cmd.Address, "address");
             if (sb[sb.Length - 1] == ',')
                 sb.Remove(sb.Length - 1, 1);
             sb.Append(" WHERE idPerson = @id");

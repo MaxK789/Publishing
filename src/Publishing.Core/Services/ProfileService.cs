@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
+using Publishing.Core.Commands;
 
 namespace Publishing.Core.Services
 {
@@ -24,7 +25,18 @@ namespace Publishing.Core.Services
             {
                 throw new InvalidOperationException("Email вже використовується");
             }
-            await _repo.UpdateAsync(dto.Id, dto.FirstName, dto.LastName, dto.Email, dto.Status, dto.Phone, dto.Fax, dto.Address).ConfigureAwait(false);
+            var cmd = new UpdateProfileCommand
+            {
+                Id = dto.Id,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email = dto.Email,
+                Status = dto.Status,
+                Phone = dto.Phone,
+                Fax = dto.Fax,
+                Address = dto.Address
+            };
+            await _repo.UpdateAsync(cmd).ConfigureAwait(false);
         }
     }
 }

@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
+using System.Threading.Tasks;
+using Publishing.Services.Events;
 
 namespace Publishing
 {
-    public partial class statisticForm : Form
+    public partial class statisticForm : BaseForm
     {
-        private readonly INavigationService _navigation;
+        private readonly IRoleService _roles;
         private readonly IStatisticRepository _statRepo;
-        private readonly IUserSession _session;
+        private readonly IOrderEventsPublisher _events;
 
         [Obsolete("Designer only", error: false)]
         public statisticForm()
@@ -18,16 +20,18 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public statisticForm(INavigationService navigation, IStatisticRepository statRepo, IUserSession session)
+        public statisticForm(INavigationService navigation, IStatisticRepository statRepo, IUserSession session, IRoleService roles, IOrderEventsPublisher events)
+            : base(session, navigation)
         {
-            _navigation = navigation;
             _statRepo = statRepo;
-            _session = session;
+            _roles = roles;
+            _events = events;
             InitializeComponent();
         }
 
         private async void statisticForm_Load(object sender, EventArgs e)
         {
+            _events.OrderCreated += _ => _ = RefreshStatisticsAsync();
             authorsBox.Items.Clear();
             authorsBox.Items.Add("Усі");
 
@@ -61,11 +65,7 @@ namespace Publishing
 
         private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _session.UserId = string.Empty;
-            _session.UserName = string.Empty;
-            _session.UserType = string.Empty;
-
-            _navigation.Navigate<loginForm>(this);
+            Logout();
         }
 
         private void списокToolStripMenuItem_Click(object sender, EventArgs e)
@@ -163,11 +163,17 @@ namespace Publishing
 
         private void вийтиToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            _session.UserId = string.Empty;
-            _session.UserName = string.Empty;
-            _session.UserType = string.Empty;
+            Logout();
+        }
 
-            _navigation.Navigate<loginForm>(this);
+        private async Task RefreshStatisticsAsync()
+        {
+            chart1.Series[0].Points.Clear();
+            var dataList = await _statRepo.GetOrdersPerMonthAsync();
+            foreach (var dataPoint in dataList)
+            {
+                chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+            }
         }
     }
 }

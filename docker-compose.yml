@@ -8,6 +8,7 @@ services:
     environment:
       - DB_CONN=${DB_CONN}
       - REDIS_CONN=${REDIS_CONN}
+      - RABBIT_CONN=${RABBIT_CONN}
       - JWT__Issuer=${JWT__Issuer}
       - JWT__Audience=${JWT__Audience}
       - JWT__SigningKey=${JWT__SigningKey}
@@ -135,6 +136,14 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
+    networks:
+      - micro-net
+
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - micro-net
 

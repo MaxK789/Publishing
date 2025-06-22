@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
+using Publishing.Core.Commands;
 
 namespace Publishing.Core.Services
 {
@@ -22,11 +23,29 @@ namespace Publishing.Core.Services
             string? existing = await _repo.GetNameIfExistsAsync(dto.Name).ConfigureAwait(false);
             if (existing == dto.Name)
             {
-                await _repo.UpdateAsync(dto.Id, dto.Name, dto.Email, dto.Phone, dto.Fax, dto.Address).ConfigureAwait(false);
+                var cmd = new UpdateOrganizationCommand
+                {
+                    Id = dto.Id,
+                    Name = dto.Name,
+                    Email = dto.Email,
+                    Phone = dto.Phone,
+                    Fax = dto.Fax,
+                    Address = dto.Address
+                };
+                await _repo.UpdateAsync(cmd).ConfigureAwait(false);
             }
             else
             {
-                await _repo.InsertAsync(dto.Name, dto.Email, dto.Phone, dto.Fax, dto.Address, dto.Id).ConfigureAwait(false);
+                var cmd = new CreateOrganizationCommand
+                {
+                    Name = dto.Name,
+                    Email = dto.Email,
+                    Phone = dto.Phone,
+                    Fax = dto.Fax,
+                    Address = dto.Address,
+                    PersonId = dto.Id
+                };
+                await _repo.InsertAsync(cmd).ConfigureAwait(false);
             }
         }
     }

@@ -12,5 +12,6 @@
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.8.2" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc9.10" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc9.10" />
+    <ProjectReference Include="..\Publishing.Services\Publishing.Services.csproj" />
   </ItemGroup>
 </Project>

@@ -4,14 +4,15 @@ using System.Windows.Forms;
 using Publishing.Core.Interfaces;
 using Publishing.Core.DTOs;
 using Publishing.Services;
+using Publishing.Services.ErrorHandling;
+using System.Threading.Tasks;
 
 namespace Publishing
 {
-    public partial class registrationForm : Form
+    public partial class registrationForm : BaseForm
     {
         private readonly IRegistrationService _service;
-        private readonly INavigationService _navigation;
-        private readonly IUserSession _session;
+        private readonly IErrorHandler _errorHandler;
 
         [Obsolete("Designer only", error: false)]
         public registrationForm()
@@ -19,11 +20,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public registrationForm(IRegistrationService service, INavigationService navigation, IUserSession session)
+        public registrationForm(IRegistrationService service, INavigationService navigation, IUserSession session, IErrorHandler errorHandler)
+            : base(session, navigation)
         {
             _service = service;
-            _navigation = navigation;
-            _session = session;
+            _errorHandler = errorHandler;
             InitializeComponent();
         }
 
@@ -46,17 +47,18 @@ namespace Publishing
 
             try
             {
-                var user = await _service.RegisterAsync(dto);
-                _session.UserId = user.Id;
-                _session.UserType = user.Type;
-                _session.UserName = user.Name;
+                var result = await _service.RegisterAsync(dto);
+                _session.UserId = result.User.Id;
+                _session.UserType = result.User.Type;
+                _session.UserName = result.User.Name;
+                _session.Token = result.Token;
 
                 _navigation.Navigate<mainForm>(this);
-                MessageBox.Show($"Вітаємо, {_session.UserName} ({_session.UserType})!");
+                _errorHandler.ShowFriendlyError($"Вітаємо, {_session.UserName} ({_session.UserType})!");
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                _errorHandler.Handle(ex);
             }
         }
 

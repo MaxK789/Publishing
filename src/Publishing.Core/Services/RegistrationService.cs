@@ -16,10 +16,18 @@ namespace Publishing.Core.Services
             _validator = validator;
         }
 
-        public Task<UserDto> RegisterAsync(RegisterUserDto dto)
+        public Task<AuthResultDto> RegisterAsync(RegisterUserDto dto)
         {
             _validator.ValidateAndThrow(dto);
-            return _authService.RegisterAsync(dto.FirstName, dto.LastName, dto.Email, dto.Status!, dto.Password);
+            var cmd = new Publishing.Core.Commands.RegisterUserCommand
+            {
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email = dto.Email,
+                Status = dto.Status!,
+                Password = dto.Password
+            };
+            return _authService.RegisterAsync(cmd);
         }
     }
 }

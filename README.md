@@ -91,13 +91,14 @@ docker-compose up --build
 ```
 
 The API gateway project under `src/ApiGateway` routes requests to the services. Swagger is enabled for each service at `/swagger` and health checks are exposed at `/health`.
-Copy `.env.example` to `.env` and adjust the connection strings and JWT settings before starting the stack. Required variables are `SA_PASSWORD`, `ACCEPT_EULA`, `DB_CONN`, `REDIS_CONN`, `JWT__Issuer`, `JWT__Audience` and `JWT__SigningKey`.
+Copy `.env.example` to `.env` and adjust the connection strings and JWT settings before starting the stack. Required variables are `SA_PASSWORD`, `ACCEPT_EULA`, `DB_CONN`, `REDIS_CONN`, `RABBIT_CONN`, `JWT__Issuer`, `JWT__Audience` and `JWT__SigningKey`.
 The issuer, audience and signing key must match the values used to sign JWT tokens consumed by the services.
 Set `ASPNETCORE_ENVIRONMENT=Development` in the compose file (or `.env`) to enable Swagger inside the containers. Change or remove this variable to run the services in production.
 Database migrations now apply **asynchronously** during startup and each service reports readiness via `/health`.
 All API routes require an `Authorization: Bearer <token>` header containing a JWT signed with the configured key.
 When browsing Swagger, use the **Authorize** button to provide a token for authenticated requests.
 Persistent volumes `db-data` and `redis-data` preserve SQL Server and Redis data between restarts. The services automatically apply EF Core migrations using the `DB_CONN` connection string. All containers join the `micro-net` Docker network so the gateway can resolve service names. Swagger can also be reached through the gateway under `/orders/swagger`, `/profile/swagger` and `/organization/swagger`.
+RabbitMQ runs as `rabbit` on port `5672` for publishing order events used by statistics.
 
 Each service enables Redis caching via `REDIS_CONN`, OpenTelemetry tracing with a console exporter and secures endpoints using CORS and JWT bearer authentication. Contract tests live under `src/tests/Publishing.Contracts.Tests` and verify API compatibility using Pact. These tests run automatically via the `contracts.yml` GitHub Actions workflow.
 

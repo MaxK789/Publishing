@@ -3,6 +3,8 @@ using Publishing.Core.Interfaces;
 using Publishing.Core.Domain;
 using MediatR;
 using Publishing.AppLayer.Commands;
+using Publishing.Core.DTOs;
+using AutoMapper;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
@@ -18,12 +20,16 @@ public class OrdersController : ControllerBase
     private readonly IMediator _mediator;
     private readonly IOrderRepository _orders;
     private readonly IDistributedCache _cache;
+    private readonly IOrderInputValidator _validator;
+    private readonly IMapper _mapper;
 
-    public OrdersController(IMediator mediator, IOrderRepository orders, IDistributedCache cache)
+    public OrdersController(IMediator mediator, IOrderRepository orders, IDistributedCache cache, IOrderInputValidator validator, IMapper mapper)
     {
         _mediator = mediator;
         _orders = orders;
         _cache = cache;
+        _validator = validator;
+        _mapper = mapper;
     }
 
     [HttpGet]
@@ -57,13 +63,17 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateOrderCommand cmd)
+    public async Task<IActionResult> Create(CreateOrderDto dto)
     {
+        _validator.Validate(dto);
+        var cmd = _mapper.Map<CreateOrderCommand>(dto);
         Order order = await _mediator.Send(cmd);
+        await _cache.RemoveAsync("orders_all");
         return Ok(order);
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = "RequireAdmin")]
     public async Task<IActionResult> Delete(int id)
     {
         await _orders.DeleteAsync(id);

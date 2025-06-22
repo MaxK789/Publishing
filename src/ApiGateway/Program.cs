@@ -6,6 +6,10 @@ using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using OpenTelemetry.Trace;
+using Publishing.Services;
+using Publishing.Services.ErrorHandling;
+using Publishing.Services.Roles;
+using Publishing.Services.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,10 +38,14 @@ builder.Services.AddAuthentication("Bearer")
             ValidAudience = audience,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
-            ValidateLifetime = true
+            ValidateLifetime = true,
+            RoleClaimType = "role"
         };
     });
 builder.Services.AddAuthorization();
+builder.Services.AddScoped<IErrorHandler, ErrorHandler>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IJwtFactory, JwtFactory>();
 builder.Services.AddOpenTelemetry().WithTracing(b =>
     b.AddAspNetCoreInstrumentation()
      .AddHttpClientInstrumentation()
@@ -48,6 +56,7 @@ builder.Logging.AddJsonConsole();
 var app = builder.Build();
 
 app.UseCors();
+app.UseExceptionHandling();
 app.UseAuthentication();
 app.UseAuthorization();
 await app.UseOcelot();

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
+using Publishing.AppLayer.Mapping;
 using Publishing.Infrastructure;
 using Publishing.Infrastructure.Repositories;
 using Publishing.Infrastructure.DataAccess;
@@ -19,14 +20,13 @@ using Publishing.AppLayer.Validators;
 using Publishing.AppLayer.Behaviors;
 using FluentValidation;
 using Publishing.Services;
+using Publishing.Services.ErrorHandling;
+using Publishing.Services.Events;
 
 namespace Publishing
 {
     internal static class Program
     {
-        /// <summary>
-        /// Главная точка входа для приложения.
-        /// </summary>
         [STAThread]
         static void Main()
         {
@@ -63,14 +63,18 @@ namespace Publishing
             services.AddScoped<ILogger, LoggerService>();
             services.AddScoped<IDiscountPolicy, StandardDiscountPolicy>();
             services.AddScoped<IPriceCalculator, PriceCalculator>();
-            services.AddScoped<IOrderValidator, OrderValidator>();
+            services.AddScoped<IOrderInputValidator, OrderInputValidator>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IErrorHandler, ErrorHandler>();
             services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
             services.AddSingleton<IUserSession, UserSession>();
             services.AddMemoryCache();
+            services.AddAutoMapper(typeof(OrderProfile).Assembly);
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateOrderHandler).Assembly));
             services.AddValidatorsFromAssemblyContaining<EmailValidator>();
             services.AddTransient<IValidator<string>, EmailValidator>();
             services.AddTransient<PhoneFaxValidator>();
+            services.AddTransient<IValidator<string>, PhoneFaxValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             var configuration = new ConfigurationBuilder()
@@ -98,10 +102,16 @@ namespace Publishing
             services.AddTransient<IDbContext, DapperDbContext>();
             services.AddScoped<IDbHelper, DbHelper>();
             services.AddScoped<ILoginRepository, LoginRepository>();
+            services.AddScoped<IJwtFactory, JwtFactory>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IRegistrationService, RegistrationService>();
             services.AddScoped<INavigationService, NavigationService>();
+            var rabbit = configuration["RABBIT_CONN"];
+            if (string.IsNullOrWhiteSpace(rabbit))
+                services.AddSingleton<IOrderEventsPublisher, OrderEventsPublisher>();
+            else
+                services.AddSingleton<IOrderEventsPublisher>(new RabbitOrderEventsPublisher(rabbit));
             services.AddTransient<loginForm>();
             services.AddTransient<registrationForm>();
             services.AddTransient<addOrderForm>();

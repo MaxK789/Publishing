@@ -14,6 +14,12 @@ using BCrypt.Net;
 using Publishing.Core.Services;
 using Publishing.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
+
+class StubJwt : IJwtFactory
+{
+    public string GenerateToken(Publishing.Core.DTOs.UserDto user) => "tkn";
+}
 
 namespace Publishing.Integration.Tests
 {
@@ -91,11 +97,11 @@ namespace Publishing.Integration.Tests
             string id = _db.QueryAsync<int>("SELECT idPerson FROM Person WHERE emailPerson='c@d.com'").Result.First().ToString();
             _db.ExecuteAsync($"INSERT INTO Pass(password,idPerson) VALUES('{hash}', {id})").Wait();
 
-            var service = new AuthService(new LoginRepository(_db));
-            var user = await service.AuthenticateAsync("c@d.com", "pass");
+            var service = new AuthService(new LoginRepository(_db), new StubJwt());
+            var result = await service.AuthenticateAsync("c@d.com", "pass");
 
-            Assert.IsNotNull(user);
-            Assert.AreEqual(id, user!.Id);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(id, result!.User.Id);
         }
 
         [TestMethod]
