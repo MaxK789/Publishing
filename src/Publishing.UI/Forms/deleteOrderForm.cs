@@ -3,14 +3,16 @@ using System.Data;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
+using System.Threading.Tasks;
+using Publishing.Services.ErrorHandling;
 
 namespace Publishing
 {
-    public partial class deleteOrderForm : Form
+    public partial class deleteOrderForm : BaseForm
     {
-        private readonly INavigationService _navigation;
         private readonly IOrderRepository _orderRepo;
-        private readonly IUserSession _session;
+        private readonly IRoleService _roles;
+        private readonly IErrorHandler _errorHandler;
 
         [Obsolete("Designer only", error: false)]
         public deleteOrderForm()
@@ -18,11 +20,12 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public deleteOrderForm(INavigationService navigation, IOrderRepository orderRepo, IUserSession session)
+        public deleteOrderForm(INavigationService navigation, IOrderRepository orderRepo, IUserSession session, IRoleService roles, IErrorHandler errorHandler)
+            : base(session, navigation)
         {
-            _navigation = navigation;
             _orderRepo = orderRepo;
-            _session = session;
+            _roles = roles;
+            _errorHandler = errorHandler;
             InitializeComponent();
         }
 
@@ -34,7 +37,7 @@ namespace Publishing
 
                 await _orderRepo.DeleteAsync(idToDelete);
 
-                MessageBox.Show("Видалено idOrder: " + idToDelete.ToString());
+                _errorHandler.ShowFriendlyError("Видалено idOrder: " + idToDelete.ToString());
 
                 dataGridView1.Rows.RemoveAt(e.RowIndex);
             }
@@ -57,56 +60,44 @@ namespace Publishing
 
         private void вийтиToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            _session.UserId = string.Empty;
-            _session.UserName = string.Empty;
-            _session.UserType = string.Empty;
-
-            _navigation.Navigate<loginForm>(this);
+            Logout();
         }
 
         private async void deleteOrderForm_Load(object sender, EventArgs e)
         {
-            string id = _session.UserId;
+            ConfigureRoleBasedUi();
+            await PopulateOrdersGrid();
+        }
 
-            if (_session.UserType == "контактна особа")
-                організаціяToolStripMenuItem.Visible = true;
-            else
-                організаціяToolStripMenuItem.Visible = false;
-
-            if (_session.UserType != "admin")
-            {
-                статистикаToolStripMenuItem.Visible = false;
-                змінитиДаніToolStripMenuItem.Visible = true;
-
-                    DataTable dataTable = await _orderRepo.GetByPersonAsync(id);
-
-                dataGridView1.DataSource = dataTable;
-
-                DataGridViewLinkColumn linkColumn = new DataGridViewLinkColumn();
-                dataGridView1.Columns.Add(linkColumn);
-                linkColumn.HeaderText = "Delete";
-                linkColumn.Name = "DeleteColumn";
-                linkColumn.Text = "Delete";
-                linkColumn.UseColumnTextForLinkValue = true;
-
-            }
-            else
+        private void ConfigureRoleBasedUi()
+        {
+            організаціяToolStripMenuItem.Visible = _roles.IsContactPerson(_session.UserType);
+            if (_roles.IsAdmin(_session.UserType))
             {
                 додатиToolStripMenuItem.Visible = false;
                 статистикаToolStripMenuItem.Visible = true;
                 змінитиДаніToolStripMenuItem.Visible = false;
-
-                    DataTable dataTable = await _orderRepo.GetAllAsync();
-
-                dataGridView1.DataSource = dataTable;
-
-                DataGridViewLinkColumn linkColumn = new DataGridViewLinkColumn();
-                dataGridView1.Columns.Add(linkColumn);
-                linkColumn.HeaderText = "Delete";
-                linkColumn.Name = "DeleteColumn";
-                linkColumn.Text = "Delete";
-                linkColumn.UseColumnTextForLinkValue = true;
             }
+            else
+            {
+                статистикаToolStripMenuItem.Visible = false;
+                змінитиДаніToolStripMenuItem.Visible = true;
+            }
+        }
+
+        private async Task PopulateOrdersGrid()
+        {
+            DataTable dataTable = _roles.IsAdmin(_session.UserType)
+                ? await _orderRepo.GetAllAsync()
+                : await _orderRepo.GetByPersonAsync(_session.UserId);
+            dataGridView1.DataSource = dataTable;
+
+            DataGridViewLinkColumn linkColumn = new DataGridViewLinkColumn();
+            dataGridView1.Columns.Add(linkColumn);
+            linkColumn.HeaderText = "Delete";
+            linkColumn.Name = "DeleteColumn";
+            linkColumn.Text = "Delete";
+            linkColumn.UseColumnTextForLinkValue = true;
         }
 
         private void додатиToolStripMenuItem_Click(object sender, EventArgs e)

@@ -3,9 +3,9 @@ using Publishing.AppLayer.Commands;
 
 namespace Publishing.AppLayer.Validators
 {
-    public class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
+    public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
     {
-        public CreateOrderValidator()
+        public CreateOrderCommandValidator()
         {
             RuleFor(x => x.Pages).GreaterThan(0);
             RuleFor(x => x.Tirage).GreaterThan(0);

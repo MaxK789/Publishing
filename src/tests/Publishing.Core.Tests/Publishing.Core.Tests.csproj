@@ -14,6 +14,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.22" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.22" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.22" />
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../Publishing.Core/Publishing.Core.csproj" />

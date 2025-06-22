@@ -3,14 +3,14 @@ using System.Data;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
+using System.Threading.Tasks;
 
 namespace Publishing
 {
-    public partial class mainForm : Form
+    public partial class mainForm : BaseForm
     {
-        private readonly INavigationService _navigation;
         private readonly IOrderRepository _orderRepo;
-        private readonly IUserSession _session;
+        private readonly IRoleService _roles;
 
         [Obsolete("Designer only", error: false)]
         public mainForm()
@@ -18,11 +18,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public mainForm(INavigationService navigation, IOrderRepository orderRepo, IUserSession session)
+        public mainForm(INavigationService navigation, IOrderRepository orderRepo, IUserSession session, IRoleService roles)
+            : base(session, navigation)
         {
-            _navigation = navigation;
             _orderRepo = orderRepo;
-            _session = session;
+            _roles = roles;
             InitializeComponent();
         }
 
@@ -33,11 +33,7 @@ namespace Publishing
 
         private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _session.UserId = string.Empty;
-            _session.UserName = string.Empty;
-            _session.UserType = string.Empty;
-
-            _navigation.Navigate<loginForm>(this);
+            Logout();
         }
 
         private void змінитиДаніToolStripMenuItem_Click(object sender, EventArgs e)
@@ -62,21 +58,17 @@ namespace Publishing
 
         private async void mainForm_Load(object sender, EventArgs e)
         {
-            if (_session.UserType == "контактна особа")
-                організаціяToolStripMenuItem.Visible = true;
-            else
-                організаціяToolStripMenuItem.Visible = false;
-
-            if (_session.UserType != "admin")
-            {
-                статистикаToolStripMenuItem.Visible = false;
-                змінитиДаніToolStripMenuItem.Visible = true;
-            }
-            else
+            організаціяToolStripMenuItem.Visible = _roles.IsContactPerson(_session.UserType);
+            if (_roles.IsAdmin(_session.UserType))
             {
                 статистикаToolStripMenuItem.Visible = true;
                 змінитиДаніToolStripMenuItem.Visible = false;
                 додатиToolStripMenuItem.Visible = false;
+            }
+            else
+            {
+                статистикаToolStripMenuItem.Visible = false;
+                змінитиДаніToolStripMenuItem.Visible = true;
             }
 
             await _orderRepo.UpdateExpiredAsync();

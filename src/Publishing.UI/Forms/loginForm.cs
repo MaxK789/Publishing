@@ -1,15 +1,15 @@
 using System;
 using Publishing.Core.Interfaces;
 using Publishing.Services;
+using Publishing.Services.ErrorHandling;
 using System.Windows.Forms;
 
 namespace Publishing
 {
-    public partial class loginForm : Form
+    public partial class loginForm : BaseForm
     {
         private readonly IAuthService _authService;
-        private readonly INavigationService _navigation;
-        private readonly IUserSession _session;
+        private readonly IErrorHandler _errorHandler;
 
         [Obsolete("Designer only", error: false)]
         public loginForm()
@@ -17,11 +17,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public loginForm(IAuthService authService, INavigationService navigation, IUserSession session)
+        public loginForm(IAuthService authService, INavigationService navigation, IUserSession session, IErrorHandler errorHandler)
+            : base(session, navigation)
         {
             _authService = authService;
-            _navigation = navigation;
-            _session = session;
+            _errorHandler = errorHandler;
             InitializeComponent();
         }
 
@@ -31,20 +31,21 @@ namespace Publishing
             string email = emailTextBox.Text;
             string password = passwordTextBox.Text;
 
-            var user = await _authService.AuthenticateAsync(email, password);
+            var result = await _authService.AuthenticateAsync(email, password);
 
-            if (user != null)
+            if (result != null)
             {
-                _session.UserId = user.Id;
-                _session.UserType = user.Type;
-                _session.UserName = user.Name;
+                _session.UserId = result.User.Id;
+                _session.UserType = result.User.Type;
+                _session.UserName = result.User.Name;
+                _session.Token = result.Token;
 
                 _navigation.Navigate<mainForm>(this);
-                MessageBox.Show($"Вітаємо, {_session.UserName} ({_session.UserType})!");
+                _errorHandler.ShowFriendlyError($"Вітаємо, {_session.UserName} ({_session.UserType})!");
             }
             else
             {
-                MessageBox.Show("Невірна електронна пошта або пароль");
+                _errorHandler.ShowFriendlyError("Невірна електронна пошта або пароль");
             }
         }
 

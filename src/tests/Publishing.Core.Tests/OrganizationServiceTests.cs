@@ -5,6 +5,7 @@ using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using Publishing.AppLayer.Validators;
+using Publishing.Core.Commands;
 
 namespace Publishing.Core.Tests
 {
@@ -14,39 +15,23 @@ namespace Publishing.Core.Tests
         private class StubRepo : IOrganizationRepository
         {
             public string? Existing;
-            public UpdateOrganizationDto? Inserted;
-            public UpdateOrganizationDto? Updated;
+            public CreateOrganizationCommand? Inserted;
+            public UpdateOrganizationCommand? Updated;
 
             public Task<string?> GetNameIfExistsAsync(string name)
             {
                 return Task.FromResult(name == Existing ? Existing : null);
             }
 
-            public Task InsertAsync(string name, string email, string phone, string fax, string address, string personId)
+            public Task InsertAsync(CreateOrganizationCommand cmd)
             {
-                Inserted = new UpdateOrganizationDto
-                {
-                    Id = personId,
-                    Name = name,
-                    Email = email,
-                    Phone = phone,
-                    Fax = fax,
-                    Address = address
-                };
+                Inserted = cmd;
                 return Task.CompletedTask;
             }
 
-            public Task UpdateAsync(string id, string? name, string? email, string? phone, string? fax, string? address)
+            public Task UpdateAsync(UpdateOrganizationCommand cmd)
             {
-                Updated = new UpdateOrganizationDto
-                {
-                    Id = id,
-                    Name = name ?? string.Empty,
-                    Email = email ?? string.Empty,
-                    Phone = phone ?? string.Empty,
-                    Fax = fax ?? string.Empty,
-                    Address = address ?? string.Empty
-                };
+                Updated = cmd;
                 return Task.CompletedTask;
             }
         }

@@ -8,8 +8,8 @@ namespace Publishing.AppLayer.Validators
         {
             RuleFor(x => x)
                 .NotEmpty()
-                // require domain part to contain a dot
-                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+                .Matches(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+                .WithMessage("Invalid email format");
         }
     }
 }

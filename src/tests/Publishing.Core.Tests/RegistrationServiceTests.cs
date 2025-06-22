@@ -13,15 +13,15 @@ namespace Publishing.Core.Tests
     {
         private class StubAuthService : IAuthService
         {
-            public RegisterUserDto? Passed;
-            public UserDto ReturnUser = new UserDto("1", "N", "t");
+            public Publishing.Core.Commands.RegisterUserCommand? Passed;
+            public AuthResultDto ReturnUser = new(new UserDto("1", "N", "t"), "tkn");
 
-            public Task<UserDto?> AuthenticateAsync(string email, string password)
-                => Task.FromResult<UserDto?>(null);
+            public Task<AuthResultDto?> AuthenticateAsync(string email, string password)
+                => Task.FromResult<AuthResultDto?>(null);
 
-            public Task<UserDto> RegisterAsync(string firstName, string lastName, string email, string status, string password)
+            public Task<AuthResultDto> RegisterAsync(Publishing.Core.Commands.RegisterUserCommand cmd)
             {
-                Passed = new RegisterUserDto { FirstName = firstName, LastName = lastName, Email = email, Status = status, Password = password };
+                Passed = cmd;
                 return Task.FromResult(ReturnUser);
             }
         }
@@ -35,10 +35,10 @@ namespace Publishing.Core.Tests
             var svc = new RegistrationService(auth, new PassValidator());
             var dto = new RegisterUserDto { FirstName = "F", LastName = "L", Email = "e@e.com", Status = "s", Password = "p" };
 
-            var user = await svc.RegisterAsync(dto);
+            var result = await svc.RegisterAsync(dto);
 
-            Assert.IsNotNull(user);
-            Assert.AreEqual(auth.ReturnUser, user);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(auth.ReturnUser, result);
             Assert.IsNotNull(auth.Passed);
         }
 

@@ -5,5 +5,6 @@ namespace Publishing.Services
         public string UserId { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
         public string UserType { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty;
     }
 }

@@ -5,5 +5,6 @@ namespace Publishing.Services
         string UserId { get; set; }
         string UserName { get; set; }
         string UserType { get; set; }
+        string Token { get; set; }
     }
 }

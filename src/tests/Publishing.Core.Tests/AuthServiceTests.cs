@@ -28,6 +28,11 @@ namespace Publishing.Core.Tests
             public Task InsertPasswordAsync(string h, int id) => Task.CompletedTask;
         }
 
+        private class StubFactory : IJwtFactory
+        {
+            public string GenerateToken(UserDto user) => "token";
+        }
+
         [TestMethod]
         public async Task Authenticate_ReturnsUserDto()
         {
@@ -35,27 +40,37 @@ namespace Publishing.Core.Tests
             {
                 StoredHash = BCrypt.Net.BCrypt.HashPassword("pwd", 11)
             };
-            var service = new AuthService(repo);
+            var service = new AuthService(repo, new StubFactory());
 
-            var user = await service.AuthenticateAsync("e", "pwd");
+            var result = await service.AuthenticateAsync("e", "pwd");
 
-            Assert.IsNotNull(user);
-            Assert.AreEqual(repo.Id, user!.Id);
-            Assert.AreEqual(repo.Type, user.Type);
-            Assert.AreEqual(repo.Name, user.Name);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(repo.Id, result!.User.Id);
+            Assert.AreEqual(repo.Type, result.User.Type);
+            Assert.AreEqual(repo.Name, result.User.Name);
+            Assert.IsFalse(string.IsNullOrEmpty(result.Token));
         }
 
         [TestMethod]
         public async Task Register_ReturnsNewUser()
         {
             var repo = new StubLoginRepository();
-            var service = new AuthService(repo);
+            var service = new AuthService(repo, new StubFactory());
 
-            var user = await service.RegisterAsync("F", "L", "e@e.com", "type", "pass");
+            var cmd = new Publishing.Core.Commands.RegisterUserCommand
+            {
+                FirstName = "F",
+                LastName = "L",
+                Email = "e@e.com",
+                Status = "type",
+                Password = "pass"
+            };
+            var result = await service.RegisterAsync(cmd);
 
-            Assert.AreEqual("5", user.Id);
-            Assert.AreEqual("F", user.Name);
-            Assert.AreEqual("type", user.Type);
+            Assert.AreEqual("5", result.User.Id);
+            Assert.AreEqual("F", result.User.Name);
+            Assert.AreEqual("type", result.User.Type);
+            Assert.IsFalse(string.IsNullOrEmpty(result.Token));
         }
 
         [TestMethod]
@@ -63,8 +78,16 @@ namespace Publishing.Core.Tests
         public async Task Register_EmailExists_Throws()
         {
             var repo = new StubLoginRepository { EmailExistsReturn = true };
-            var service = new AuthService(repo);
-            await service.RegisterAsync("F", "L", "e@e.com", "t", "p");
+            var service = new AuthService(repo, new StubFactory());
+            var cmd = new Publishing.Core.Commands.RegisterUserCommand
+            {
+                FirstName = "F",
+                LastName = "L",
+                Email = "e@e.com",
+                Status = "t",
+                Password = "p"
+            };
+            await service.RegisterAsync(cmd);
         }
 
         [TestMethod]
@@ -74,7 +97,7 @@ namespace Publishing.Core.Tests
             {
                 StoredHash = BCrypt.Net.BCrypt.HashPassword("pwd", 11)
             };
-            var svc = new AuthService(repo);
+            var svc = new AuthService(repo, new StubFactory());
 
             var user = await svc.AuthenticateAsync("e", "wrong");
 

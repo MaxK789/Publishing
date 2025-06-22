@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using Publishing.Core.Interfaces;
 using Publishing.Core.DTOs;
+using Publishing.Core.Commands;
+using MediatR;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Publishing.Organization.Service.Controllers;
@@ -10,17 +12,21 @@ namespace Publishing.Organization.Service.Controllers;
 [Route("api/[controller]")]
 public class OrganizationController : ControllerBase
 {
-    private readonly IOrganizationService _service;
+    private readonly IMediator _mediator;
+    private readonly IMapper _mapper;
 
-    public OrganizationController(IOrganizationService service)
+    public OrganizationController(IMediator mediator, IMapper mapper)
     {
-        _service = service;
+        _mediator = mediator;
+        _mapper = mapper;
     }
 
     [HttpPost("update")]
+    [Authorize(Policy = "RequireAdmin")]
     public async Task<IActionResult> Update(UpdateOrganizationDto dto)
     {
-        await _service.UpdateAsync(dto);
+        var cmd = _mapper.Map<UpdateOrganizationCommand>(dto);
+        await _mediator.Send(cmd);
         return NoContent();
     }
 }

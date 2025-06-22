@@ -114,4 +114,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="PagesParseError" xml:space="preserve">
+    <value>Некоректне число сторінок</value>
+  </data>
+  <data name="TirageParseError" xml:space="preserve">
+    <value>Некоректний тираж</value>
+  </data>
+  <data name="OrderAdded" xml:space="preserve">
+    <value>Замовлення додано</value>
+  </data>
+  <data name="DataUpdated" xml:space="preserve">
+    <value>Дані оновлено</value>
+  </data>
 </root>

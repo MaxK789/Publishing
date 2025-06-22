@@ -11,7 +11,19 @@ using System;
 using OpenTelemetry.Trace;
 using MediatR;
 using Publishing.AppLayer.Handlers;
+using Publishing.AppLayer.Mapping;
 using Publishing.Organization.Service.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using Publishing.Services.Authorization;
+using Publishing.Services;
+using Publishing.Core.Interfaces;
+using Publishing.Core.Services;
+using FluentValidation;
+using Publishing.Infrastructure.Repositories;
+using Publishing.Services.ErrorHandling;
+using Publishing.Services.Roles;
+using Publishing.Infrastructure;
+using Publishing.AppLayer.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,19 +46,42 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(options =>
 {
     options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidIssuer = issuer,
-        ValidateAudience = true,
-        ValidAudience = audience,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
-        ValidateLifetime = true
-    };
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = issuer,
+            ValidateAudience = true,
+            ValidAudience = audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
+            ValidateLifetime = true,
+            RoleClaimType = "role"
+        };
 });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdmin", p => p.Requirements.Add(new AdminRequirement()));
+    options.AddPolicy("RequireContact", p => p.Requirements.Add(new ContactPersonRequirement()));
+    options.AddPolicy("RequireStatistics", p => p.Requirements.Add(new StatisticsViewerRequirement()));
+});
+builder.Services.AddSingleton<IAuthorizationHandler, AdminHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, ContactPersonHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, StatisticsViewerHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateOrderHandler).Assembly));
+builder.Services.AddAutoMapper(typeof(OrderProfile).Assembly);
+builder.Services.AddValidatorsFromAssemblyContaining<EmailValidator>();
+builder.Services.AddScoped<IOrderInputValidator, OrderInputValidator>();
+builder.Services.AddTransient<PhoneFaxValidator>();
+builder.Services.AddTransient<IValidator<string>, EmailValidator>();
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
+builder.Services.AddTransient<IDbContext, DapperDbContext>();
+builder.Services.AddScoped<IDbHelper, DbHelper>();
+builder.Services.AddScoped<ILogger, LoggerService>();
+builder.Services.AddScoped<IErrorHandler, ErrorHandler>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IJwtFactory, JwtFactory>();
 builder.Services.AddOpenTelemetry().WithTracing(b =>
     b.AddAspNetCoreInstrumentation()
      .AddHttpClientInstrumentation()
@@ -81,6 +116,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+app.UseExceptionHandling();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

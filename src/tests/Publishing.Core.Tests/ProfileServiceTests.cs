@@ -6,6 +6,7 @@ using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using Publishing.AppLayer.Validators;
+using Publishing.Core.Commands;
 
 namespace Publishing.Core.Tests
 {
@@ -15,23 +16,13 @@ namespace Publishing.Core.Tests
         private class StubRepo : IProfileRepository
         {
             public bool EmailExists;
-            public UpdateProfileDto? Updated;
+            public UpdateProfileCommand? Updated;
 
             public Task<bool> EmailExistsAsync(string email) => Task.FromResult(EmailExists);
 
-            public Task UpdateAsync(string id, string? fName, string? lName, string? email, string? status, string? phone, string? fax, string? address)
+            public Task UpdateAsync(UpdateProfileCommand cmd)
             {
-                Updated = new UpdateProfileDto
-                {
-                    Id = id,
-                    FirstName = fName,
-                    LastName = lName,
-                    Email = email,
-                    Status = status,
-                    Phone = phone,
-                    Fax = fax,
-                    Address = address
-                };
+                Updated = cmd;
                 return Task.CompletedTask;
             }
         }

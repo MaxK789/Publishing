@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Publishing.Core\Publishing.Core.csproj" />
     <ProjectReference Include="..\Publishing.Infrastructure\Publishing.Infrastructure.csproj" />
+    <ProjectReference Include="..\Publishing.Services\Publishing.Services.csproj" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
@@ -16,6 +17,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.12.0-beta.1" />
     <PackageReference Include="MediatR" Version="12.1.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="6.0.0" />
     <ProjectReference Include="..\Publishing.Application\Publishing.Application.csproj" />
   </ItemGroup>

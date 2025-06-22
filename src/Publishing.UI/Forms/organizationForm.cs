@@ -4,14 +4,16 @@ using Publishing.Services;
 using Publishing.Core.Interfaces;
 using Publishing.Core.DTOs;
 using System.Resources;
+using System.Threading.Tasks;
+using Publishing.Services.ErrorHandling;
 
 namespace Publishing
 {
-    public partial class organizationForm : Form
+    public partial class organizationForm : BaseForm
     {
-        private readonly INavigationService _navigation;
         private readonly IOrganizationService _service;
-        private readonly IUserSession _session;
+        private readonly IRoleService _roles;
+        private readonly IErrorHandler _errorHandler;
         private readonly ResourceManager _resources = new ResourceManager("Publishing.Resources.Resources", typeof(organizationForm).Assembly);
 
         [Obsolete("Designer only", error: false)]
@@ -20,11 +22,12 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public organizationForm(INavigationService navigation, IOrganizationService service, IUserSession session)
+        public organizationForm(INavigationService navigation, IOrganizationService service, IUserSession session, IRoleService roles, IErrorHandler errorHandler)
+            : base(session, navigation)
         {
-            _navigation = navigation;
             _service = service;
-            _session = session;
+            _roles = roles;
+            _errorHandler = errorHandler;
             InitializeComponent();
         }
 
@@ -51,7 +54,7 @@ namespace Publishing
             };
 
             await _service.UpdateAsync(dto);
-            MessageBox.Show(_resources.GetString("DataUpdated") ?? "Success");
+            _errorHandler.ShowFriendlyError(_resources.GetString("DataUpdated") ?? "Success");
             _navigation.Navigate<mainForm>(this);
         }
 
@@ -82,11 +85,7 @@ namespace Publishing
 
         private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _session.UserId = string.Empty;
-            _session.UserName = string.Empty;
-            _session.UserType = string.Empty;
-
-            _navigation.Navigate<loginForm>(this);
+            Logout();
         }
     }
 }
