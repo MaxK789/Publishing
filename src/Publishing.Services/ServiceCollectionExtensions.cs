@@ -8,7 +8,7 @@ namespace Publishing.Services
         public static IServiceCollection AddUiNotifier(this IServiceCollection services)
         {
             var disabled = Environment.GetEnvironmentVariable("NOTIFICATIONS_DISABLED");
-            if (string.Equals(disabled, "true", StringComparison.OrdinalIgnoreCase))
+            if (bool.TryParse(disabled?.Trim(), out var isDisabled) && isDisabled)
             {
                 services.AddSingleton<IUiNotifier, SilentUiNotifier>();
                 return services;
