@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net6.0-windows</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UseWindowsForms Condition=" '$(TargetFramework)' == 'net6.0-windows'">true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
@@ -23,6 +24,8 @@
     <ProjectReference Include="../../Publishing.Infrastructure/Publishing.Infrastructure.csproj" />
     <ProjectReference Include="../../Publishing.Application/Publishing.Application.csproj" />
     <ProjectReference Include="../../Publishing.Services/Publishing.Services.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0-windows' ">
     <ProjectReference Include="../../Publishing.UI/Publishing.UI.csproj" />
   </ItemGroup>
 </Project>

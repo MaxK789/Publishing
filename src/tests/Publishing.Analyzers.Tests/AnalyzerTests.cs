@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
+using Microsoft.CodeAnalysis.Testing.ReferenceAssemblies;
 using Publishing.Analyzers;
 
 namespace Publishing.Analyzers.Tests;

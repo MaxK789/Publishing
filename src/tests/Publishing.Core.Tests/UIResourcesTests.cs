@@ -3,6 +3,7 @@ using System.Resources;
 
 namespace Publishing.Core.Tests;
 
+#if WINDOWS
 [TestClass]
 public class UIResourcesTests
 {
@@ -25,3 +26,4 @@ public class UIResourcesTests
         }
     }
 }
+#endif
