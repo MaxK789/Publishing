@@ -5,11 +5,12 @@ using MediatR;
 using FluentValidation;
 using Publishing.Core.Commands;
 using Publishing.Core.Interfaces;
+using Publishing.Services;
 using System.Resources;
 
 namespace Publishing.AppLayer.Handlers;
 
-public class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizationCommand>
+public class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizationCommand, Unit>
 {
     private readonly IOrganizationRepository _repo;
     private readonly IValidator<UpdateOrganizationCommand> _validator;
