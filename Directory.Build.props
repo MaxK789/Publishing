@@ -1,6 +1,6 @@
 <Project>
   <!-- Attach analyzer project as an Analyzer to all projects except the analyzer itself -->
-  <ItemGroup Condition="'$(MSBuildProjectFullPath)' != '$(MSBuildThisFileDirectory)src/Publishing.Analyzers/Publishing.Analyzers.csproj'">
+  <ItemGroup Condition="'$(MSBuildProjectName)' != 'Publishing.Analyzers'">
     <ProjectReference Include="$(MSBuildThisFileDirectory)src/Publishing.Analyzers/Publishing.Analyzers.csproj"
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
