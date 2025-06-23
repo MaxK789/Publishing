@@ -13,7 +13,7 @@ using AutoMapper;
 
 namespace Publishing
 {
-    public partial class addOrderForm : BaseForm
+    public partial class AddOrderForm : BaseForm
     {
         private readonly IMediator _mediator;
         private readonly IOrderInputValidator _inputValidator;
@@ -23,15 +23,15 @@ namespace Publishing
         private readonly IErrorHandler _errorHandler;
         private readonly IUiNotifier _notifier;
         private readonly IMapper _mapper;
-        private readonly ResourceManager _resources = new("Publishing.Resources.Resources", typeof(addOrderForm).Assembly);
+        private readonly ResourceManager _resources = new("Publishing.Resources.Resources", typeof(AddOrderForm).Assembly);
         private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(Publishing.Services.IUiNotifier).Assembly);
         [Obsolete("Designer only", error: false)]
-        public addOrderForm()
+        public AddOrderForm()
         {
             InitializeComponent();
         }
 
-        public addOrderForm(
+        public AddOrderForm(
             IMediator mediator,
             INavigationService navigation,
             IUserSession session,
@@ -55,40 +55,40 @@ namespace Publishing
             InitializeComponent();
         }
 
-        private void addOrderForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void AddOrderForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             System.Windows.Forms.Application.Exit();
         }
 
-        private void змінитиДаніToolStripMenuItem_Click(object sender, EventArgs e)
+        private void PersonalDataMenuItem_Click(object sender, EventArgs e)
         {
-            _navigation.Navigate<profileForm>(this);
+            _navigation.Navigate<ProfileForm>(this);
         }
 
-        private void списокToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ListMenuItem_Click(object sender, EventArgs e)
         {
-            _navigation.Navigate<mainForm>(this);
+            _navigation.Navigate<MainForm>(this);
         }
 
-        private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExitMenuItem_Click(object sender, EventArgs e)
         {
             Logout();
         }
 
-        private void addOrderForm_Load(object sender, EventArgs e)
+        private void AddOrderForm_Load(object sender, EventArgs e)
         {
-            організаціяToolStripMenuItem.Visible = _roles.IsContactPerson(_session.UserType);
+            OrganizationMenuItem.Visible = _roles.IsContactPerson(_session.UserType);
         }
 
-        private void calculateButton_Click(object sender, EventArgs e)
+        private void CalculateButton_Click(object sender, EventArgs e)
         {
-            if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
+            if (!int.TryParse(PageNumTextBox.Text, out int pageNum))
             {
                 _notifier.NotifyWarning(_resources.GetString("PagesParseError") ?? "Error");
                 return;
             }
 
-            if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
+            if (!int.TryParse(TirageTextBox.Text, out int tirageNum))
             {
                 _notifier.NotifyWarning(_resources.GetString("TirageParseError") ?? "Error");
                 return;
@@ -96,10 +96,10 @@ namespace Publishing
 
             decimal pricePerPage = _printeryRepository.GetPricePerPage();
             decimal price = _priceCalculator.Calculate(pageNum, tirageNum, pricePerPage);
-            totalPriceLabel.Text = string.Format(_resources.GetString("TotalPriceLabel") ?? "Total: {0}", price);
+            TotalPriceLabel.Text = string.Format(_resources.GetString("TotalPriceLabel") ?? "Total: {0}", price);
         }
 
-        private async void orderButton_Click(object sender, EventArgs e)
+        private async void OrderButton_Click(object sender, EventArgs e)
         {
             if (!TryParseInput(out var dto)) return;
             try
@@ -121,18 +121,18 @@ namespace Publishing
         {
             dto = new CreateOrderDto
             {
-                Type = typeBox.SelectedItem?.ToString() ?? string.Empty,
-                Name = nameProductTextBox.Text,
-                Printery = printeryBox.SelectedItem?.ToString() ?? string.Empty,
+                Type = TypeComboBox.SelectedItem?.ToString() ?? string.Empty,
+                Name = NameProductTextBox.Text,
+                Printery = PrinteryComboBox.SelectedItem?.ToString() ?? string.Empty,
                 PersonId = _session.UserId
             };
 
-            if (!int.TryParse(pageNumTextBox.Text, out var pages))
+            if (!int.TryParse(PageNumTextBox.Text, out var pages))
             {
                 _notifier.NotifyWarning(_resources.GetString("PagesParseError") ?? "Error");
                 return false;
             }
-            if (!int.TryParse(tirageTextBox.Text, out var tirage))
+            if (!int.TryParse(TirageTextBox.Text, out var tirage))
             {
                 _notifier.NotifyWarning(_resources.GetString("TirageParseError") ?? "Error");
                 return false;
@@ -147,28 +147,28 @@ namespace Publishing
             var cmd = _mapper.Map<CreateOrderCommand>(dto);
             var order = await _mediator.Send(cmd);
             _notifier.NotifyInfo(_notify.GetString("OrderCreated") ?? "Success");
-            totalPriceLabel.Text = string.Format(_resources.GetString("TotalPriceLabel") ?? "Total: {0}", order.Price);
-            _navigation.Navigate<mainForm>(this);
+            TotalPriceLabel.Text = string.Format(_resources.GetString("TotalPriceLabel") ?? "Total: {0}", order.Price);
+            _navigation.Navigate<MainForm>(this);
         }
 
-        private void змінитиДаніToolStripMenuItem_Click_1(object sender, EventArgs e)
+        private void PersonalDataMenuItem_Click_1(object sender, EventArgs e)
         {
-            _navigation.Navigate<profileForm>(this);
+            _navigation.Navigate<ProfileForm>(this);
         }
 
-        private void додатиToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddMenuItem_Click(object sender, EventArgs e)
         {
-            _navigation.Navigate<addOrderForm>(this);
+            _navigation.Navigate<AddOrderForm>(this);
         }
 
-        private void видалитиToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DeleteMenuItem_Click(object sender, EventArgs e)
         {
-            _navigation.Navigate<deleteOrderForm>(this);
+            _navigation.Navigate<DeleteOrderForm>(this);
         }
 
-        private void організаціяToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OrganizationMenuItem_Click(object sender, EventArgs e)
         {
-            _navigation.Navigate<organizationForm>(this);
+            _navigation.Navigate<OrganizationForm>(this);
         }
     }
 }

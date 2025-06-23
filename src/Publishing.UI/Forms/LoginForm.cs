@@ -6,19 +6,19 @@ using System.Windows.Forms;
 
 namespace Publishing
 {
-    public partial class loginForm : BaseForm
+    public partial class LoginForm : BaseForm
     {
         private readonly IAuthService _authService;
         private readonly IUiNotifier _notifier;
         private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(Publishing.Services.IUiNotifier).Assembly);
 
         [Obsolete("Designer only", error: false)]
-        public loginForm()
+        public LoginForm()
         {
             InitializeComponent();
         }
 
-        public loginForm(IAuthService authService, INavigationService navigation, IUserSession session, IUiNotifier notifier)
+        public LoginForm(IAuthService authService, INavigationService navigation, IUserSession session, IUiNotifier notifier)
             : base(session, navigation)
         {
             _authService = authService;
@@ -29,8 +29,8 @@ namespace Publishing
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            string email = emailTextBox.Text;
-            string password = passwordTextBox.Text;
+            string email = EmailTextBox.Text;
+            string password = PasswordTextBox.Text;
 
             var result = await _authService.AuthenticateAsync(email, password);
 
@@ -41,7 +41,7 @@ namespace Publishing
                 _session.UserName = result.User.Name;
                 _session.Token = result.Token;
 
-                _navigation.Navigate<mainForm>(this);
+                _navigation.Navigate<MainForm>(this);
                 _notifier.NotifyInfo(string.Format(_notify.GetString("WelcomeUser") ?? "Welcome, {0}!", _session.UserName, _session.UserType));
             }
             else
@@ -52,7 +52,7 @@ namespace Publishing
 
         private void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            _navigation.Navigate<registrationForm>(this);
+            _navigation.Navigate<RegistrationForm>(this);
         }
 
         private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -60,9 +60,9 @@ namespace Publishing
             System.Windows.Forms.Application.Exit();
         }
 
-        private void loginForm_Load(object sender, EventArgs e)
+        private void LoginForm_Load(object sender, EventArgs e)
         {
-            passwordTextBox.UseSystemPasswordChar = true;
+            PasswordTextBox.UseSystemPasswordChar = true;
         }
     }
 }

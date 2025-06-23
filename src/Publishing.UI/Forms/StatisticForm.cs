@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Publishing
 {
-    public partial class statisticForm : BaseForm
+    public partial class StatisticForm : BaseForm
     {
         private readonly IRoleService _roles;
         private readonly IStatisticRepository _statRepo;
@@ -15,12 +15,12 @@ namespace Publishing
         private readonly IErrorHandler _errorHandler;
 
         [Obsolete("Designer only", error: false)]
-        public statisticForm()
+        public StatisticForm()
         {
             InitializeComponent();
         }
 
-        public statisticForm(
+        public StatisticForm(
             INavigationService navigation,
             IStatisticRepository statRepo,
             IUserSession session,
@@ -36,11 +36,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        private async void statisticForm_Load(object sender, EventArgs e)
+        private async void StatisticForm_Load(object sender, EventArgs e)
         {
             _events.OrderCreated += async _ => await RefreshStatisticsAsync();
-            authorsBox.Items.Clear();
-            authorsBox.Items.Add("Усі");
+            AuthorsBox.Items.Clear();
+            AuthorsBox.Items.Add("Усі");
 
             try
             {
@@ -51,19 +51,19 @@ namespace Publishing
                     foreach (string[] authorArray in authorNames)
                     {
                         string authorName = authorArray[0];
-                        authorsBox.Items.Add(authorName);
+                        AuthorsBox.Items.Add(authorName);
                     }
 
-                    authorsBox.SelectedIndex = 0;
+                    AuthorsBox.SelectedIndex = 0;
                 }
 
-                chart1.Series[0].Points.Clear();
+                OrdersChart.Series[0].Points.Clear();
 
                 List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync();
 
                 foreach (var dataPoint in dataList)
                 {
-                    chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+                    OrdersChart.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
                 }
             }
             catch (Exception ex)
@@ -72,56 +72,56 @@ namespace Publishing
             }
         }
 
-        private void statisticForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void StatisticForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             System.Windows.Forms.Application.Exit();
         }
 
-        private void вийтиToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExitMenuItem_Click(object sender, EventArgs e)
         {
             Logout();
         }
 
-        private void списокToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ListMenuItem_Click(object sender, EventArgs e)
         {
-            _navigation.Navigate<mainForm>(this);
+            _navigation.Navigate<MainForm>(this);
         }
 
-        private void видалитиToolStripMenuItem_Click_1(object sender, EventArgs e)
+        private void DeleteMenuItem_Click_1(object sender, EventArgs e)
         {
-            _navigation.Navigate<deleteOrderForm>(this);
+            _navigation.Navigate<DeleteOrderForm>(this);
         }
 
-        private async void orderCountPerMonthButton_Click(object sender, EventArgs e)
+        private async void OrderCountPerMonthButton_Click(object sender, EventArgs e)
         {
-            chart1.Series[0].Points.Clear();
+            OrdersChart.Series[0].Points.Clear();
 
             List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync();
 
             foreach (var dataPoint in dataList)
             {
-                chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+                OrdersChart.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
             }
         }
 
-        private async void orderCountPerAuthorButton_Click(object sender, EventArgs e)
+        private async void OrderCountPerAuthorButton_Click(object sender, EventArgs e)
         {
-            if (authorsBox.SelectedItem != null && authorsBox.SelectedItem.ToString() == "Усі")
+            if (AuthorsBox.SelectedItem != null && AuthorsBox.SelectedItem.ToString() == "Усі")
             {
-                chart1.Series[0].Points.Clear();
+                OrdersChart.Series[0].Points.Clear();
 
                 List<string[]> dataList = await _statRepo.GetOrdersPerAuthorAsync();
 
                 foreach (var dataPoint in dataList)
                 {
-                    chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+                    OrdersChart.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
                 }
             }
             else
             {
-                chart1.Series[0].Points.Clear();
+                OrdersChart.Series[0].Points.Clear();
 
-                string fullNameAuthor = authorsBox.SelectedItem?.ToString();
+                string fullNameAuthor = AuthorsBox.SelectedItem?.ToString();
                 if (fullNameAuthor == null)
                 {
                     return;
@@ -134,17 +134,17 @@ namespace Publishing
                     string authorName = dataPoint[0];
                     int orderCount = int.Parse(dataPoint[1]);
 
-                    chart1.Series[0].Points.AddXY(authorName, orderCount);
+                    OrdersChart.Series[0].Points.AddXY(authorName, orderCount);
                 }
             }
         }
 
-        private async void fromDateToDateButton_Click(object sender, EventArgs e)
+        private async void FromDateToDateButton_Click(object sender, EventArgs e)
         {
-            chart1.Series[0].Points.Clear();
+            OrdersChart.Series[0].Points.Clear();
 
-            DateTime fDate = dateTimePicker1.Value;
-            DateTime lDate = dateTimePicker2.Value;
+            DateTime fDate = FromDatePicker.Value;
+            DateTime lDate = ToDatePicker.Value;
 
             List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync(fDate, lDate);
 
@@ -153,40 +153,40 @@ namespace Publishing
                 string orderMonth = dataPoint[0];
                 int orderCount = int.Parse(dataPoint[1]);
 
-                chart1.Series[0].Points.AddXY(orderMonth, orderCount);
+                OrdersChart.Series[0].Points.AddXY(orderMonth, orderCount);
             }
 
         }
 
-        private async void tirageButton_Click(object sender, EventArgs e)
+        private async void TirageButton_Click(object sender, EventArgs e)
         {
-            chart1.Series[0].Points.Clear();
+            OrdersChart.Series[0].Points.Clear();
 
             List<string[]> dataList = await _statRepo.GetTiragePerAuthorAsync();
 
             foreach (var dataPoint in dataList)
             {
-                chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+                OrdersChart.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
             }
         }
 
-        private void статистикаToolStripMenuItem_Click(object sender, EventArgs e)
+        private void StatisticsMenuItem_Click(object sender, EventArgs e)
         {
-            _navigation.Navigate<statisticForm>(this);
+            _navigation.Navigate<StatisticForm>(this);
         }
 
-        private void вийтиToolStripMenuItem_Click_1(object sender, EventArgs e)
+        private void ExitMenuItem_Click_1(object sender, EventArgs e)
         {
             Logout();
         }
 
         private async Task RefreshStatisticsAsync()
         {
-            chart1.Series[0].Points.Clear();
+            OrdersChart.Series[0].Points.Clear();
             var dataList = await _statRepo.GetOrdersPerMonthAsync();
             foreach (var dataPoint in dataList)
             {
-                chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+                OrdersChart.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
             }
         }
     }
