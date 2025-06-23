@@ -15,7 +15,7 @@ public class ProfileContracts
 {
     private static string CreateJwt()
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MySuperSecretKey12345"));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MySuperSecretKey1234567890123456"));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var token = new JwtSecurityToken(
             issuer: "example.com",
