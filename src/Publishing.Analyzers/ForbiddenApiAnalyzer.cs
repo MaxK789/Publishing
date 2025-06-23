@@ -55,7 +55,7 @@ public class ForbiddenApiAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeTree(SyntaxTreeAnalysisContext context)
     {
         var root = context.Tree.GetRoot(context.CancellationToken);
-        foreach (var directive in root.DescendantTrivia().Where(t => t.IsKind(SyntaxKind.IfDirectiveTrivia)))
+        foreach (var directive in root.DescendantTrivia().Where(t => t.IsKind(SyntaxKind.IfDirectiveTrivia))
         {
             var ifDir = (IfDirectiveTriviaSyntax)directive.GetStructure();
             if (ifDir != null && ifDir.Condition.ToString().Contains("WINDOWS"))
