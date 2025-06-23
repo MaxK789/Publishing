@@ -16,7 +16,7 @@ namespace Publishing.Core.Services
             RuleFor(x => x.Tirage).GreaterThan(0);
         }
 
-        public void Validate(CreateOrderDto dto)
+        public new void Validate(CreateOrderDto dto)
         {
             var result = base.Validate(dto);
             if (!result.IsValid) throw new ValidationException(result.Errors);
