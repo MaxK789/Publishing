@@ -15,7 +15,7 @@ public class OrganizationContracts
 {
     private static string CreateJwt()
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SecretKey123"));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MySuperSecretKey12345"));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var token = new JwtSecurityToken(
             issuer: "example.com",

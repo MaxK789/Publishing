@@ -22,7 +22,7 @@ public class JwtFactory : IJwtFactory
     {
         var issuer = _configuration["JWT:Issuer"] ?? "example.com";
         var audience = _configuration["JWT:Audience"] ?? "example.com";
-        var signingKey = _configuration["JWT:SigningKey"] ?? "SecretKey123";
+        var signingKey = _configuration["JWT:SigningKey"] ?? "MySuperSecretKey12345";
 
         var claims = new[]
         {
