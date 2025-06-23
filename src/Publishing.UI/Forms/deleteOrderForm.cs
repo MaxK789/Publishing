@@ -13,7 +13,7 @@ namespace Publishing
         private readonly IOrderRepository _orderRepo;
         private readonly IRoleService _roles;
         private readonly IUiNotifier _notifier;
-        private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(deleteOrderForm).Assembly);
+        private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(Publishing.Services.IUiNotifier).Assembly);
 
         [Obsolete("Designer only", error: false)]
         public deleteOrderForm()
