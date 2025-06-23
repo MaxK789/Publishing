@@ -40,7 +40,7 @@ namespace Publishing
             var notifier = Services.GetRequiredService<IUiNotifier>() as IDisposable;
             System.Windows.Forms.Application.ApplicationExit += (_, __) => notifier?.Dispose();
 
-            var form = Services.GetRequiredService<loginForm>();
+            var form = Services.GetRequiredService<LoginForm>();
             System.Windows.Forms.Application.Run(form);
 
             if (Services is IDisposable d)
@@ -114,14 +114,14 @@ namespace Publishing
                 services.AddSingleton<IOrderEventsPublisher, OrderEventsPublisher>();
             else
                 services.AddSingleton<IOrderEventsPublisher>(new RabbitOrderEventsPublisher(rabbit));
-            services.AddTransient<loginForm>();
-            services.AddTransient<registrationForm>();
-            services.AddTransient<addOrderForm>();
-            services.AddTransient<deleteOrderForm>();
-            services.AddTransient<mainForm>();
-            services.AddTransient<profileForm>();
-            services.AddTransient<organizationForm>();
-            services.AddTransient<statisticForm>();
+            services.AddTransient<LoginForm>();
+            services.AddTransient<RegistrationForm>();
+            services.AddTransient<AddOrderForm>();
+            services.AddTransient<DeleteOrderForm>();
+            services.AddTransient<MainForm>();
+            services.AddTransient<ProfileForm>();
+            services.AddTransient<OrganizationForm>();
+            services.AddTransient<StatisticForm>();
         }
     }
 }

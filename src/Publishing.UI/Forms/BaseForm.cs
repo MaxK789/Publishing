@@ -24,7 +24,7 @@ namespace Publishing
             _session.UserName = string.Empty;
             _session.UserType = string.Empty;
             _session.Token = string.Empty;
-            _navigation.Navigate<loginForm>(this);
+            _navigation.Navigate<LoginForm>(this);
         }
     }
 }

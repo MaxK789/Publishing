@@ -9,7 +9,7 @@ using System.Resources;
 
 namespace Publishing
 {
-    public partial class registrationForm : BaseForm
+    public partial class RegistrationForm : BaseForm
     {
         private readonly IRegistrationService _service;
         private readonly IErrorHandler _errorHandler;
@@ -17,12 +17,12 @@ namespace Publishing
         private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(Publishing.Services.IUiNotifier).Assembly);
 
         [Obsolete("Designer only", error: false)]
-        public registrationForm()
+        public RegistrationForm()
         {
             InitializeComponent();
         }
 
-        public registrationForm(IRegistrationService service, INavigationService navigation, IUserSession session, IErrorHandler errorHandler, IUiNotifier notifier)
+        public RegistrationForm(IRegistrationService service, INavigationService navigation, IUserSession session, IErrorHandler errorHandler, IUiNotifier notifier)
             : base(session, navigation)
         {
             _service = service;
@@ -34,7 +34,7 @@ namespace Publishing
 
         private void LoginLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            _navigation.Navigate<loginForm>(this);
+            _navigation.Navigate<LoginForm>(this);
         }
 
         private async void LoginButton_Click(object sender, EventArgs e)
@@ -43,9 +43,9 @@ namespace Publishing
             {
                 FirstName = FNameTextBox.Text,
                 LastName = LNameTextBox.Text,
-                Email = emailTextBox.Text,
-                Status = statusBox.SelectedItem?.ToString(),
-                Password = passwordTextBox.Text
+                Email = EmailTextBox.Text,
+                Status = StatusBox.SelectedItem?.ToString(),
+                Password = PasswordTextBox.Text
             };
 
             try
@@ -56,7 +56,7 @@ namespace Publishing
                 _session.UserName = result.User.Name;
                 _session.Token = result.Token;
 
-                _navigation.Navigate<mainForm>(this);
+                _navigation.Navigate<MainForm>(this);
                 _notifier.NotifyInfo(string.Format(_notify.GetString("WelcomeUser") ?? "Welcome, {0}!", _session.UserName, _session.UserType));
             }
             catch (Exception ex)
@@ -65,14 +65,14 @@ namespace Publishing
             }
         }
 
-        private void registrationForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void RegistrationForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             System.Windows.Forms.Application.Exit();
         }
 
-        private void registrationForm_Load(object sender, EventArgs e)
+        private void RegistrationForm_Load(object sender, EventArgs e)
         {
-            passwordTextBox.UseSystemPasswordChar = true;
+            PasswordTextBox.UseSystemPasswordChar = true;
         }
     }
 }
