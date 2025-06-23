@@ -33,6 +33,7 @@ public class AnalyzerTests
 
         test.TestState.AdditionalReferences.Add(typeof(Microsoft.Extensions.DependencyInjection.ServiceCollection).Assembly);
         test.TestState.AdditionalReferences.Add(typeof(Microsoft.AspNetCore.Builder.WebApplication).Assembly);
+        test.TestState.AdditionalReferences.Add(typeof(Microsoft.Extensions.Logging.ILoggingBuilder).Assembly);
         test.TestState.AdditionalReferences.Add(typeof(System.Windows.Forms.Form).Assembly);
         test.TestState.AdditionalReferences.Add(typeof(Publishing.Services.IUiNotifier).Assembly);
         test.ExpectedDiagnostics.AddRange(expected);
