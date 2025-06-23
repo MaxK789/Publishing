@@ -2,11 +2,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Remote;
 using System;
-using System.Linq;
+
 
 namespace Publishing.UI.Tests;
 
 [TestClass]
+[TestCategory("UI")]
 public class BalloonTests
 {
     private WindowsDriver<WindowsElement>? _session;

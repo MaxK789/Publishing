@@ -3,6 +3,16 @@
 
 This repository hosts a simple publishing workflow demo. Database schema is maintained with Entity Framework Core migrations.
 
+## 🚀 Quick Start
+
+### Prerequisites
+
+* Docker Desktop with at least **4 GB RAM**
+* [.NET 6 SDK](https://dotnet.microsoft.com/en-us/download)
+* [Git 2.34](https://git-scm.com/) or newer
+
+For Windows Home users follow [Microsoft's guide](https://learn.microsoft.com/en-us/visualstudio/containers/docker-desktop) to enable Linux containers.
+
 ## Configuration
 
 The `Publishing.UI` project contains an `appsettings.json` file with a default connection string pointing to LocalDB.  The project file copies this file to the output directory so both the application and `dotnet ef` commands can use it automatically. During startup a dedicated initializer applies pending EF Core migrations so the schema stays in sync with the models.
@@ -160,4 +170,4 @@ credentials. Without these secrets the `Login & Push` steps will fail with an
 "incorrect username or password" error.
 
 For details on running UI tests see [docs/ui-testing.md](docs/ui-testing.md).
-The Windows job in CI executes these tests with WinAppDriver.
+The Windows job in CI executes these tests with WinAppDriver. When testing locally install WinAppDriver via winget or the MSI package as it is not included with the NuGet package.
