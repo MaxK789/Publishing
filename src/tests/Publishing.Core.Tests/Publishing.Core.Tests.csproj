@@ -11,6 +11,8 @@
     <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
     <PackageReference Include="coverlet.collector" Version="3.2.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <!-- Provide System.Collections.Immutable so analyzers can load -->
+    <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.22" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.22" />
