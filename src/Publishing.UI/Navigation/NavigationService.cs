@@ -1,10 +1,9 @@
-#if WINDOWS
+using System;
+using System.Windows.Forms;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Publishing.Services
 {
-    using System;
-    using System.Windows.Forms;
-    using Microsoft.Extensions.DependencyInjection;
-
     public class NavigationService : INavigationService
     {
         private readonly IServiceProvider _provider;
@@ -22,4 +21,3 @@ namespace Publishing.Services
         }
     }
 }
-#endif

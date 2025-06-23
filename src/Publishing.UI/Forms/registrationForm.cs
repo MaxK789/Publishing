@@ -6,6 +6,7 @@ using Publishing.Core.DTOs;
 using Publishing.Services;
 using Publishing.Services.ErrorHandling;
 using System.Threading.Tasks;
+using System.Resources;
 
 namespace Publishing
 {
@@ -13,6 +14,8 @@ namespace Publishing
     {
         private readonly IRegistrationService _service;
         private readonly IErrorHandler _errorHandler;
+        private readonly IUiNotifier _notifier;
+        private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(registrationForm).Assembly);
 
         [Obsolete("Designer only", error: false)]
         public registrationForm()
@@ -20,11 +23,12 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public registrationForm(IRegistrationService service, INavigationService navigation, IUserSession session, IErrorHandler errorHandler)
+        public registrationForm(IRegistrationService service, INavigationService navigation, IUserSession session, IErrorHandler errorHandler, IUiNotifier notifier)
             : base(session, navigation)
         {
             _service = service;
             _errorHandler = errorHandler;
+            _notifier = notifier;
             InitializeComponent();
         }
 
@@ -54,7 +58,7 @@ namespace Publishing
                 _session.Token = result.Token;
 
                 _navigation.Navigate<mainForm>(this);
-                _errorHandler.ShowFriendlyError($"Вітаємо, {_session.UserName} ({_session.UserType})!");
+                _notifier.NotifyInfo(string.Format(_notify.GetString("WelcomeUser") ?? "Welcome, {0}!", _session.UserName, _session.UserType));
             }
             catch (Exception ex)
             {

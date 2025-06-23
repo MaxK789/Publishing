@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="OrderCreated" xml:space="preserve">
+    <value>Order created</value>
+  </data>
+  <data name="OrganizationUpdated" xml:space="preserve">
+    <value>Organization updated</value>
+  </data>
+  <data name="ProfileUpdated" xml:space="preserve">
+    <value>Profile updated</value>
+  </data>
+  <data name="OrderDeleted" xml:space="preserve">
+    <value>Deleted order {0}</value>
+  </data>
+  <data name="InvalidCredentials" xml:space="preserve">
+    <value>Invalid email or password</value>
+  </data>
+  <data name="WelcomeUser" xml:space="preserve">
+    <value>Welcome, {0} ({1})!</value>
+  </data>
+</root>

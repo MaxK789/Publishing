@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="OrderCreated" xml:space="preserve">
+    <value>Замовлення створено</value>
+  </data>
+  <data name="OrganizationUpdated" xml:space="preserve">
+    <value>Організацію оновлено</value>
+  </data>
+  <data name="ProfileUpdated" xml:space="preserve">
+    <value>Профіль оновлено</value>
+  </data>
+  <data name="OrderDeleted" xml:space="preserve">
+    <value>Видалено замовлення № {0}</value>
+  </data>
+  <data name="InvalidCredentials" xml:space="preserve">
+    <value>Невірна електронна пошта або пароль</value>
+  </data>
+  <data name="WelcomeUser" xml:space="preserve">
+    <value>Вітаємо, {0} ({1})!</value>
+  </data>
+</root>

@@ -22,8 +22,10 @@ namespace Publishing
         private readonly IPriceCalculator _priceCalculator;
         private readonly IPrinteryRepository _printeryRepository;
         private readonly IErrorHandler _errorHandler;
+        private readonly IUiNotifier _notifier;
         private readonly IMapper _mapper;
-        private readonly ResourceManager _resources = new ResourceManager("Publishing.Resources.Resources", typeof(addOrderForm).Assembly);
+        private readonly ResourceManager _resources = new("Publishing.Resources.Resources", typeof(addOrderForm).Assembly);
+        private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(addOrderForm).Assembly);
         [Obsolete("Designer only", error: false)]
         public addOrderForm()
         {
@@ -39,6 +41,7 @@ namespace Publishing
             IPriceCalculator priceCalculator,
             IPrinteryRepository printeryRepository,
             IErrorHandler errorHandler,
+            IUiNotifier notifier,
             IMapper mapper)
             : base(session, navigation)
         {
@@ -48,6 +51,7 @@ namespace Publishing
             _priceCalculator = priceCalculator;
             _printeryRepository = printeryRepository;
             _errorHandler = errorHandler;
+            _notifier = notifier;
             _mapper = mapper;
             InitializeComponent();
         }
@@ -81,19 +85,19 @@ namespace Publishing
         {
             if (!int.TryParse(pageNumTextBox.Text, out int pageNum))
             {
-                _errorHandler.ShowFriendlyError(_resources.GetString("PagesParseError") ?? "Error");
+                _notifier.NotifyWarning(_resources.GetString("PagesParseError") ?? "Error");
                 return;
             }
 
             if (!int.TryParse(tirageTextBox.Text, out int tirageNum))
             {
-                _errorHandler.ShowFriendlyError(_resources.GetString("TirageParseError") ?? "Error");
+                _notifier.NotifyWarning(_resources.GetString("TirageParseError") ?? "Error");
                 return;
             }
 
             decimal pricePerPage = _printeryRepository.GetPricePerPage();
             decimal price = _priceCalculator.Calculate(pageNum, tirageNum, pricePerPage);
-            totalPriceLabel.Text = "Кінцева ціна:" + price.ToString();
+            totalPriceLabel.Text = string.Format(_resources.GetString("TotalPriceLabel") ?? "Total: {0}", price);
         }
 
         private async void orderButton_Click(object sender, EventArgs e)
@@ -106,7 +110,7 @@ namespace Publishing
             }
             catch (ValidationException ex)
             {
-                _errorHandler.ShowFriendlyError(string.Join("\n", ex.Errors.Select(e => e.ErrorMessage)));
+                _notifier.NotifyWarning(string.Join("\n", ex.Errors.Select(e => e.ErrorMessage)));
             }
             catch (Exception ex)
             {
@@ -126,12 +130,12 @@ namespace Publishing
 
             if (!int.TryParse(pageNumTextBox.Text, out var pages))
             {
-                _errorHandler.ShowFriendlyError(_resources.GetString("PagesParseError") ?? "Error");
+                _notifier.NotifyWarning(_resources.GetString("PagesParseError") ?? "Error");
                 return false;
             }
             if (!int.TryParse(tirageTextBox.Text, out var tirage))
             {
-                _errorHandler.ShowFriendlyError(_resources.GetString("TirageParseError") ?? "Error");
+                _notifier.NotifyWarning(_resources.GetString("TirageParseError") ?? "Error");
                 return false;
             }
             dto.Pages = pages;
@@ -143,8 +147,8 @@ namespace Publishing
         {
             var cmd = _mapper.Map<CreateOrderCommand>(dto);
             var order = await _mediator.Send(cmd);
-            _errorHandler.ShowFriendlyError(_resources.GetString("OrderAdded") ?? "Success");
-            totalPriceLabel.Text = "Кінцева ціна:" + order.Price.ToString();
+            _notifier.NotifyInfo(_notify.GetString("OrderCreated") ?? "Success");
+            totalPriceLabel.Text = string.Format(_resources.GetString("TotalPriceLabel") ?? "Total: {0}", order.Price);
             _navigation.Navigate<mainForm>(this);
         }
 

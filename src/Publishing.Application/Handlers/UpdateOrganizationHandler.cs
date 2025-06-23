@@ -5,6 +5,7 @@ using MediatR;
 using FluentValidation;
 using Publishing.Core.Commands;
 using Publishing.Core.Interfaces;
+using System.Resources;
 
 namespace Publishing.AppLayer.Handlers;
 
@@ -13,12 +14,15 @@ public class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizationComma
     private readonly IOrganizationRepository _repo;
     private readonly IValidator<UpdateOrganizationCommand> _validator;
     private readonly IUnitOfWork _uow;
+    private readonly IUiNotifier _notifier;
+    private readonly ResourceManager _resources = new("Publishing.Services.Resources.Notifications", typeof(UpdateOrganizationHandler).Assembly);
 
-    public UpdateOrganizationHandler(IOrganizationRepository repo, IValidator<UpdateOrganizationCommand> validator, IUnitOfWork uow)
+    public UpdateOrganizationHandler(IOrganizationRepository repo, IValidator<UpdateOrganizationCommand> validator, IUnitOfWork uow, IUiNotifier notifier)
     {
         _repo = repo;
         _validator = validator;
         _uow = uow;
+        _notifier = notifier;
     }
 
     public async Task<Unit> Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
@@ -46,6 +50,7 @@ public class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizationComma
                 await _repo.InsertAsync(createCmd).ConfigureAwait(false);
             }
             await _uow.CommitAsync();
+            _notifier.NotifyInfo(_resources.GetString("OrganizationUpdated") ?? "Organization updated");
         }
         catch
         {

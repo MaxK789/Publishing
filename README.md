@@ -1,4 +1,5 @@
 # Publishing
+![CI](https://github.com/example/publishing/actions/workflows/ci.yml/badge.svg)
 
 This repository hosts a simple publishing workflow demo. Database schema is maintained with Entity Framework Core migrations.
 
@@ -58,8 +59,7 @@ In CI pipelines you can apply migrations automatically using:
 dotnet ef database update --project src/Publishing.Infrastructure
 ```
 
-A GitHub Actions workflow under `.github/workflows/ci.yml` demonstrates how to build the solution and run tests automatically during CI.
-The job now runs on Linux and uses a temporary SQLite database so no SQL Server instance is required.
+A GitHub Actions workflow under `.github/workflows/ci.yml` demonstrates how to build the solution and run tests automatically during CI.  The pipeline runs on Linux and Windows, publishing a NuGet package with custom analyzers.  Code coverage fails the build if it drops below **85%**.
 
 ## Testing
 
@@ -79,6 +79,55 @@ services.AddScoped<IDiscountPolicy, StandardDiscountPolicy>();
 
 New strategies can be provided by registering a different implementation without touching `PriceCalculator`.
 Components should obtain `PriceCalculator` via dependency injection rather than constructing it directly.
+
+## UI Notifications
+
+User-facing messages are routed through `IUiNotifier`. In WinForms builds a
+system tray balloon appears, while console services write the text to `stdout`.
+When the application runs without a graphical environment, only log entries are
+produced.
+
+Register the notifier via extension:
+
+```csharp
+var host = Host.CreateDefaultBuilder(args)
+    .ConfigureServices(services =>
+    {
+        services.AddUiNotifier();
+    })
+    .Build();
+```
+
+Call the appropriate method depending on context:
+
+| Method | Usage |
+| --- | --- |
+| `NotifyInfo` | Successful actions |
+| `NotifyWarning` | Validation or minor issues |
+| `NotifyError` | Exceptions and failures |
+
+In unit tests `IUiNotifier` can be replaced with a stub:
+
+```csharp
+var factory = new WebApplicationFactory<Program>()
+    .WithWebHostBuilder(b =>
+    {
+        b.ConfigureTestServices(services =>
+        {
+            services.AddSingleton<IUiNotifier, StubNotifier>();
+        });
+    });
+```
+
+Set `NOTIFICATIONS_DISABLED=true` to suppress all UI output. The Windows job in CI uses this flag except when running WinAppDriver tests.
+
+## Static Analysis
+
+Custom Roslyn analyzers enforce the notifier registration and forbid APIs like `MessageBox.Show` or the `#if WINDOWS` directive. Run `dotnet format analyzers` to apply automatic fixes before committing.
+
+## Localization & Accessibility
+
+Notification texts reside in `Notifications.resx` with Ukrainian translations in `Notifications.uk-UA.resx`. Create new culture-specific files to extend the UI. Access strings via `ResourceManager`. Tests ensure translations exist for every key.
 
 
 ## Microservices setup
@@ -109,3 +158,6 @@ them to Docker Hub. To allow these workflows to authenticate, create repository
 secrets named `DOCKER_USERNAME` and `DOCKER_PASSWORD` containing your Docker Hub
 credentials. Without these secrets the `Login & Push` steps will fail with an
 "incorrect username or password" error.
+
+For details on running UI tests see [docs/ui-testing.md](docs/ui-testing.md).
+The Windows job in CI executes these tests with WinAppDriver.

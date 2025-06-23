@@ -8,6 +8,7 @@ using Publishing.Core.Interfaces;
 using FluentValidation;
 using Publishing.Services.Events;
 using AutoMapper;
+using System.Resources;
 
 namespace Publishing.AppLayer.Handlers
 {
@@ -21,6 +22,8 @@ namespace Publishing.AppLayer.Handlers
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IOrderEventsPublisher _events;
+        private readonly IUiNotifier _notifier;
+        private readonly ResourceManager _resources = new("Publishing.Services.Resources.Notifications", typeof(CreateOrderHandler).Assembly);
 
         public CreateOrderHandler(
             IOrderRepository orderRepository,
@@ -30,7 +33,8 @@ namespace Publishing.AppLayer.Handlers
             IMapper mapper,
             IDateTimeProvider dateTimeProvider,
             IUnitOfWork unitOfWork,
-            IOrderEventsPublisher events)
+            IOrderEventsPublisher events,
+            IUiNotifier notifier)
         {
             _orderRepository = orderRepository;
             _printeryRepository = printeryRepository;
@@ -39,6 +43,7 @@ namespace Publishing.AppLayer.Handlers
             _dateTimeProvider = dateTimeProvider;
             _unitOfWork = unitOfWork;
             _events = events;
+            _notifier = notifier;
             _mapper = mapper;
         }
 
@@ -53,6 +58,7 @@ namespace Publishing.AppLayer.Handlers
             await SaveOrderAsync(order);
             var dto = _mapper.Map<Publishing.Core.DTOs.OrderDto>(order);
             _events.PublishOrderCreated(dto);
+            _notifier.NotifyInfo(_resources.GetString("OrderCreated") ?? "Order created");
 
             return order;
         }

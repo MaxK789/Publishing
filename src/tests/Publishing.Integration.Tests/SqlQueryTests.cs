@@ -3,6 +3,7 @@ using Publishing.Infrastructure.DataAccess;
 using Publishing.Infrastructure;
 using Publishing.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Extensions.Caching.Memory;
@@ -37,6 +38,7 @@ public class SqlQueryTests
 
         var services = new ServiceCollection();
         services.AddTransient<ILogger, LoggerService>();
+        services.AddUiNotifier();
         services.AddSingleton<IDbConnectionFactory>(sp =>
             new SqliteDbConnectionFactory(new TestConfiguration(_cs), sp.GetRequiredService<ILogger>()));
         services.AddTransient<IDbContext, DapperDbContext>();

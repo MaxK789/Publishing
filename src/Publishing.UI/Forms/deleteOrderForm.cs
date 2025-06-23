@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
 using System.Threading.Tasks;
-using Publishing.Services.ErrorHandling;
+using System.Resources;
 
 namespace Publishing
 {
@@ -12,7 +12,8 @@ namespace Publishing
     {
         private readonly IOrderRepository _orderRepo;
         private readonly IRoleService _roles;
-        private readonly IErrorHandler _errorHandler;
+        private readonly IUiNotifier _notifier;
+        private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(deleteOrderForm).Assembly);
 
         [Obsolete("Designer only", error: false)]
         public deleteOrderForm()
@@ -20,12 +21,12 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public deleteOrderForm(INavigationService navigation, IOrderRepository orderRepo, IUserSession session, IRoleService roles, IErrorHandler errorHandler)
+        public deleteOrderForm(INavigationService navigation, IOrderRepository orderRepo, IUserSession session, IRoleService roles, IUiNotifier notifier)
             : base(session, navigation)
         {
             _orderRepo = orderRepo;
             _roles = roles;
-            _errorHandler = errorHandler;
+            _notifier = notifier;
             InitializeComponent();
         }
 
@@ -37,7 +38,7 @@ namespace Publishing
 
                 await _orderRepo.DeleteAsync(idToDelete);
 
-                _errorHandler.ShowFriendlyError("Видалено idOrder: " + idToDelete.ToString());
+                _notifier.NotifyInfo(string.Format(_notify.GetString("OrderDeleted") ?? "Deleted order {0}", idToDelete));
 
                 dataGridView1.Rows.RemoveAt(e.RowIndex);
             }

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
 using Publishing.Core.Interfaces;
 using Publishing.Infrastructure;
 using System.IO;
@@ -45,6 +46,7 @@ namespace Publishing.Integration.Tests
                 .Build();
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
+            services.AddUiNotifier();
             services.AddTransient<ILogger, LoggerService>();
             services.AddTransient<IDbConnectionFactory, SqliteDbConnectionFactory>();
             services.AddTransient<IDbContext, DapperDbContext>();

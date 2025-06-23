@@ -39,6 +39,9 @@ namespace Publishing
 
 
 
+            var notifier = Services.GetRequiredService<IUiNotifier>() as IDisposable;
+            System.Windows.Forms.Application.ApplicationExit += (_, __) => notifier?.Dispose();
+
             var form = Services.GetRequiredService<loginForm>();
             System.Windows.Forms.Application.Run(form);
 
@@ -65,6 +68,7 @@ namespace Publishing
             services.AddScoped<IPriceCalculator, PriceCalculator>();
             services.AddScoped<IOrderInputValidator, OrderInputValidator>();
             services.AddScoped<IRoleService, RoleService>();
+            services.AddUiNotifier();
             services.AddScoped<IErrorHandler, ErrorHandler>();
             services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
             services.AddSingleton<IUserSession, UserSession>();

@@ -1,7 +1,7 @@
 using System;
 using Publishing.Core.Interfaces;
 using Publishing.Services;
-using Publishing.Services.ErrorHandling;
+using System.Resources;
 using System.Windows.Forms;
 
 namespace Publishing
@@ -9,7 +9,8 @@ namespace Publishing
     public partial class loginForm : BaseForm
     {
         private readonly IAuthService _authService;
-        private readonly IErrorHandler _errorHandler;
+        private readonly IUiNotifier _notifier;
+        private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(loginForm).Assembly);
 
         [Obsolete("Designer only", error: false)]
         public loginForm()
@@ -17,11 +18,11 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public loginForm(IAuthService authService, INavigationService navigation, IUserSession session, IErrorHandler errorHandler)
+        public loginForm(IAuthService authService, INavigationService navigation, IUserSession session, IUiNotifier notifier)
             : base(session, navigation)
         {
             _authService = authService;
-            _errorHandler = errorHandler;
+            _notifier = notifier;
             InitializeComponent();
         }
 
@@ -41,11 +42,11 @@ namespace Publishing
                 _session.Token = result.Token;
 
                 _navigation.Navigate<mainForm>(this);
-                _errorHandler.ShowFriendlyError($"Вітаємо, {_session.UserName} ({_session.UserType})!");
+                _notifier.NotifyInfo(string.Format(_notify.GetString("WelcomeUser") ?? "Welcome, {0}!", _session.UserName, _session.UserType));
             }
             else
             {
-                _errorHandler.ShowFriendlyError("Невірна електронна пошта або пароль");
+                _notifier.NotifyWarning(_notify.GetString("InvalidCredentials") ?? "Invalid credentials");
             }
         }
 

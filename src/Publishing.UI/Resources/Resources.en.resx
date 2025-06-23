@@ -12,4 +12,7 @@
   <data name="DataUpdated" xml:space="preserve">
     <value>Data successfully updated</value>
   </data>
+  <data name="TotalPriceLabel" xml:space="preserve">
+    <value>Total price: {0}</value>
+  </data>
 </root>

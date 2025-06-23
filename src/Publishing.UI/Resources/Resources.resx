@@ -12,4 +12,7 @@
   <data name="DataUpdated" xml:space="preserve">
     <value>Дані успішно змінено</value>
   </data>
+  <data name="TotalPriceLabel" xml:space="preserve">
+    <value>Кінцева ціна: {0}</value>
+  </data>
 </root>
