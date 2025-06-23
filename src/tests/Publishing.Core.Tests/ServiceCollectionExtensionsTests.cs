@@ -21,6 +21,18 @@ namespace Publishing.Core.Tests
         }
 
         [TestMethod]
+        public void AddUiNotifier_ParsesBooleanWithWhitespace()
+        {
+            var services = new ServiceCollection();
+            Environment.SetEnvironmentVariable("NOTIFICATIONS_DISABLED", "  true  ");
+            services.AddUiNotifier();
+            var provider = services.BuildServiceProvider();
+            var notifier = provider.GetRequiredService<IUiNotifier>();
+            Assert.IsInstanceOfType(notifier, typeof(SilentUiNotifier));
+            Environment.SetEnvironmentVariable("NOTIFICATIONS_DISABLED", null);
+        }
+
+        [TestMethod]
         public void AddUiNotifier_ReturnsPlatformSpecificImplementation()
         {
             var services = new ServiceCollection();
