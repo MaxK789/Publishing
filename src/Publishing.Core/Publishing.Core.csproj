@@ -18,7 +18,7 @@
     <PackageReference Include="FluentValidation" Version="11.9.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../Publishing.Services/Publishing.Services.csproj" />
+    <!-- Core depends only on abstractions defined here -->
   </ItemGroup>
 
 </Project>

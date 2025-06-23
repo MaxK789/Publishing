@@ -2,7 +2,6 @@ using System;
 using BCrypt.Net;
 using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
-using Publishing.Services;
 using System.Threading.Tasks;
 
 namespace Publishing.Core.Services

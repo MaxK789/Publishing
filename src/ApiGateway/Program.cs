@@ -10,6 +10,7 @@ using Publishing.Services;
 using Publishing.Services.ErrorHandling;
 using Publishing.Services.Roles;
 using Publishing.Services.Jwt;
+using Publishing.Core.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

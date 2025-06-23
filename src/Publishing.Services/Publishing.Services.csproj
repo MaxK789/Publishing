@@ -4,10 +4,14 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms Condition="'$(TargetFramework)'=='net6.0-windows'">true</UseWindowsForms>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
+  <ItemGroup>
+    <!-- Dependency injection extensions used across all targets -->
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-    <Compile Include="UiNotifications/WinFormsUiNotifier.cs" />
-    <Compile Include="ServiceCollectionExtensions.Windows.cs" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
+    <!-- WinForms-specific implementations are included by default -->
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.31.0" />
@@ -17,5 +21,8 @@
   <ItemGroup Condition="'$(TargetFramework)'!='net6.0-windows'">
     <Compile Remove="UiNotifications/WinFormsUiNotifier.cs" />
     <Compile Remove="ServiceCollectionExtensions.Windows.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Publishing.Core/Publishing.Core.csproj" />
   </ItemGroup>
 </Project>
