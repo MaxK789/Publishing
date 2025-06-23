@@ -38,7 +38,7 @@ namespace Publishing
 
         private async void statisticForm_Load(object sender, EventArgs e)
         {
-            _events.OrderCreated += _ => _ = RefreshStatisticsAsync();
+            _events.OrderCreated += async _ => await RefreshStatisticsAsync();
             authorsBox.Items.Clear();
             authorsBox.Items.Add("Усі");
 
