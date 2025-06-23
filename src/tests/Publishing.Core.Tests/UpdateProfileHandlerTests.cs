@@ -2,6 +2,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Publishing.AppLayer.Handlers;
 using Publishing.Core.Commands;
 using Publishing.Core.Interfaces;
+using Publishing.Services;
+using System.Diagnostics.CodeAnalysis;
 using FluentValidation;
 using System;
 using System.Threading;
@@ -30,6 +32,7 @@ public class UpdateProfileHandlerTests
 
         private class FakeDbConnection : System.Data.IDbConnection
         {
+            [AllowNull]
             public string ConnectionString { get; set; } = string.Empty;
             public int ConnectionTimeout => 0;
             public string Database => string.Empty;

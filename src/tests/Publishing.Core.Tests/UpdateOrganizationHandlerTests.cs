@@ -4,6 +4,8 @@ using Publishing.Core.Commands;
 using Publishing.Core.Interfaces;
 using FluentValidation;
 using MediatR;
+using Publishing.Services;
+using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,6 +34,7 @@ public class UpdateOrganizationHandlerTests
         public System.Data.IDbTransaction Transaction => new FakeDbTransaction();
         private class FakeDbConnection : System.Data.IDbConnection
         {
+            [AllowNull]
             public string ConnectionString { get; set; } = string.Empty;
             public int ConnectionTimeout => 0;
             public string Database => string.Empty;
