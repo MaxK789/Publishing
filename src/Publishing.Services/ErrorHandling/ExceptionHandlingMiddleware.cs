@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Json;
 
 namespace Publishing.Services;
 
@@ -29,7 +29,8 @@ public class ExceptionHandlingMiddleware
             {
                 context.Response.StatusCode = 500;
                 context.Response.ContentType = "application/json";
-                await context.Response.WriteAsJsonAsync(new { error = ex.Message });
+                await context.Response.WriteAsync(
+                    JsonSerializer.Serialize(new { error = ex.Message }));
             }
         }
     }
