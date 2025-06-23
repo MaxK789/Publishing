@@ -4,6 +4,7 @@ using Publishing.Core.Commands;
 using Publishing.Core.Interfaces;
 using FluentValidation;
 using MediatR;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,7 +32,7 @@ public class UpdateOrganizationHandlerTests
         public System.Data.IDbTransaction Transaction => new FakeDbTransaction();
         private class FakeDbConnection : System.Data.IDbConnection
         {
-            public string? ConnectionString { get; set; }
+            public string ConnectionString { get; set; } = string.Empty;
             public int ConnectionTimeout => 0;
             public string Database => string.Empty;
             public System.Data.ConnectionState State => System.Data.ConnectionState.Open;
@@ -53,12 +54,19 @@ public class UpdateOrganizationHandlerTests
         }
     }
 
+    private class StubNotifier : IUiNotifier
+    {
+        public void NotifyInfo(string message) { }
+        public void NotifyWarning(string message) { }
+        public void NotifyError(string message, string? details = null) { }
+    }
+
     [TestMethod]
     public async Task Handle_ExistingName_Updates()
     {
         var repo = new StubRepo { ExistingName = "org" };
         var uow = new StubUnitOfWork();
-        var handler = new UpdateOrganizationHandler(repo, new InlineValidator<UpdateOrganizationCommand>(), uow);
+        var handler = new UpdateOrganizationHandler(repo, new InlineValidator<UpdateOrganizationCommand>(), uow, new StubNotifier());
         var cmd = new UpdateOrganizationCommand { Id = "1", Name = "org" };
         await handler.Handle(cmd, CancellationToken.None);
         Assert.IsNotNull(repo.Updated);
@@ -70,7 +78,7 @@ public class UpdateOrganizationHandlerTests
     {
         var repo = new StubRepo { ExistingName = "other" };
         var uow = new StubUnitOfWork();
-        var handler = new UpdateOrganizationHandler(repo, new InlineValidator<UpdateOrganizationCommand>(), uow);
+        var handler = new UpdateOrganizationHandler(repo, new InlineValidator<UpdateOrganizationCommand>(), uow, new StubNotifier());
         var cmd = new UpdateOrganizationCommand { Id = "2", Name = "org" };
         await handler.Handle(cmd, CancellationToken.None);
         Assert.IsNotNull(repo.Created);

@@ -55,7 +55,7 @@ namespace Publishing.Core.Tests
             public IDbTransaction Transaction => new FakeDbTransaction();
             private class FakeDbConnection : IDbConnection
             {
-                public string? ConnectionString { get; set; }
+                public string ConnectionString { get; set; } = string.Empty;
                 public int ConnectionTimeout => 0;
                 public string Database => string.Empty;
                 public ConnectionState State => ConnectionState.Open;
