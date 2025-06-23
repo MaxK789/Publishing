@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Appium.Enums;
 using OpenQA.Selenium.Appium;
+using AppiumBy = OpenQA.Selenium.Appium.AppiumBy;
 using System;
 
 
