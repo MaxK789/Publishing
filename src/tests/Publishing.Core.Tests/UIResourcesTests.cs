@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Resources;
+using Publishing;
 
 namespace Publishing.Core.Tests;
 
@@ -12,7 +13,7 @@ public class UIResourcesTests
     {
         var baseRes = new ResourceManager(
             "Publishing.Resources.Resources",
-            typeof(Publishing.Program).Assembly);
+            typeof(loginForm).Assembly);
         foreach (var entry in baseRes.GetResourceSet(System.Globalization.CultureInfo.InvariantCulture, true, true)!)
         {
             // Skip entries without a valid string key to avoid nullable warnings.
