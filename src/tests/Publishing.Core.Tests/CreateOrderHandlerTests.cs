@@ -12,6 +12,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Publishing.Core.Tests
 {
@@ -55,6 +56,7 @@ namespace Publishing.Core.Tests
             public IDbTransaction Transaction => new FakeDbTransaction();
             private class FakeDbConnection : IDbConnection
             {
+                [AllowNull]
                 public string ConnectionString { get; set; } = string.Empty;
                 public int ConnectionTimeout => 0;
                 public string Database => string.Empty;
