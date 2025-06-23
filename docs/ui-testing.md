@@ -1,6 +1,6 @@
 # UI Testing
 
-WinForms screens are tested using WinAppDriver. The `Microsoft.Windows.AppDriver` NuGet package adds references but does **not** install the actual driver. Use **winget** or download the MSI from GitHub and start it before running the tests.
+WinForms screens are tested using WinAppDriver. The tests rely on the `Appium.WebDriver` NuGet package for the Selenium bindings, but the WinAppDriver executable itself is not included. Install it via **winget** or download the MSI from GitHub and start it before running the tests.
 
 ```
 winget install WinAppDriver
