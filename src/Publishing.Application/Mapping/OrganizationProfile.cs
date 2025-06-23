@@ -9,6 +9,7 @@ public class OrganizationProfile : Profile
     public OrganizationProfile()
     {
         CreateMap<UpdateOrganizationDto, UpdateOrganizationCommand>();
-        CreateMap<UpdateOrganizationDto, CreateOrganizationCommand>();
+        CreateMap<UpdateOrganizationDto, CreateOrganizationCommand>()
+            .ForMember(d => d.PersonId, o => o.MapFrom(s => s.Id));
     }
 }

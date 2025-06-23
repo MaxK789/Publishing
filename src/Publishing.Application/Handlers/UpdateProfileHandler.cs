@@ -16,7 +16,8 @@ public class UpdateProfileHandler : IRequestHandler<UpdateProfileCommand, Unit>
     private readonly IValidator<UpdateProfileCommand> _validator;
     private readonly IUnitOfWork _uow;
     private readonly IUiNotifier _notifier;
-    private readonly ResourceManager _resources = new("Publishing.Services.Resources.Notifications", typeof(UpdateProfileHandler).Assembly);
+    private readonly ResourceManager _resources =
+        new("Publishing.Services.Resources.Notifications", typeof(IUiNotifier).Assembly);
 
     public UpdateProfileHandler(IProfileRepository repo, IValidator<UpdateProfileCommand> validator, IUnitOfWork uow, IUiNotifier notifier)
     {

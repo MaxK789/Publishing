@@ -9,7 +9,9 @@ public class UIResourcesTests
     [TestMethod]
     public void AllKeys_HaveUkrainianTranslation()
     {
-        var baseRes = new ResourceManager("Publishing.UI.Resources.Resources", typeof(Publishing.Services.SilentUiNotifier).Assembly);
+        var baseRes = new ResourceManager(
+            "Publishing.UI.Resources.Resources",
+            typeof(Publishing.UI.Program).Assembly);
         foreach (var entry in baseRes.GetResourceSet(System.Globalization.CultureInfo.InvariantCulture, true, true)!)
         {
             // Skip entries without a valid string key to avoid nullable warnings.

@@ -11,7 +11,7 @@ namespace Publishing.AppLayer.Validators
         public PhoneFaxValidator()
         {
             RuleFor(x => x)
-                .Must(v => string.IsNullOrEmpty(v) || Regex.IsMatch(v, "^\\+?[1-9]\\d{6,14}$"))
+                .Must(v => string.IsNullOrEmpty(v) || Regex.IsMatch(v, "^\\+?[1-9]\\d{2,14}$"))
                 .WithMessage("Invalid phone/fax format");
         }
     }

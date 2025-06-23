@@ -19,7 +19,7 @@ namespace Publishing.Services
             _logger.LogError(ex.Message, ex);
             try
             {
-                _notifier.NotifyError(ex.Message, ex.StackTrace);
+                _notifier.NotifyError(ex.Message, ex.ToString());
             }
             catch
             {

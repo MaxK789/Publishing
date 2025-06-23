@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Testing;
 using Publishing.Analyzers;
 
 namespace Publishing.Analyzers.Tests;
@@ -16,7 +17,12 @@ public class AnalyzerTests
         var test = new CSharpAnalyzerTest<T, MSTestVerifier>
         {
             TestCode = source,
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net60
         };
+
+        test.TestState.AdditionalReferences.Add(typeof(Microsoft.Extensions.DependencyInjection.ServiceCollection).Assembly);
+        test.TestState.AdditionalReferences.Add(typeof(Microsoft.AspNetCore.Builder.WebApplication).Assembly);
+        test.TestState.AdditionalReferences.Add(typeof(System.Windows.Forms.Form).Assembly);
         await test.RunAsync();
     }
 
