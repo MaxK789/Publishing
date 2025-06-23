@@ -4,8 +4,6 @@ using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
 using System.Threading.Tasks;
-using Publishing.Services.Events;
-using Publishing.Services.ErrorHandling;
 
 namespace Publishing
 {

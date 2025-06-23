@@ -20,8 +20,6 @@ using Publishing.AppLayer.Validators;
 using Publishing.AppLayer.Behaviors;
 using FluentValidation;
 using Publishing.Services;
-using Publishing.Services.ErrorHandling;
-using Publishing.Services.Events;
 
 namespace Publishing
 {

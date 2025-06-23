@@ -6,7 +6,7 @@ using Publishing.AppLayer.Commands;
 using Publishing.Core.Domain;
 using Publishing.Core.Interfaces;
 using FluentValidation;
-using Publishing.Services.Events;
+using Publishing.Services;
 using AutoMapper;
 using System.Resources;
 

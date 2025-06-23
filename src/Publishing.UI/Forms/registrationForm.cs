@@ -4,7 +4,6 @@ using System.Windows.Forms;
 using Publishing.Core.Interfaces;
 using Publishing.Core.DTOs;
 using Publishing.Services;
-using Publishing.Services.ErrorHandling;
 using System.Threading.Tasks;
 using System.Resources;
 

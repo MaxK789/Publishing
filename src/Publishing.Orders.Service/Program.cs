@@ -16,13 +16,10 @@ using Publishing.Orders.Service.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Publishing.Services.Authorization;
 using Publishing.Services;
-using Publishing.Services.Events;
 using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using FluentValidation;
 using Publishing.Infrastructure.Repositories;
-using Publishing.Services.ErrorHandling;
-using Publishing.Services.Roles;
 using Publishing.Infrastructure;
 using Publishing.AppLayer.Validators;
 

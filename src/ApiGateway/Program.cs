@@ -7,8 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using OpenTelemetry.Trace;
 using Publishing.Services;
-using Publishing.Services.ErrorHandling;
-using Publishing.Services.Roles;
 using Publishing.Services.Jwt;
 using Publishing.Core.Interfaces;
 
