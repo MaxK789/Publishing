@@ -129,7 +129,7 @@ var factory = new WebApplicationFactory<Program>()
     });
 ```
 
-Set `NOTIFICATIONS_DISABLED=true` to suppress all UI output. The Windows job in CI uses this flag except when running WinAppDriver tests.
+Set `NOTIFICATIONS_DISABLED=true` to suppress all UI output. Set it to `false` or remove the variable entirely when you want to see tray balloons or console text. The Windows job in CI uses this flag except when running WinAppDriver tests.
 
 ## Static Analysis
 
