@@ -12,7 +12,8 @@
     <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
     <!-- Use Appium library directly for WinAppDriver UI tests -->
     <PackageReference Include="Appium.WebDriver" Version="5.0.0" />
-    <PackageReference Include="Selenium.WebDriver" Version="4.9.1" />
+    <!-- Align Selenium version with Appium dependency to avoid downgrade warnings -->
+    <PackageReference Include="Selenium.WebDriver" Version="4.21.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../Publishing.UI/Publishing.UI.csproj" />
