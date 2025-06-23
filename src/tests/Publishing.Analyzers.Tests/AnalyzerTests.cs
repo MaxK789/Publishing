@@ -15,11 +15,13 @@ public class AnalyzerTests
 {
     private static async Task VerifyAsync<T>(string source) where T : DiagnosticAnalyzer, new()
     {
+#pragma warning disable CS0618 // MSTestVerifier is obsolete, but newer alternatives are not available in offline builds
         var test = new CSharpAnalyzerTest<T, MSTestVerifier>
         {
             TestCode = source,
             ReferenceAssemblies = ReferenceAssemblies.Net.Net60
         };
+#pragma warning restore CS0618
 
         test.TestState.AdditionalReferences.Add(typeof(Microsoft.Extensions.DependencyInjection.ServiceCollection).Assembly);
         test.TestState.AdditionalReferences.Add(typeof(Microsoft.AspNetCore.Builder.WebApplication).Assembly);
