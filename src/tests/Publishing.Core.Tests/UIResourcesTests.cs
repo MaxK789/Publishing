@@ -13,7 +13,7 @@ public class UIResourcesTests
     {
         var baseRes = new ResourceManager(
             "Publishing.Resources.Resources",
-            typeof(loginForm).Assembly);
+            typeof(LoginForm).Assembly);
         foreach (var entry in baseRes.GetResourceSet(System.Globalization.CultureInfo.InvariantCulture, true, true)!)
         {
             // Skip entries without a valid string key to avoid nullable warnings.
