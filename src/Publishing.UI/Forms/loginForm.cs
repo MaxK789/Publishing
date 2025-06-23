@@ -10,7 +10,7 @@ namespace Publishing
     {
         private readonly IAuthService _authService;
         private readonly IUiNotifier _notifier;
-        private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(loginForm).Assembly);
+        private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(Publishing.Services.IUiNotifier).Assembly);
 
         [Obsolete("Designer only", error: false)]
         public loginForm()

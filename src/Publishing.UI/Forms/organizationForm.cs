@@ -14,7 +14,7 @@ namespace Publishing
         private readonly IRoleService _roles;
         private readonly IUiNotifier _notifier;
         private readonly ResourceManager _resources = new("Publishing.Resources.Resources", typeof(organizationForm).Assembly);
-        private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(organizationForm).Assembly);
+        private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(Publishing.Services.IUiNotifier).Assembly);
 
         [Obsolete("Designer only", error: false)]
         public organizationForm()
