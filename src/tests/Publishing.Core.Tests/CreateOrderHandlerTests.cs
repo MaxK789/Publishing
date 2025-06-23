@@ -6,6 +6,8 @@ using Publishing.Core.Domain;
 using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using FluentValidation;
+using Publishing.Services;
+using Publishing.Core.DTOs;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,7 +55,7 @@ namespace Publishing.Core.Tests
             public IDbTransaction Transaction => new FakeDbTransaction();
             private class FakeDbConnection : IDbConnection
             {
-                public string ConnectionString { get; set; } = string.Empty;
+                public string? ConnectionString { get; set; }
                 public int ConnectionTimeout => 0;
                 public string Database => string.Empty;
                 public ConnectionState State => ConnectionState.Open;

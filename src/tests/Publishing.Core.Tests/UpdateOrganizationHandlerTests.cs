@@ -31,7 +31,7 @@ public class UpdateOrganizationHandlerTests
         public System.Data.IDbTransaction Transaction => new FakeDbTransaction();
         private class FakeDbConnection : System.Data.IDbConnection
         {
-            public string ConnectionString { get; set; } = string.Empty;
+            public string? ConnectionString { get; set; }
             public int ConnectionTimeout => 0;
             public string Database => string.Empty;
             public System.Data.ConnectionState State => System.Data.ConnectionState.Open;

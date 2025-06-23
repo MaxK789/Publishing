@@ -39,7 +39,7 @@ namespace Publishing.Integration.Tests
             };
             var cs = builder.ToString();
             var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>
+                .AddInMemoryCollection(new Dictionary<string, string?>
                 {
                     ["ConnectionStrings:DefaultConnection"] = cs
                 })
