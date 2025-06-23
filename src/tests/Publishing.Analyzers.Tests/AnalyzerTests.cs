@@ -14,7 +14,7 @@ namespace Publishing.Analyzers.Tests;
 [TestClass]
 public class AnalyzerTests
 {
-    private static async Task VerifyAsync<T>(string source) where T : DiagnosticAnalyzer, new()
+    private static async Task VerifyAsync<T>(string source, params DiagnosticResult[] expected) where T : DiagnosticAnalyzer, new()
     {
 #pragma warning disable CS0618 // MSTestVerifier is obsolete, but newer alternatives are not available in offline builds
         var test = new CSharpAnalyzerTest<T, MSTestVerifier>
@@ -35,6 +35,7 @@ public class AnalyzerTests
         test.TestState.AdditionalReferences.Add(typeof(Microsoft.AspNetCore.Builder.WebApplication).Assembly);
         test.TestState.AdditionalReferences.Add(typeof(System.Windows.Forms.Form).Assembly);
         test.TestState.AdditionalReferences.Add(typeof(Publishing.Services.IUiNotifier).Assembly);
+        test.ExpectedDiagnostics.AddRange(expected);
         await test.RunAsync();
     }
 
@@ -42,15 +43,19 @@ public class AnalyzerTests
     public async Task ConfigureServicesWithoutCall_ProducesWarning()
     {
         var code = @"using Microsoft.Extensions.DependencyInjection;
-class Startup{void ConfigureServices(IServiceCollection s){}}";
-        await VerifyAsync<AddUiNotifierAnalyzer>(code);
+class Startup{void ConfigureServices(IServiceCollection s){}}
+class Program{static void Main(){}}";
+        var expected = new DiagnosticResult(AddUiNotifierAnalyzer.DiagnosticId, DiagnosticSeverity.Error)
+            .WithSpan(1, 1, 3, 36);
+        await VerifyAsync<AddUiNotifierAnalyzer>(code, expected);
     }
 
     [TestMethod]
     public async Task ConfigureServicesWithCall_NoWarning()
     {
         var code = @"using Microsoft.Extensions.DependencyInjection;
-class Startup{void ConfigureServices(IServiceCollection s){s.AddUiNotifier();}}";
+class Startup{void ConfigureServices(IServiceCollection s){s.AddUiNotifier();}}
+class Program{static void Main(){}}";
         await VerifyAsync<AddUiNotifierAnalyzer>(code);
     }
 
@@ -58,14 +63,18 @@ class Startup{void ConfigureServices(IServiceCollection s){s.AddUiNotifier();}}"
     public async Task ProgramWithoutCall_ProducesDiagnostic()
     {
         var code = "using Microsoft.Extensions.DependencyInjection;\nusing Microsoft.AspNetCore.Builder;\nvar builder = WebApplication.CreateBuilder();";
-        await VerifyAsync<AddUiNotifierAnalyzer>(code);
+        var expected = new DiagnosticResult(AddUiNotifierAnalyzer.DiagnosticId, DiagnosticSeverity.Error)
+            .WithSpan(1, 1, 3, 46);
+        await VerifyAsync<AddUiNotifierAnalyzer>(code, expected);
     }
 
     [TestMethod]
     public async Task MessageBoxShow_ProducesDiagnostic()
     {
-        var code = "using System.Windows.Forms; class C{ void M(){ MessageBox.Show(\"x\");}}";
-        await VerifyAsync<ForbiddenApiAnalyzer>(code);
+        var code = "using System.Windows.Forms; class C{ void M(){ MessageBox.Show(\"x\");}}\nclass Program{static void Main(){}}";
+        var expected = new DiagnosticResult(ForbiddenApiAnalyzer.MessageBoxId, DiagnosticSeverity.Error)
+            .WithSpan(1, 48, 1, 68);
+        await VerifyAsync<ForbiddenApiAnalyzer>(code, expected);
     }
 
     [TestMethod]
@@ -84,10 +93,17 @@ svcs.AddUiNotifier();";
     public async Task MissingInChainedSetup_ProducesDiagnostic()
     {
         var code = @"using Microsoft.Extensions.DependencyInjection;
+static class Ext {
+    public static IServiceCollection AddLogging(this IServiceCollection s) => s;
+    public static IServiceCollection AddRouting(this IServiceCollection s) => s;
+}
 class Startup{void ConfigureServices(IServiceCollection s){s
     .AddLogging()
-    .AddRouting();}}";
-        await VerifyAsync<AddUiNotifierAnalyzer>(code);
+    .AddRouting();}}
+class Program{static void Main(){}}";
+        var expected = new DiagnosticResult(AddUiNotifierAnalyzer.DiagnosticId, DiagnosticSeverity.Error)
+            .WithSpan(1, 1, 9, 36);
+        await VerifyAsync<AddUiNotifierAnalyzer>(code, expected);
     }
 
     [TestMethod]
@@ -95,7 +111,8 @@ class Startup{void ConfigureServices(IServiceCollection s){s
     {
         var code = @"using Microsoft.Extensions.DependencyInjection;
 static class Ext{public static void Reg(this IServiceCollection s){s.AddUiNotifier();}}
-class S{void ConfigureServices(IServiceCollection s){s.Reg();}}";
+class S{void ConfigureServices(IServiceCollection s){s.Reg();}}
+class Program{static void Main(){}}";
         await VerifyAsync<AddUiNotifierAnalyzer>(code);
     }
 }
