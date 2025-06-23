@@ -19,5 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../Publishing.Analyzers/Publishing.Analyzers.csproj" />
+    <ProjectReference Include="../../Publishing.Services/Publishing.Services.csproj" />
   </ItemGroup>
 </Project>

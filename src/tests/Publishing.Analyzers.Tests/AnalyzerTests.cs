@@ -23,9 +23,17 @@ public class AnalyzerTests
         };
 #pragma warning restore CS0618
 
+        test.SolutionTransforms.Add((solution, projectId) =>
+        {
+            var compilationOptions = solution.GetProject(projectId)!.CompilationOptions!
+                .WithOutputKind(OutputKind.ConsoleApplication);
+            return solution.WithProjectCompilationOptions(projectId, compilationOptions);
+        });
+
         test.TestState.AdditionalReferences.Add(typeof(Microsoft.Extensions.DependencyInjection.ServiceCollection).Assembly);
         test.TestState.AdditionalReferences.Add(typeof(Microsoft.AspNetCore.Builder.WebApplication).Assembly);
         test.TestState.AdditionalReferences.Add(typeof(System.Windows.Forms.Form).Assembly);
+        test.TestState.AdditionalReferences.Add(typeof(Publishing.Services.IUiNotifier).Assembly);
         await test.RunAsync();
     }
 
