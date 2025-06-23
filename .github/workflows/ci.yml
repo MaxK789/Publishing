@@ -25,5 +25,48 @@ jobs:
       run: dotnet build --no-restore
     - name: Format
       run: dotnet format --no-restore --verify-no-changes
+    - name: Analyzers
+      run: dotnet format analyzers --no-restore
+    - name: Grep for forbidden APIs
+      run: git grep -nE "(MessageBox\.Show|#if\s+WINDOWS)" && exit 1 || echo "OK"
     - name: Test
-      run: dotnet test --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults /p:Threshold=80 /p:ThresholdType=line /p:ThresholdStat=total
+      run: dotnet test --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults /p:Threshold=85 /p:ThresholdType=line /p:ThresholdStat=total
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore -c Release
+    - name: Start WinAppDriver
+      shell: powershell
+      run: |
+        Start-Process "C:\\Program Files (x86)\\Windows Application Driver\\WinAppDriver.exe"
+        Start-Sleep -Seconds 5
+    - name: Test
+      run: dotnet test --no-build --results-directory ./TestResults
+    - uses: actions/upload-artifact@v3
+      with:
+        name: TestResults-windows
+        path: TestResults/*.trx
+
+  pack-analyzers:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Pack analyzers
+      run: dotnet pack src/Publishing.Analyzers/Publishing.Analyzers.csproj -c Release -o ./artifacts
+    - uses: actions/upload-artifact@v3
+      with:
+        name: Publishing.Analyzers
+        path: artifacts/*.nupkg

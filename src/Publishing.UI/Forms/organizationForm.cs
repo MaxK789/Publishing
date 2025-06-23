@@ -5,7 +5,6 @@ using Publishing.Core.Interfaces;
 using Publishing.Core.DTOs;
 using System.Resources;
 using System.Threading.Tasks;
-using Publishing.Services.ErrorHandling;
 
 namespace Publishing
 {
@@ -13,8 +12,9 @@ namespace Publishing
     {
         private readonly IOrganizationService _service;
         private readonly IRoleService _roles;
-        private readonly IErrorHandler _errorHandler;
-        private readonly ResourceManager _resources = new ResourceManager("Publishing.Resources.Resources", typeof(organizationForm).Assembly);
+        private readonly IUiNotifier _notifier;
+        private readonly ResourceManager _resources = new("Publishing.Resources.Resources", typeof(organizationForm).Assembly);
+        private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(organizationForm).Assembly);
 
         [Obsolete("Designer only", error: false)]
         public organizationForm()
@@ -22,12 +22,12 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public organizationForm(INavigationService navigation, IOrganizationService service, IUserSession session, IRoleService roles, IErrorHandler errorHandler)
+        public organizationForm(INavigationService navigation, IOrganizationService service, IUserSession session, IRoleService roles, IUiNotifier notifier)
             : base(session, navigation)
         {
             _service = service;
             _roles = roles;
-            _errorHandler = errorHandler;
+            _notifier = notifier;
             InitializeComponent();
         }
 
@@ -54,7 +54,7 @@ namespace Publishing
             };
 
             await _service.UpdateAsync(dto);
-            _errorHandler.ShowFriendlyError(_resources.GetString("DataUpdated") ?? "Success");
+            _notifier.NotifyInfo(_notify.GetString("OrganizationUpdated") ?? "Success");
             _navigation.Navigate<mainForm>(this);
         }
 

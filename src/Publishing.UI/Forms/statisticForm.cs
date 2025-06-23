@@ -5,6 +5,7 @@ using Publishing.Services;
 using Publishing.Core.Interfaces;
 using System.Threading.Tasks;
 using Publishing.Services.Events;
+using Publishing.Services.ErrorHandling;
 
 namespace Publishing
 {
@@ -13,6 +14,7 @@ namespace Publishing
         private readonly IRoleService _roles;
         private readonly IStatisticRepository _statRepo;
         private readonly IOrderEventsPublisher _events;
+        private readonly IErrorHandler _errorHandler;
 
         [Obsolete("Designer only", error: false)]
         public statisticForm()
@@ -20,12 +22,19 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public statisticForm(INavigationService navigation, IStatisticRepository statRepo, IUserSession session, IRoleService roles, IOrderEventsPublisher events)
+        public statisticForm(
+            INavigationService navigation,
+            IStatisticRepository statRepo,
+            IUserSession session,
+            IRoleService roles,
+            IOrderEventsPublisher events,
+            IErrorHandler errorHandler)
             : base(session, navigation)
         {
             _statRepo = statRepo;
             _roles = roles;
             _events = events;
+            _errorHandler = errorHandler;
             InitializeComponent();
         }
 
@@ -35,26 +44,33 @@ namespace Publishing
             authorsBox.Items.Clear();
             authorsBox.Items.Add("Усі");
 
-            List<string[]> authorNames = await _statRepo.GetAuthorNamesAsync();
-
-            if (authorNames != null && authorNames.Count > 0)
+            try
             {
-                foreach (string[] authorArray in authorNames)
+                List<string[]> authorNames = await _statRepo.GetAuthorNamesAsync();
+
+                if (authorNames != null && authorNames.Count > 0)
                 {
-                    string authorName = authorArray[0];
-                    authorsBox.Items.Add(authorName);
+                    foreach (string[] authorArray in authorNames)
+                    {
+                        string authorName = authorArray[0];
+                        authorsBox.Items.Add(authorName);
+                    }
+
+                    authorsBox.SelectedIndex = 0;
                 }
 
-                authorsBox.SelectedIndex = 0;
+                chart1.Series[0].Points.Clear();
+
+                List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync();
+
+                foreach (var dataPoint in dataList)
+                {
+                    chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+                }
             }
-
-            chart1.Series[0].Points.Clear();
-
-            List<string[]> dataList = await _statRepo.GetOrdersPerMonthAsync();
-
-            foreach (var dataPoint in dataList)
+            catch (Exception ex)
             {
-                chart1.Series[0].Points.AddXY(dataPoint[0], int.Parse(dataPoint[1]));
+                _errorHandler.Handle(ex);
             }
         }
 

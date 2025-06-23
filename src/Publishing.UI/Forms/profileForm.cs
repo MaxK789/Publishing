@@ -5,7 +5,6 @@ using Publishing.Core.Interfaces;
 using Publishing.Core.DTOs;
 using System.Resources;
 using System.Threading.Tasks;
-using Publishing.Services.ErrorHandling;
 
 namespace Publishing
 {
@@ -13,8 +12,8 @@ namespace Publishing
     {
         private readonly IProfileService _profileService;
         private readonly IRoleService _roles;
-        private readonly IErrorHandler _errorHandler;
-        private readonly ResourceManager _resources = new ResourceManager("Publishing.Resources.Resources", typeof(profileForm).Assembly);
+        private readonly IUiNotifier _notifier;
+        private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(profileForm).Assembly);
 
         [Obsolete("Designer only", error: false)]
         public profileForm()
@@ -22,12 +21,12 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public profileForm(INavigationService navigation, IProfileService profileService, IUserSession session, IRoleService roles, IErrorHandler errorHandler)
+        public profileForm(INavigationService navigation, IProfileService profileService, IUserSession session, IRoleService roles, IUiNotifier notifier)
             : base(session, navigation)
         {
             _profileService = profileService;
             _roles = roles;
-            _errorHandler = errorHandler;
+            _notifier = notifier;
             InitializeComponent();
         }
 
@@ -51,7 +50,7 @@ namespace Publishing
             };
 
             await _profileService.UpdateAsync(dto);
-            _errorHandler.ShowFriendlyError(_resources.GetString("DataUpdated") ?? "Success");
+            _notifier.NotifyInfo(_notify.GetString("ProfileUpdated") ?? "Success");
             _navigation.Navigate<mainForm>(this);
         }
 

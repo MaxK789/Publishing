@@ -79,6 +79,7 @@ builder.Services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
 builder.Services.AddTransient<IDbContext, DapperDbContext>();
 builder.Services.AddScoped<IDbHelper, DbHelper>();
 builder.Services.AddScoped<ILogger, LoggerService>();
+builder.Services.AddUiNotifier();
 builder.Services.AddScoped<IErrorHandler, ErrorHandler>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IJwtFactory, JwtFactory>();

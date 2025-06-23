@@ -130,7 +130,7 @@
             this.totalPriceLabel.Name = "totalPriceLabel";
             this.totalPriceLabel.Size = new System.Drawing.Size(105, 20);
             this.totalPriceLabel.TabIndex = 32;
-            this.totalPriceLabel.Text = "Кінцева ціна:";
+            this.totalPriceLabel.Text = "Total price:";
             // 
             // tirageTextBox
             // 

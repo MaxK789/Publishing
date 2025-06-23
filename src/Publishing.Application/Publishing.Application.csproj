@@ -13,5 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="../Publishing.Core/Publishing.Core.csproj" />
     <ProjectReference Include="../Publishing.Infrastructure/Publishing.Infrastructure.csproj" />
+    <ProjectReference Include="../Publishing.Services/Publishing.Services.csproj" />
   </ItemGroup>
 </Project>

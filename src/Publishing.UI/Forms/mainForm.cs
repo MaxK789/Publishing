@@ -3,6 +3,7 @@ using System.Data;
 using System.Windows.Forms;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
+using Publishing.Services.ErrorHandling;
 using System.Threading.Tasks;
 
 namespace Publishing
@@ -11,6 +12,7 @@ namespace Publishing
     {
         private readonly IOrderRepository _orderRepo;
         private readonly IRoleService _roles;
+        private readonly IErrorHandler _errorHandler;
 
         [Obsolete("Designer only", error: false)]
         public mainForm()
@@ -18,11 +20,17 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public mainForm(INavigationService navigation, IOrderRepository orderRepo, IUserSession session, IRoleService roles)
+        public mainForm(
+            INavigationService navigation,
+            IOrderRepository orderRepo,
+            IUserSession session,
+            IRoleService roles,
+            IErrorHandler errorHandler)
             : base(session, navigation)
         {
             _orderRepo = orderRepo;
             _roles = roles;
+            _errorHandler = errorHandler;
             InitializeComponent();
         }
 
@@ -71,10 +79,16 @@ namespace Publishing
                 змінитиДаніToolStripMenuItem.Visible = true;
             }
 
-            await _orderRepo.UpdateExpiredAsync();
-            DataTable dataTable = await _orderRepo.GetActiveAsync();
-
-            dataGridView1.DataSource = dataTable;
+            try
+            {
+                await _orderRepo.UpdateExpiredAsync();
+                DataTable dataTable = await _orderRepo.GetActiveAsync();
+                dataGridView1.DataSource = dataTable;
+            }
+            catch (Exception ex)
+            {
+                _errorHandler.Handle(ex);
+            }
         }
 
         private void статистикаToolStripMenuItem_Click(object sender, EventArgs e)

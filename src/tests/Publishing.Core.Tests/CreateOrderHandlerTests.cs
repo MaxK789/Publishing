@@ -83,6 +83,13 @@ namespace Publishing.Core.Tests
             public void PublishOrderUpdated(OrderDto order) => OrderUpdated?.Invoke(order);
         }
 
+        private class StubNotifier : IUiNotifier
+        {
+            public void NotifyInfo(string message) { }
+            public void NotifyWarning(string message) { }
+            public void NotifyError(string message, string? details = null) { }
+        }
+
         [TestMethod]
         public async Task Handle_ValidCommand_ReturnsOrder()
         {
@@ -93,7 +100,8 @@ namespace Publishing.Core.Tests
                 new CreateOrderCommandValidator(),
                 new StubDateTimeProvider(),
                 new StubUnitOfWork(),
-                new StubOrderEventsPublisher());
+                new StubOrderEventsPublisher(),
+                new StubNotifier());
             var cmd = new CreateOrderCommand("book","Intro",10,3,"P1","PR");
 
             var result = await handler.Handle(cmd, CancellationToken.None);
