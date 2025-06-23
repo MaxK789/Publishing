@@ -23,5 +23,6 @@
     <ProjectReference Include="../../Publishing.Infrastructure/Publishing.Infrastructure.csproj" />
     <ProjectReference Include="../../Publishing.Application/Publishing.Application.csproj" />
     <ProjectReference Include="../../Publishing.Services/Publishing.Services.csproj" />
+    <ProjectReference Include="../../Publishing.UI/Publishing.UI.csproj" />
   </ItemGroup>
 </Project>
