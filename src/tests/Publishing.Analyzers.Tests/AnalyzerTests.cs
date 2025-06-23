@@ -41,21 +41,23 @@ public class AnalyzerTests
     [TestMethod]
     public async Task ConfigureServicesWithoutCall_ProducesWarning()
     {
-        var code = @"using Microsoft.Extensions.DependencyInjection;\nclass Startup{void ConfigureServices(IServiceCollection s){}}";
+        var code = @"using Microsoft.Extensions.DependencyInjection;
+class Startup{void ConfigureServices(IServiceCollection s){}}";
         await VerifyAsync<AddUiNotifierAnalyzer>(code);
     }
 
     [TestMethod]
     public async Task ConfigureServicesWithCall_NoWarning()
     {
-        var code = @"using Microsoft.Extensions.DependencyInjection;\nclass Startup{void ConfigureServices(IServiceCollection s){s.AddUiNotifier();}}";
+        var code = @"using Microsoft.Extensions.DependencyInjection;
+class Startup{void ConfigureServices(IServiceCollection s){s.AddUiNotifier();}}";
         await VerifyAsync<AddUiNotifierAnalyzer>(code);
     }
 
     [TestMethod]
     public async Task ProgramWithoutCall_ProducesDiagnostic()
     {
-        var code = "using Microsoft.Extensions.DependencyInjection;\nvar builder = WebApplication.CreateBuilder();";
+        var code = "using Microsoft.Extensions.DependencyInjection;\nusing Microsoft.AspNetCore.Builder;\nvar builder = WebApplication.CreateBuilder();";
         await VerifyAsync<AddUiNotifierAnalyzer>(code);
     }
 
@@ -70,6 +72,7 @@ public class AnalyzerTests
     public async Task BuilderServicesVariable_NoDiagnostic()
     {
         var code = @"using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 var builder = WebApplication.CreateBuilder();
 var svcs = builder.Services;
 svcs.AddLogging();
