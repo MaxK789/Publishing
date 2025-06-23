@@ -7,6 +7,8 @@ using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using FluentValidation;
 using Publishing.Services;
+using AutoMapper;
+using Publishing.AppLayer.Mapping;
 using Publishing.Core.DTOs;
 using System;
 using System.Threading;
@@ -99,9 +101,11 @@ namespace Publishing.Core.Tests
         {
             var repo = new StubOrderRepository();
             var printery = new StubPrinteryRepository();
+            var mapper = new MapperConfiguration(cfg => cfg.AddProfile<OrderProfile>()).CreateMapper();
             var handler = new CreateOrderHandler(repo, printery,
                 new PriceCalculator(new StandardDiscountPolicy()),
                 new CreateOrderCommandValidator(),
+                mapper,
                 new StubDateTimeProvider(),
                 new StubUnitOfWork(),
                 new StubOrderEventsPublisher(),
