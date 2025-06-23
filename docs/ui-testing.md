@@ -1,10 +1,13 @@
 # UI Testing
 
-WinForms screens are tested using WinAppDriver. Install the driver from the official site and start it before running the tests.
+WinForms screens are tested using WinAppDriver. The `Microsoft.Windows.AppDriver` NuGet package adds references but does **not** install the actual driver. Use **winget** or download the MSI from GitHub and start it before running the tests.
 
-```powershell
+```
+winget install WinAppDriver
 WinAppDriver.exe
 ```
+
+Enable Windows developer mode and allow access to port **4723** so the driver can accept connections.
 
 Example test checking for a balloon tip:
 

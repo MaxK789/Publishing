@@ -3,8 +3,9 @@ using Publishing.Services;
 
 namespace Publishing.UI.Tests
 {
-    [TestClass]
-    public class WinFormsUiNotifierTests
+[TestClass]
+[TestCategory("UI")]
+public class WinFormsUiNotifierTests
     {
         [TestMethod]
         public void NotifyInfo_SetsBalloonProperties()
