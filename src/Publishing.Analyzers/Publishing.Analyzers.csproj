@@ -8,6 +8,8 @@
     <PackageProjectUrl>https://github.com/example/publishing</PackageProjectUrl>
     <Description>Analyzers enforcing UI notifier usage and API restrictions.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <!-- Enable newer C# language features used by the analyzers -->
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <!-- Match the compiler shipped with .NET 6 SDK -->
