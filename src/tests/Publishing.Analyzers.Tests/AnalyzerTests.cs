@@ -54,6 +54,7 @@ class Program{static void Main(){}}";
     public async Task ConfigureServicesWithCall_NoWarning()
     {
         var code = @"using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
 class Startup{void ConfigureServices(IServiceCollection s){s.AddUiNotifier();}}
 class Program{static void Main(){}}";
         await VerifyAsync<AddUiNotifierAnalyzer>(code);
@@ -81,6 +82,7 @@ class Program{static void Main(){}}";
     public async Task BuilderServicesVariable_NoDiagnostic()
     {
         var code = @"using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
 using Microsoft.AspNetCore.Builder;
 var builder = WebApplication.CreateBuilder();
 var svcs = builder.Services;
@@ -110,6 +112,7 @@ class Program{static void Main(){}}";
     public async Task ExtensionMethodRegistration_NoDiagnostic()
     {
         var code = @"using Microsoft.Extensions.DependencyInjection;
+using Publishing.Services;
 static class Ext{public static void Reg(this IServiceCollection s){s.AddUiNotifier();}}
 class S{void ConfigureServices(IServiceCollection s){s.Reg();}}
 class Program{static void Main(){}}";
