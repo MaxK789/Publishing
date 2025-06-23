@@ -12,7 +12,14 @@ public class NotificationsResourcesTests
         var baseRes = new ResourceManager("Publishing.Services.Resources.Notifications", typeof(Publishing.Services.SilentUiNotifier).Assembly);
         foreach (var entry in baseRes.GetResourceSet(System.Globalization.CultureInfo.InvariantCulture, true, true)!)
         {
-            var key = ((System.Collections.DictionaryEntry)entry).Key!.ToString();
+            // DictionaryEntry.Key is of type object and might technically be null
+            // but resource keys are expected to be strings. Cast defensively and
+            // skip entries without a valid key to satisfy nullable analysis.
+            if (((System.Collections.DictionaryEntry)entry).Key is not string key)
+            {
+                continue;
+            }
+
             AssertKey("uk-UA", key, baseRes);
             AssertKey("en-US", key, baseRes);
         }
