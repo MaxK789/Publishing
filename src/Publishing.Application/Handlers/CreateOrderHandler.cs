@@ -23,7 +23,8 @@ namespace Publishing.AppLayer.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IOrderEventsPublisher _events;
         private readonly IUiNotifier _notifier;
-        private readonly ResourceManager _resources = new("Publishing.Services.Resources.Notifications", typeof(CreateOrderHandler).Assembly);
+        private readonly ResourceManager _resources =
+            new("Publishing.Services.Resources.Notifications", typeof(IUiNotifier).Assembly);
 
         public CreateOrderHandler(
             IOrderRepository orderRepository,

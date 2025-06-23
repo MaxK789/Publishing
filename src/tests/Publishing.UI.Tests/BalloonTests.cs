@@ -30,6 +30,7 @@ public class BalloonTests
     }
 
     [TestMethod]
+    [Ignore("Requires WinAppDriver")] 
     public void ShowsSuccessBalloon()
     {
         _session!.FindElement(MobileBy.AccessibilityId("emailTextBox")).SendKeys("demo@demo.com");
@@ -47,6 +48,7 @@ public class BalloonTests
     }
 
     [TestMethod]
+    [Ignore("Requires WinAppDriver")] 
     public void ShowsWarningOnInvalidInput()
     {
         _session!.FindElement(MobileBy.AccessibilityId("pageNumTextBox")).SendKeys("abc");
