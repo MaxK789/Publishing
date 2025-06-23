@@ -30,7 +30,7 @@ public class UpdateProfileHandlerTests
 
         private class FakeDbConnection : System.Data.IDbConnection
         {
-            public string? ConnectionString { get; set; }
+            public string ConnectionString { get; set; } = string.Empty;
             public int ConnectionTimeout => 0;
             public string Database => string.Empty;
             public System.Data.ConnectionState State => System.Data.ConnectionState.Open;
@@ -53,12 +53,19 @@ public class UpdateProfileHandlerTests
         }
     }
 
+    private class StubNotifier : IUiNotifier
+    {
+        public void NotifyInfo(string message) { }
+        public void NotifyWarning(string message) { }
+        public void NotifyError(string message, string? details = null) { }
+    }
+
     [TestMethod]
     public async Task Handle_EmailNotExists_Updates()
     {
         var repo = new StubRepo();
         var uow = new StubUnitOfWork();
-        var handler = new UpdateProfileHandler(repo, new InlineValidator<UpdateProfileCommand>(), uow);
+        var handler = new UpdateProfileHandler(repo, new InlineValidator<UpdateProfileCommand>(), uow, new StubNotifier());
         var cmd = new UpdateProfileCommand { Id = "1", Email = "e@e.com" };
         await handler.Handle(cmd, CancellationToken.None);
         Assert.IsNotNull(repo.Updated);
@@ -70,7 +77,7 @@ public class UpdateProfileHandlerTests
     {
         var repo = new StubRepo { EmailExists = true };
         var uow = new StubUnitOfWork();
-        var handler = new UpdateProfileHandler(repo, new InlineValidator<UpdateProfileCommand>(), uow);
+        var handler = new UpdateProfileHandler(repo, new InlineValidator<UpdateProfileCommand>(), uow, new StubNotifier());
         var cmd = new UpdateProfileCommand { Id = "1", Email = "e@e.com" };
         await handler.Handle(cmd, CancellationToken.None);
     }

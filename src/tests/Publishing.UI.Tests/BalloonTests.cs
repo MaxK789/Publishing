@@ -11,14 +11,14 @@ namespace Publishing.UI.Tests;
 [TestCategory("UI")]
 public class BalloonTests
 {
-    private WindowsDriver<WindowsElement>? _session;
+    private WindowsDriver? _session;
 
     [TestInitialize]
     public void Setup()
     {
         var opts = new AppiumOptions();
         opts.AddAdditionalCapability(MobileCapabilityType.App, "Publishing.UI.exe");
-        _session = new WindowsDriver<WindowsElement>(new Uri("http://127.0.0.1:4723"), opts);
+        _session = new WindowsDriver(new Uri("http://127.0.0.1:4723"), opts);
     }
 
     [TestCleanup]
