@@ -10,6 +10,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+    <!-- Match the compiler shipped with .NET 6 SDK -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" />
   </ItemGroup>
 </Project>
