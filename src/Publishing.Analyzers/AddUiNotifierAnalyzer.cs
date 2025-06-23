@@ -25,29 +25,21 @@ public class AddUiNotifierAnalyzer : DiagnosticAnalyzer
     {
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        context.RegisterSyntaxNodeAction(AnalyzeMethod, SyntaxKind.MethodDeclaration);
-        context.RegisterSyntaxNodeAction(AnalyzeProgram, SyntaxKind.CompilationUnit);
+        context.RegisterCompilationAction(AnalyzeCompilation);
     }
 
-    private static void AnalyzeMethod(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeCompilation(CompilationAnalysisContext context)
     {
-        var method = (MethodDeclarationSyntax)context.Node;
-        if (method.Identifier.Text != "ConfigureServices")
-            return;
-
-        if (!CallsAddUiNotifier(method, context.SemanticModel))
+        foreach (var tree in context.Compilation.SyntaxTrees)
         {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, method.Identifier.GetLocation()));
+            var model = context.Compilation.GetSemanticModel(tree);
+            var root = tree.GetRoot(context.CancellationToken);
+            if (CallsAddUiNotifier(root, model))
+                return;
         }
-    }
 
-    private static void AnalyzeProgram(SyntaxNodeAnalysisContext context)
-    {
-        var root = (CompilationUnitSyntax)context.Node;
-        if (!CallsAddUiNotifier(root, context.SemanticModel))
-        {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, root.GetLocation()));
-        }
+        var location = context.Compilation.SyntaxTrees.FirstOrDefault()?.GetRoot(context.CancellationToken).GetLocation() ?? Location.None;
+        context.ReportDiagnostic(Diagnostic.Create(Rule, location));
     }
 
     private static bool CallsAddUiNotifier(SyntaxNode node, SemanticModel model)
