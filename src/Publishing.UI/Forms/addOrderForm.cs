@@ -8,7 +8,6 @@ using System.Resources;
 using FluentValidation;
 using System.Linq;
 using Publishing.Services;
-using Publishing.Services.ErrorHandling;
 using System.Threading.Tasks;
 using AutoMapper;
 
