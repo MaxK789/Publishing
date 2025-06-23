@@ -3,6 +3,7 @@ using Publishing.AppLayer.Handlers;
 using Publishing.Core.Commands;
 using Publishing.Core.Interfaces;
 using FluentValidation;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,7 +30,7 @@ public class UpdateProfileHandlerTests
 
         private class FakeDbConnection : System.Data.IDbConnection
         {
-            public string ConnectionString { get; set; } = string.Empty;
+            public string? ConnectionString { get; set; }
             public int ConnectionTimeout => 0;
             public string Database => string.Empty;
             public System.Data.ConnectionState State => System.Data.ConnectionState.Open;

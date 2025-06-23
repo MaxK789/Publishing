@@ -5,13 +5,11 @@ using Publishing.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Publishing.Services;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
 using Microsoft.Extensions.Caching.Memory;
 using System.Threading.Tasks;
 using System.Data;
 using Dapper;
 using System.Linq;
-using System.Threading;
 using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using System;
@@ -36,11 +34,18 @@ public class SqlQueryTests
         }
         _cs = $"Data Source={_dbPath}";
 
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["ConnectionStrings:DefaultConnection"] = _cs
+            })
+            .Build();
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(config);
         services.AddTransient<ILogger, LoggerService>();
         services.AddUiNotifier();
         services.AddSingleton<IDbConnectionFactory>(sp =>
-            new SqliteDbConnectionFactory(new TestConfiguration(_cs), sp.GetRequiredService<ILogger>()));
+            new SqliteDbConnectionFactory(sp.GetRequiredService<IConfiguration>(), sp.GetRequiredService<ILogger>()));
         services.AddTransient<IDbContext, DapperDbContext>();
         services.AddMemoryCache();
         services.AddSingleton<QueryDispatcher>();
@@ -122,23 +127,4 @@ public class SqlQueryTests
         public override T Map(IDataReader reader) => (T)Convert.ChangeType(reader.GetValue(0), typeof(T));
     }
 
-    private class TestConfiguration : Microsoft.Extensions.Configuration.IConfiguration
-    {
-        private readonly string _cs;
-        public TestConfiguration(string cs) { _cs = cs; }
-        public string? this[string key] { get => key == "ConnectionStrings:DefaultConnection" ? _cs : null; set { } }
-        public IEnumerable<IConfigurationSection> GetChildren() => Enumerable.Empty<IConfigurationSection>();
-        public IChangeToken GetReloadToken() => new Microsoft.Extensions.Primitives.CancellationChangeToken(new CancellationTokenSource().Token);
-        public IConfigurationSection GetSection(string key) => new ConfigurationSection(this, key);
-        private class ConfigurationSection : IConfigurationSection
-        {
-            private readonly IConfiguration _cfg; private readonly string _key;
-            public ConfigurationSection(IConfiguration cfg, string key){_cfg=cfg;_key=key;}
-            public string Key => _key; public string Path => _key; public string? Value {get=>_cfg[_key];set{}}
-            public string this[string key] { get => _cfg[$"{_key}:{key}"]!; set { } }
-            public IEnumerable<IConfigurationSection> GetChildren() => Enumerable.Empty<IConfigurationSection>();
-            public IChangeToken GetReloadToken() => _cfg.GetReloadToken();
-            public IConfigurationSection GetSection(string key) => new ConfigurationSection(_cfg,$"{_key}:{key}");
-        }
-    }
 }

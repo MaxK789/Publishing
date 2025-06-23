@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
-using OpenQA.Selenium.Remote;
+using OpenQA.Selenium.Appium.Enums;
 using System;
 
 
@@ -15,8 +16,8 @@ public class BalloonTests
     [TestInitialize]
     public void Setup()
     {
-        var opts = new DesiredCapabilities();
-        opts.SetCapability("app", "Publishing.UI.exe");
+        var opts = new AppiumOptions();
+        opts.AddAdditionalCapability(MobileCapabilityType.App, "Publishing.UI.exe");
         _session = new WindowsDriver<WindowsElement>(new Uri("http://127.0.0.1:4723"), opts);
     }
 
