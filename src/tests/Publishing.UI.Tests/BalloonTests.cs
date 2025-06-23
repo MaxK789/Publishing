@@ -2,7 +2,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Appium.Enums;
 using OpenQA.Selenium.Appium;
-using AppiumBy = OpenQA.Selenium.Appium.AppiumBy;
 using System;
 
 
@@ -33,14 +32,14 @@ public class BalloonTests
     [TestMethod]
     public void ShowsSuccessBalloon()
     {
-        _session!.FindElement(AppiumBy.AccessibilityId("emailTextBox")).SendKeys("demo@demo.com");
-        _session.FindElement(AppiumBy.AccessibilityId("passwordTextBox")).SendKeys("pass");
-        _session.FindElement(AppiumBy.AccessibilityId("loginButton")).Click();
-        _session.FindElement(AppiumBy.AccessibilityId("додатиToolStripMenuItem")).Click();
-        _session.FindElement(AppiumBy.AccessibilityId("nameProductTextBox")).SendKeys("book");
-        _session.FindElement(AppiumBy.AccessibilityId("pageNumTextBox")).SendKeys("10");
-        _session.FindElement(AppiumBy.AccessibilityId("tirageTextBox")).SendKeys("1");
-        _session.FindElement(AppiumBy.AccessibilityId("orderButton")).Click();
+        _session!.FindElement(MobileBy.AccessibilityId("emailTextBox")).SendKeys("demo@demo.com");
+        _session.FindElement(MobileBy.AccessibilityId("passwordTextBox")).SendKeys("pass");
+        _session.FindElement(MobileBy.AccessibilityId("loginButton")).Click();
+        _session.FindElement(MobileBy.AccessibilityId("додатиToolStripMenuItem")).Click();
+        _session.FindElement(MobileBy.AccessibilityId("nameProductTextBox")).SendKeys("book");
+        _session.FindElement(MobileBy.AccessibilityId("pageNumTextBox")).SendKeys("10");
+        _session.FindElement(MobileBy.AccessibilityId("tirageTextBox")).SendKeys("1");
+        _session.FindElement(MobileBy.AccessibilityId("orderButton")).Click();
         System.Threading.Thread.Sleep(1000);
         var screenshot = _session.GetScreenshot();
         screenshot.SaveAsFile("TestResults/screenshots/success.png");
@@ -50,8 +49,8 @@ public class BalloonTests
     [TestMethod]
     public void ShowsWarningOnInvalidInput()
     {
-        _session!.FindElement(AppiumBy.AccessibilityId("pageNumTextBox")).SendKeys("abc");
-        _session.FindElement(AppiumBy.AccessibilityId("calculateButton")).Click();
+        _session!.FindElement(MobileBy.AccessibilityId("pageNumTextBox")).SendKeys("abc");
+        _session.FindElement(MobileBy.AccessibilityId("calculateButton")).Click();
         System.Threading.Thread.Sleep(1000);
         var screenshot = _session.GetScreenshot();
         screenshot.SaveAsFile("TestResults/screenshots/warn.png");
