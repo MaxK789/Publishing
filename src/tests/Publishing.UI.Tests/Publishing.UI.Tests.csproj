@@ -10,7 +10,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
-    <PackageReference Include="Microsoft.Windows.AppDriver" Version="1.3.0" />
+    <!-- Use Appium library directly for WinAppDriver UI tests -->
+    <PackageReference Include="Appium.WebDriver" Version="5.0.0" />
     <PackageReference Include="Selenium.WebDriver" Version="4.9.1" />
   </ItemGroup>
   <ItemGroup>
