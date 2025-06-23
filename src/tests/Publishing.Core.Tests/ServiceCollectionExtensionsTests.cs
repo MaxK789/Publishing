@@ -28,10 +28,11 @@ namespace Publishing.Core.Tests
             var provider = services.BuildServiceProvider();
             var notifier = provider.GetRequiredService<IUiNotifier>();
             var typeName = notifier.GetType().Name;
-            if (OperatingSystem.IsWindows())
-                Assert.AreEqual("WinFormsUiNotifier", typeName);
-            else
-                Assert.AreEqual("ConsoleUiNotifier", typeName);
+#if WINDOWS
+            Assert.AreEqual("WinFormsUiNotifier", typeName);
+#else
+            Assert.AreEqual("ConsoleUiNotifier", typeName);
+#endif
         }
     }
 }
