@@ -12,7 +12,7 @@ public class NotificationsResourcesTests
         var baseRes = new ResourceManager("Publishing.Services.Resources.Notifications", typeof(Publishing.Services.SilentUiNotifier).Assembly);
         foreach (var entry in baseRes.GetResourceSet(System.Globalization.CultureInfo.InvariantCulture, true, true)!)
         {
-            var key = ((System.Collections.DictionaryEntry)entry).Key.ToString();
+            var key = ((System.Collections.DictionaryEntry)entry).Key!.ToString();
             AssertKey("uk-UA", key, baseRes);
             AssertKey("en-US", key, baseRes);
         }
