@@ -14,8 +14,6 @@
     <PackageReference Include="Appium.WebDriver" Version="5.0.0" />
     <!-- Align Selenium version with Appium dependency to avoid downgrade warnings -->
     <PackageReference Include="Selenium.WebDriver" Version="4.21.0" />
-    <!-- Provide System.Collections.Immutable so analyzers can load -->
-    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../Publishing.UI/Publishing.UI.csproj" />
