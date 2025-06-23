@@ -5,11 +5,12 @@ using MediatR;
 using FluentValidation;
 using Publishing.Core.Commands;
 using Publishing.Core.Interfaces;
+using Publishing.Services;
 using System.Resources;
 
 namespace Publishing.AppLayer.Handlers;
 
-public class UpdateProfileHandler : IRequestHandler<UpdateProfileCommand>
+public class UpdateProfileHandler : IRequestHandler<UpdateProfileCommand, Unit>
 {
     private readonly IProfileRepository _repo;
     private readonly IValidator<UpdateProfileCommand> _validator;
