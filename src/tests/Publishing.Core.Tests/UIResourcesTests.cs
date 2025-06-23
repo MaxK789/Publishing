@@ -12,7 +12,12 @@ public class UIResourcesTests
         var baseRes = new ResourceManager("Publishing.UI.Resources.Resources", typeof(Publishing.Services.SilentUiNotifier).Assembly);
         foreach (var entry in baseRes.GetResourceSet(System.Globalization.CultureInfo.InvariantCulture, true, true)!)
         {
-            var key = ((System.Collections.DictionaryEntry)entry).Key!.ToString();
+            // Skip entries without a valid string key to avoid nullable warnings.
+            if (((System.Collections.DictionaryEntry)entry).Key is not string key)
+            {
+                continue;
+            }
+
             string? translated = baseRes.GetString(key, new System.Globalization.CultureInfo("uk"));
             Assert.IsFalse(string.IsNullOrEmpty(translated), $"Missing translation for {key}");
         }

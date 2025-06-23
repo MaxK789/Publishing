@@ -11,14 +11,16 @@ namespace Publishing.UI.Tests;
 [TestCategory("UI")]
 public class BalloonTests
 {
-    private OpenQA.Selenium.Appium.Windows.WindowsDriver<OpenQA.Selenium.Appium.Windows.WindowsElement>? _session;
+    // In Appium.WebDriver versions referenced by this project the WindowsDriver
+    // type isn't generic, so use the non-generic form for the session instance.
+    private OpenQA.Selenium.Appium.Windows.WindowsDriver? _session;
 
     [TestInitialize]
     public void Setup()
     {
         var opts = new AppiumOptions();
         opts.AddAdditionalAppiumOption(MobileCapabilityType.App, "Publishing.UI.exe");
-        _session = new OpenQA.Selenium.Appium.Windows.WindowsDriver<OpenQA.Selenium.Appium.Windows.WindowsElement>(new Uri("http://127.0.0.1:4723"), opts);
+        _session = new OpenQA.Selenium.Appium.Windows.WindowsDriver(new Uri("http://127.0.0.1:4723"), opts);
     }
 
     [TestCleanup]
