@@ -57,7 +57,7 @@ public class ForbiddenApiAnalyzerTests
     public async Task NotifyIconShowBalloonTip_ProducesDiagnostic()
     {
         var code = "using System.Windows.Forms; class C{ void M(){ new NotifyIcon().ShowBalloonTip(1); }}";
-        await VerifyAsync(code, (ForbiddenApiAnalyzer.DiagnosticId, 1, 63));
+        await VerifyAsync(code, (ForbiddenApiAnalyzer.DiagnosticId, 1, 65));
     }
 
     [TestMethod]
