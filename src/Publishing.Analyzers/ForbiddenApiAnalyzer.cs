@@ -44,17 +44,23 @@ public class ForbiddenApiAnalyzer : DiagnosticAnalyzer
     {
         if (context.Node is InvocationExpressionSyntax inv)
         {
-            var symbol = context.SemanticModel.GetSymbolInfo(inv).Symbol as IMethodSymbol;
+            var info = context.SemanticModel.GetSymbolInfo(inv);
+            var symbol = (info.Symbol ?? info.CandidateSymbols.FirstOrDefault()) as IMethodSymbol;
             if (symbol == null)
                 return;
 
             if (symbol.ContainingType?.ToDisplayString() == "System.Windows.Forms.MessageBox" && symbol.Name == "Show")
             {
-                context.ReportDiagnostic(Diagnostic.Create(ApiRule, inv.GetLocation(), "MessageBox.Show"));
+                // Highlight the full member access expression
+                var location = inv.Expression.GetLocation();
+                context.ReportDiagnostic(Diagnostic.Create(ApiRule, location, "MessageBox.Show"));
             }
             else if (symbol.ContainingType?.ToDisplayString() == "System.Windows.Forms.NotifyIcon" && symbol.Name == "ShowBalloonTip")
             {
-                context.ReportDiagnostic(Diagnostic.Create(ApiRule, inv.GetLocation(), "NotifyIcon.ShowBalloonTip"));
+                Location location = inv.Expression is MemberAccessExpressionSyntax member
+                    ? member.Name.GetLocation()
+                    : inv.GetLocation();
+                context.ReportDiagnostic(Diagnostic.Create(ApiRule, location, "NotifyIcon.ShowBalloonTip"));
             }
         }
     }
