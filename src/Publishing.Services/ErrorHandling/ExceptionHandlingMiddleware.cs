@@ -2,18 +2,17 @@ using System;
 using System.Threading.Tasks;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Publishing.Services;
 
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly IErrorHandler _handler;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next, IErrorHandler handler)
+    public ExceptionHandlingMiddleware(RequestDelegate next)
     {
         _next = next;
-        _handler = handler;
     }
 
     public async Task Invoke(HttpContext context)
@@ -24,7 +23,8 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception ex)
         {
-            _handler.Handle(ex);
+            var handler = context.RequestServices.GetRequiredService<IErrorHandler>();
+            handler.Handle(ex);
             if (!context.Response.HasStarted)
             {
                 context.Response.StatusCode = 500;
