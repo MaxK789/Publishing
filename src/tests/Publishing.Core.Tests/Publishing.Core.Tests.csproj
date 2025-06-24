@@ -4,6 +4,7 @@
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UseWindowsForms Condition=" '$(TargetFramework)' == 'net6.0-windows'">true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
