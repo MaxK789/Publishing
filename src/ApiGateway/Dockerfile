@@ -7,6 +7,7 @@ WORKDIR /src
 COPY src/Publishing.Core/.           "Publishing.Core/"
 COPY src/Publishing.Infrastructure/. "Publishing.Infrastructure/"
 COPY src/Publishing.Application/.    "Publishing.Application/"
+COPY src/Publishing.Services/.       "Publishing.Services/"
 
 # 1.2) Copy and restore ApiGateway itself
 COPY src/ApiGateway/. "ApiGateway/"
