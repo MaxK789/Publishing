@@ -1,12 +1,9 @@
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Testing;
-using static Microsoft.CodeAnalysis.Testing.ReferenceAssemblies;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Publishing.Analyzers;
 
 namespace Publishing.Analyzers.Tests;
@@ -14,50 +11,60 @@ namespace Publishing.Analyzers.Tests;
 [TestClass]
 public class ForbiddenApiAnalyzerTests
 {
-    private static async Task VerifyAsync(string source, params DiagnosticResult[] expected)
+    private static async Task<ImmutableArray<Diagnostic>> GetDiagnosticsAsync(string source)
     {
-#pragma warning disable CS0618
-        var test = new CSharpAnalyzerTest<ForbiddenApiAnalyzer, MSTestVerifier>
+        var syntaxTree = CSharpSyntaxTree.ParseText(source);
+        var references = new MetadataReference[]
         {
-            TestCode = source,
-            ReferenceAssemblies = ReferenceAssemblies.Net.Net60
+            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(System.Windows.Forms.Form).Assembly.Location)
         };
-#pragma warning restore CS0618
-        test.SolutionTransforms.Add((solution, projectId) =>
+
+        var compilation = CSharpCompilation.Create(
+            "Test",
+            new[] { syntaxTree },
+            references,
+            new CSharpCompilationOptions(OutputKind.ConsoleApplication));
+
+        var analyzer = new ForbiddenApiAnalyzer();
+        var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(analyzer);
+        var compilationWithAnalyzers = compilation.WithAnalyzers(analyzers);
+        return await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync();
+    }
+
+    private static async Task VerifyAsync(string source, params (string id, int line, int column)[] expected)
+    {
+        var diagnostics = await GetDiagnosticsAsync(source);
+        Assert.AreEqual(expected.Length, diagnostics.Length, "Unexpected diagnostic count");
+
+        for (int i = 0; i < expected.Length; i++)
         {
-            var options = solution.GetProject(projectId)!.CompilationOptions!;
-            return solution.WithProjectCompilationOptions(projectId, options.WithOutputKind(OutputKind.ConsoleApplication));
-        });
-        test.TestState.AdditionalReferences.Add(typeof(System.Windows.Forms.Form).Assembly);
-        test.ExpectedDiagnostics.AddRange(expected);
-        await test.RunAsync();
+            Assert.AreEqual(expected[i].id, diagnostics[i].Id, $"Diagnostic {i} id mismatch");
+            var span = diagnostics[i].Location.GetLineSpan();
+            Assert.AreEqual(expected[i].line, span.StartLinePosition.Line + 1, $"Diagnostic {i} line mismatch");
+            Assert.AreEqual(expected[i].column, span.StartLinePosition.Character + 1, $"Diagnostic {i} column mismatch");
+        }
     }
 
     [TestMethod]
     public async Task MessageBoxShow_ProducesDiagnostic()
     {
         var code = "using System.Windows.Forms; class C{ void M(){ MessageBox.Show(\"x\");}}";
-        var expected = new DiagnosticResult(ForbiddenApiAnalyzer.DiagnosticId, DiagnosticSeverity.Error)
-            .WithSpan(1, 48, 1, 68);
-        await VerifyAsync(code, expected);
+        await VerifyAsync(code, (ForbiddenApiAnalyzer.DiagnosticId, 1, 48));
     }
 
     [TestMethod]
     public async Task NotifyIconShowBalloonTip_ProducesDiagnostic()
     {
         var code = "using System.Windows.Forms; class C{ void M(){ new NotifyIcon().ShowBalloonTip(1); }}";
-        var expected = new DiagnosticResult(ForbiddenApiAnalyzer.DiagnosticId, DiagnosticSeverity.Error)
-            .WithSpan(1, 63, 1, 93);
-        await VerifyAsync(code, expected);
+        await VerifyAsync(code, (ForbiddenApiAnalyzer.DiagnosticId, 1, 63));
     }
 
     [TestMethod]
     public async Task WindowsDirective_ProducesDiagnostic()
     {
         var code = "class C{ void M(){\n#if WINDOWS\nvar x = 0;\n#endif\n}}";
-        var expected = new DiagnosticResult(ForbiddenApiAnalyzer.WindowsDirectiveId, DiagnosticSeverity.Error)
-            .WithSpan(2, 1, 2, 12);
-        await VerifyAsync(code, expected);
+        await VerifyAsync(code, (ForbiddenApiAnalyzer.WindowsDirectiveId, 2, 1));
     }
 
     [TestMethod]

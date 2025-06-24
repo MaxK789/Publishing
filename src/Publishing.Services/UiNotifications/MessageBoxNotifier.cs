@@ -1,4 +1,4 @@
-#if NET6_0_WINDOWS
+#if WINDOWS
 using System.Windows.Forms;
 
 namespace Publishing.Services
