@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using OpenTelemetry.Trace;
 using Publishing.Services;
-using Publishing.Services.Jwt;
 using Publishing.Core.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
