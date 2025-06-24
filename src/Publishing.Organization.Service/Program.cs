@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Publishing.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.IdentityModel.Tokens;
@@ -20,7 +19,6 @@ using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using FluentValidation;
 using Publishing.Infrastructure.Repositories;
-using Publishing.Infrastructure;
 using Publishing.AppLayer.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -76,7 +74,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
 builder.Services.AddTransient<IDbContext, DapperDbContext>();
 builder.Services.AddScoped<IDbHelper, DbHelper>();
-builder.Services.AddScoped<ILogger, LoggerService>();
+builder.Services.AddScoped<Publishing.Core.Interfaces.ILogger, LoggerService>();
 builder.Services.AddSingleton<IUiNotifier, ConsoleUiNotifier>();
 builder.Services.AddScoped<IErrorHandler, ErrorHandler>();
 builder.Services.AddScoped<IRoleService, RoleService>();
