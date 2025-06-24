@@ -70,6 +70,12 @@ builder.Services.AddAutoMapper(typeof(ProfileProfile).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<EmailValidator>();
 builder.Services.AddTransient<PhoneFaxValidator>();
 builder.Services.AddTransient<IValidator<string>, EmailValidator>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IPrinteryRepository, PrinteryRepository>();
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IDiscountPolicy, StandardDiscountPolicy>();
+builder.Services.AddScoped<IPriceCalculator, PriceCalculator>();
+builder.Services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
@@ -101,10 +107,11 @@ if (string.IsNullOrWhiteSpace(conn))
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlServer(conn, b => b.MigrationsAssembly("Publishing.Infrastructure")));
 
-builder.Services
+var healthChecks = builder.Services
     .AddHealthChecks()
-    .AddDatabaseHealthChecks()
-    .AddRabbitMQ(rabbitConnectionString: rabbitConn);
+    .AddDatabaseHealthChecks();
+if (!string.IsNullOrWhiteSpace(rabbitConn))
+    healthChecks.AddRabbitMQ(rabbitConnectionString: rabbitConn);
 
 var app = builder.Build();
 
