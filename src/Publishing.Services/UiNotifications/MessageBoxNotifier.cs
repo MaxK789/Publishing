@@ -1,3 +1,4 @@
+#if NET6_0_WINDOWS
 using System.Windows.Forms;
 
 namespace Publishing.Services
@@ -30,3 +31,4 @@ namespace Publishing.Services
     }
 #pragma warning restore PUB002
 }
+#endif

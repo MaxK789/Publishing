@@ -11,16 +11,16 @@ namespace Publishing.UI.Tests;
 [TestCategory("UI")]
 public class MessageBoxUiTests
 {
-    // In Appium.WebDriver versions referenced by this project the WindowsDriver
-    // type isn't generic, so use the non-generic form for the session instance.
-    private OpenQA.Selenium.Appium.Windows.WindowsDriver? _session;
+    // Appium.WebDriver exposes a generic WindowsDriver<T> which provides
+    // FindElementBy* helper methods on the WindowsElement type.
+    private WindowsDriver<WindowsElement>? _session;
 
     [TestInitialize]
     public void Setup()
     {
         var opts = new AppiumOptions();
         opts.AddAdditionalAppiumOption(MobileCapabilityType.App, "Publishing.UI.exe");
-        _session = new OpenQA.Selenium.Appium.Windows.WindowsDriver(new Uri("http://127.0.0.1:4723"), opts);
+        _session = new WindowsDriver<WindowsElement>(new Uri("http://127.0.0.1:4723"), opts);
     }
 
     [TestCleanup]

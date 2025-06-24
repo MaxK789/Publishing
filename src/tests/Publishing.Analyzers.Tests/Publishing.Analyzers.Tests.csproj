@@ -16,6 +16,5 @@
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Publishing.Analyzers" Version="1.1.0" PrivateAssets="all" />
   </ItemGroup>
 </Project>
