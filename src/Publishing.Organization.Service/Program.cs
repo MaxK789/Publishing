@@ -71,6 +71,8 @@ builder.Services.AddScoped<IOrderInputValidator, OrderInputValidator>();
 builder.Services.AddTransient<PhoneFaxValidator>();
 builder.Services.AddTransient<IValidator<string>, EmailValidator>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
 builder.Services.AddTransient<IDbContext, DapperDbContext>();
