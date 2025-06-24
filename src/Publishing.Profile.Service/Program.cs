@@ -9,6 +9,7 @@ using HealthChecks.RabbitMQ;
 using Microsoft.OpenApi.Models;
 using System;
 using OpenTelemetry.Trace;
+using OpenTelemetry.Resources;
 using MediatR;
 using Publishing.AppLayer.Handlers;
 using Publishing.AppLayer.Mapping;
@@ -92,7 +93,9 @@ if (string.IsNullOrWhiteSpace(rabbitConn))
 else
     builder.Services.AddSingleton<IOrderEventsPublisher>(sp =>
         new RabbitOrderEventsPublisher(rabbitConn));
-builder.Services.AddOpenTelemetry().WithTracing(b =>
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(r => r.AddService(builder.Environment.ApplicationName))
+    .WithTracing(b =>
     b.AddAspNetCoreInstrumentation()
      .AddHttpClientInstrumentation()
      .AddEntityFrameworkCoreInstrumentation()
