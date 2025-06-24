@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Publishing.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -76,7 +75,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
 builder.Services.AddTransient<IDbContext, DapperDbContext>();
 builder.Services.AddScoped<IDbHelper, DbHelper>();
-builder.Services.AddScoped<ILogger, LoggerService>();
+builder.Services.AddScoped<Publishing.Core.Interfaces.ILogger, LoggerService>();
 builder.Services.AddSingleton<IUiNotifier, ConsoleUiNotifier>();
 builder.Services.AddScoped<IErrorHandler, ErrorHandler>();
 builder.Services.AddScoped<IRoleService, RoleService>();
