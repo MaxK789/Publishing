@@ -19,6 +19,7 @@ using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using FluentValidation;
 using Publishing.Infrastructure.Repositories;
+using Publishing.Infrastructure;
 using Publishing.AppLayer.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
