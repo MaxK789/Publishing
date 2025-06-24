@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>net6.0-windows;net6.0</TargetFrameworks>
     <Nullable>enable</Nullable>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UseWindowsForms Condition="'$(TargetFramework)'=='net6.0-windows'">true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
