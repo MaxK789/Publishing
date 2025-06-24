@@ -19,13 +19,6 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.31.0" />
     <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'!='net6.0-windows'">
-    <Compile Remove="UiNotifications/WinFormsUiNotifier.cs" />
-    <Compile Remove="ServiceCollectionExtensions.Windows.cs" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
-    <Compile Remove="ServiceCollectionExtensions.NonWindows.cs" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Publishing.Core/Publishing.Core.csproj" />
   </ItemGroup>

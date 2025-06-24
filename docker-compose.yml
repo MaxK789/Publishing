@@ -13,7 +13,6 @@ services:
       - JWT__Audience=${JWT__Audience}
       - JWT__SigningKey=${JWT__SigningKey}
       - ASPNETCORE_ENVIRONMENT=Development
-      - NOTIFICATIONS_DISABLED=false
     depends_on:
       db:
         condition: service_healthy
@@ -43,7 +42,6 @@ services:
       - JWT__Audience=${JWT__Audience}
       - JWT__SigningKey=${JWT__SigningKey}
       - ASPNETCORE_ENVIRONMENT=Development
-      - NOTIFICATIONS_DISABLED=false
     depends_on:
       db:
         condition: service_healthy
@@ -73,7 +71,6 @@ services:
       - JWT__Audience=${JWT__Audience}
       - JWT__SigningKey=${JWT__SigningKey}
       - ASPNETCORE_ENVIRONMENT=Development
-      - NOTIFICATIONS_DISABLED=false
     depends_on:
       db:
         condition: service_healthy
@@ -101,7 +98,6 @@ services:
       - JWT__Audience=${JWT__Audience}
       - JWT__SigningKey=${JWT__SigningKey}
       - ASPNETCORE_ENVIRONMENT=Development
-      - NOTIFICATIONS_DISABLED=false
     depends_on:
       orders:
         condition: service_healthy

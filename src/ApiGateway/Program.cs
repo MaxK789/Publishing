@@ -42,7 +42,7 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 builder.Services.AddAuthorization();
-builder.Services.AddUiNotifier();
+builder.Services.AddSingleton<IUiNotifier, ConsoleUiNotifier>();
 builder.Services.AddScoped<IErrorHandler, ErrorHandler>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IJwtFactory, JwtFactory>();
