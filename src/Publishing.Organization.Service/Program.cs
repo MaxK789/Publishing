@@ -82,6 +82,16 @@ builder.Services.AddSingleton<IUiNotifier, ConsoleUiNotifier>();
 builder.Services.AddScoped<IErrorHandler, ErrorHandler>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IJwtFactory, JwtFactory>();
+builder.Services.AddScoped<IPrinteryRepository, PrinteryRepository>();
+builder.Services.AddScoped<IDiscountPolicy, StandardDiscountPolicy>();
+builder.Services.AddScoped<IPriceCalculator, PriceCalculator>();
+builder.Services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
+var rabbitConn = builder.Configuration["RABBIT_CONN"];
+if (string.IsNullOrWhiteSpace(rabbitConn))
+    builder.Services.AddSingleton<IOrderEventsPublisher, OrderEventsPublisher>();
+else
+    builder.Services.AddSingleton<IOrderEventsPublisher>(sp =>
+        new RabbitOrderEventsPublisher(rabbitConn));
 builder.Services.AddOpenTelemetry().WithTracing(b =>
     b.AddAspNetCoreInstrumentation()
      .AddHttpClientInstrumentation()
