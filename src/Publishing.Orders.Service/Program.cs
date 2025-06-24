@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using HealthChecks.RabbitMQ;
 using Microsoft.OpenApi.Models;
 using System;
 using OpenTelemetry.Trace;
@@ -71,6 +72,12 @@ builder.Services.AddScoped<IOrderInputValidator, OrderInputValidator>();
 builder.Services.AddTransient<PhoneFaxValidator>();
 builder.Services.AddTransient<IValidator<string>, EmailValidator>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IPrinteryRepository, PrinteryRepository>();
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+builder.Services.AddScoped<IDiscountPolicy, StandardDiscountPolicy>();
+builder.Services.AddScoped<IPriceCalculator, PriceCalculator>();
+builder.Services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
 builder.Services.AddTransient<IDbContext, DapperDbContext>();
@@ -103,7 +110,8 @@ builder.Services.AddDbContext<AppDbContext>(o =>
 
 builder.Services
     .AddHealthChecks()
-    .AddDatabaseHealthChecks();
+    .AddDatabaseHealthChecks()
+    .AddRabbitMQ(rabbitConnectionString: rabbitConn);
 
 var app = builder.Build();
 

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using HealthChecks.RabbitMQ;
 using Microsoft.OpenApi.Models;
 using System;
 using OpenTelemetry.Trace;
@@ -64,10 +65,9 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddSingleton<IAuthorizationHandler, AdminHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, ContactPersonHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, StatisticsViewerHandler>();
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateOrderHandler).Assembly));
-builder.Services.AddAutoMapper(typeof(OrderProfile).Assembly);
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateProfileHandler).Assembly));
+builder.Services.AddAutoMapper(typeof(ProfileProfile).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<EmailValidator>();
-builder.Services.AddScoped<IOrderInputValidator, OrderInputValidator>();
 builder.Services.AddTransient<PhoneFaxValidator>();
 builder.Services.AddTransient<IValidator<string>, EmailValidator>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
@@ -80,6 +80,12 @@ builder.Services.AddSingleton<IUiNotifier, ConsoleUiNotifier>();
 builder.Services.AddScoped<IErrorHandler, ErrorHandler>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IJwtFactory, JwtFactory>();
+var rabbitConn = builder.Configuration["RABBIT_CONN"];
+if (string.IsNullOrWhiteSpace(rabbitConn))
+    builder.Services.AddSingleton<IOrderEventsPublisher, OrderEventsPublisher>();
+else
+    builder.Services.AddSingleton<IOrderEventsPublisher>(sp =>
+        new RabbitOrderEventsPublisher(rabbitConn));
 builder.Services.AddOpenTelemetry().WithTracing(b =>
     b.AddAspNetCoreInstrumentation()
      .AddHttpClientInstrumentation()
@@ -97,7 +103,8 @@ builder.Services.AddDbContext<AppDbContext>(o =>
 
 builder.Services
     .AddHealthChecks()
-    .AddDatabaseHealthChecks();
+    .AddDatabaseHealthChecks()
+    .AddRabbitMQ(rabbitConnectionString: rabbitConn);
 
 var app = builder.Build();
 
