@@ -108,10 +108,11 @@ if (string.IsNullOrWhiteSpace(conn))
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlServer(conn, b => b.MigrationsAssembly("Publishing.Infrastructure")));
 
-builder.Services
+var healthChecks = builder.Services
     .AddHealthChecks()
-    .AddDatabaseHealthChecks()
-    .AddRabbitMQ(rabbitConnectionString: rabbitConn);
+    .AddDatabaseHealthChecks();
+if (!string.IsNullOrWhiteSpace(rabbitConn))
+    healthChecks.AddRabbitMQ(rabbitConnectionString: rabbitConn);
 
 var app = builder.Build();
 
