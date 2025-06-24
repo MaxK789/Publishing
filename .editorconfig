@@ -13,7 +13,6 @@ max_line_length = 120
 dotnet_sort_system_directives_first = true
 csharp_new_line_before_open_brace = all
 
-dotnet_diagnostic.PUB001.severity = error
 dotnet_diagnostic.PUB002.severity = error
 dotnet_diagnostic.PUB003.severity = error
 

@@ -10,13 +10,13 @@ namespace Publishing.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class ForbiddenApiAnalyzer : DiagnosticAnalyzer
 {
-    public const string MessageBoxId = "PUB002";
+    public const string DiagnosticId = "PUB002";
     public const string WindowsDirectiveId = "PUB003";
 
-    private static readonly DiagnosticDescriptor MessageBoxRule = new(
-        MessageBoxId,
-        "MessageBox.Show usage",
-        "Do not use MessageBox.Show; use IUiNotifier",
+    private static readonly DiagnosticDescriptor ApiRule = new(
+        DiagnosticId,
+        "Forbidden API usage",
+        "Do not call '{0}'; use IUiNotifier instead",
         "Usage",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
@@ -30,7 +30,7 @@ public class ForbiddenApiAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(MessageBoxRule, WindowsRule);
+        ImmutableArray.Create(ApiRule, WindowsRule);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -45,9 +45,16 @@ public class ForbiddenApiAnalyzer : DiagnosticAnalyzer
         if (context.Node is InvocationExpressionSyntax inv)
         {
             var symbol = context.SemanticModel.GetSymbolInfo(inv).Symbol as IMethodSymbol;
-            if (symbol?.ContainingType?.ToDisplayString() == "System.Windows.Forms.MessageBox" && symbol.Name == "Show")
+            if (symbol == null)
+                return;
+
+            if (symbol.ContainingType?.ToDisplayString() == "System.Windows.Forms.MessageBox" && symbol.Name == "Show")
             {
-                context.ReportDiagnostic(Diagnostic.Create(MessageBoxRule, inv.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(ApiRule, inv.GetLocation(), "MessageBox.Show"));
+            }
+            else if (symbol.ContainingType?.ToDisplayString() == "System.Windows.Forms.NotifyIcon" && symbol.Name == "ShowBalloonTip")
+            {
+                context.ReportDiagnostic(Diagnostic.Create(ApiRule, inv.GetLocation(), "NotifyIcon.ShowBalloonTip"));
             }
         }
     }
@@ -58,7 +65,7 @@ public class ForbiddenApiAnalyzer : DiagnosticAnalyzer
         foreach (var directive in root.DescendantTrivia().Where(t => t.IsKind(SyntaxKind.IfDirectiveTrivia)))
         {
             var ifDir = (IfDirectiveTriviaSyntax)directive.GetStructure();
-            if (ifDir != null && ifDir.Condition.ToString().Contains("WINDOWS"))
+            if (ifDir != null && ifDir.Condition.ToString().Trim() == "WINDOWS")
             {
                 context.ReportDiagnostic(Diagnostic.Create(WindowsRule, directive.GetLocation()));
             }

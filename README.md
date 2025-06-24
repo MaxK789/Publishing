@@ -92,18 +92,18 @@ Components should obtain `PriceCalculator` via dependency injection rather than 
 
 ## UI Notifications
 
-User-facing messages are routed through `IUiNotifier`. In WinForms builds a
-system tray balloon appears, while console services write the text to `stdout`.
+User-facing messages are routed through `IUiNotifier`. Windows clients now show
+standard message boxes while console services write the text to `stdout`.
 When the application runs without a graphical environment, only log entries are
 produced.
 
-Register the notifier via extension:
+Register the notifier directly:
 
 ```csharp
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
-        services.AddUiNotifier();
+        services.AddSingleton<IUiNotifier, MessageBoxNotifier>();
     })
     .Build();
 ```
@@ -129,11 +129,18 @@ var factory = new WebApplicationFactory<Program>()
     });
 ```
 
-Set `NOTIFICATIONS_DISABLED=true` to suppress all UI output. Set it to `false` or remove the variable entirely when you want to see tray balloons or console text. The Windows job in CI uses this flag except when running WinAppDriver tests.
 
 ## Static Analysis
 
-Custom Roslyn analyzers enforce the notifier registration and forbid APIs like `MessageBox.Show` or the `#if WINDOWS` directive. Run `dotnet format analyzers` to apply automatic fixes before committing.
+Custom Roslyn analyzers enforce the notifier registration and forbid APIs like `MessageBox.Show` or `NotifyIcon.ShowBalloonTip`. The `ForbiddenApiAnalyzer` (rule ID `PUB002`) triggers errors when these calls appear outside the `MessageBoxNotifier` class. Run `dotnet format analyzers` to apply automatic fixes before committing.
+
+Additionally rule `PUB003` forbids `#if WINDOWS` conditional directives. Instead of platform checks wrap Windows-specific code behind abstractions so it can be tested on other platforms. The following snippet would trigger the rule:
+
+```csharp
+#if WINDOWS
+var path = "c:/temp";
+#endif
+```
 
 ## Localization & Accessibility
 
@@ -171,3 +178,24 @@ credentials. Without these secrets the `Login & Push` steps will fail with an
 
 For details on running UI tests see [docs/ui-testing.md](docs/ui-testing.md).
 The Windows job in CI executes these tests with WinAppDriver. When testing locally install WinAppDriver via winget or the MSI package as it is not included with the NuGet package.
+
+### Publishing new analyzer version
+
+Custom analyzers live in `src/Publishing.Analyzers`. Create a new NuGet package with:
+
+```bash
+dotnet pack src/Publishing.Analyzers/Publishing.Analyzers.csproj -c Release -o ./artifacts
+```
+
+Then push the generated `.nupkg` to your feed:
+
+```bash
+dotnet nuget push artifacts/*.nupkg --source <url> --api-key <key>
+```
+
+The `pack-analyzers` job in CI runs the same commands and publishes packages automatically on merges to `main`.
+To consume the package in other projects reference it as:
+
+```xml
+<PackageReference Include="Publishing.Analyzers" Version="1.1.0" PrivateAssets="all" />
+```

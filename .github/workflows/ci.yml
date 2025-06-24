@@ -30,7 +30,9 @@ jobs:
     - name: Analyzers
       run: dotnet format analyzers --no-restore
     - name: Grep for forbidden APIs
-      run: git grep -nE "(MessageBox\.Show|#if\s+WINDOWS)" && exit 1 || echo "OK"
+      run: git grep -nE "(MessageBox\.Show|NotifyIcon\.ShowBalloonTip)" && (echo "Found forbidden API" && exit 1) || echo "No forbidden API calls"
+    - name: Grep for conditional compilation
+      run: git grep -nE "#if\s+WINDOWS" && (echo "Found forbidden #if WINDOWS" && exit 1) || echo "No forbidden directives"
     - name: Test
       run: dotnet test --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults /p:Threshold=90 /p:ThresholdType=line /p:ThresholdStat=total --filter "TestCategory!=UI"
   build-windows:
@@ -41,6 +43,11 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
+    - name: Install WinAppDriver
+      shell: powershell
+      run: |
+        choco install winappdriver -y
+        Start-Sleep -Seconds 5
     - name: Restore
       run: dotnet restore
     - name: Build
@@ -72,5 +79,5 @@ jobs:
       with:
         name: Publishing.Analyzers
         path: artifacts/*.nupkg
-    - name: Push package
-      run: dotnet nuget push artifacts/*.nupkg --source ${{ secrets.NUGET_SOURCE }} --api-key ${{ secrets.NUGET_API_KEY }}
+    - name: Push analyzers to feed
+      run: dotnet nuget push ./artifacts/*.nupkg --source ${{ secrets.NUGET_FEED_URL }} --api-key ${{ secrets.NUGET_API_KEY }}

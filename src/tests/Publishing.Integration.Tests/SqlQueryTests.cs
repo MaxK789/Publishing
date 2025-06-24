@@ -43,7 +43,7 @@ public class SqlQueryTests
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(config);
         services.AddTransient<ILogger, LoggerService>();
-        services.AddUiNotifier();
+        services.AddSingleton<IUiNotifier, SilentUiNotifier>();
         services.AddSingleton<IDbConnectionFactory>(sp =>
             new SqliteDbConnectionFactory(sp.GetRequiredService<IConfiguration>(), sp.GetRequiredService<ILogger>()));
         services.AddTransient<IDbContext, DapperDbContext>();
