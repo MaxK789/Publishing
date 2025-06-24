@@ -36,9 +36,9 @@ public class MessageBoxUiTests
         try
         {
             _session!.FindElement(MobileBy.AccessibilityId("loginButton")).Click();
-            var dialog = _session.FindElementByName("Publishing");
-            Assert.IsNotNull(dialog.FindElementByName("Invalid email or password"));
-            dialog.FindElementByName("OK").Click();
+            var dialog = _session.FindElement(MobileBy.Name("Publishing"));
+            Assert.IsNotNull(dialog.FindElement(MobileBy.Name("Invalid email or password")));
+            dialog.FindElement(MobileBy.Name("OK")).Click();
         }
         catch
         {
