@@ -7,6 +7,7 @@ WORKDIR /src
 COPY src/Publishing.Core/.           "Publishing.Core/"
 COPY src/Publishing.Infrastructure/. "Publishing.Infrastructure/"
 COPY src/Publishing.Application/.    "Publishing.Application/"
+COPY src/Publishing.Services/.       "Publishing.Services/"
 
 # 1.2) Copy and restore Profile.Service itself
 COPY src/Publishing.Profile.Service/. "Publishing.Profile.Service/"
