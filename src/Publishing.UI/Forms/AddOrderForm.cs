@@ -146,7 +146,6 @@ namespace Publishing
         {
             var cmd = _mapper.Map<CreateOrderCommand>(dto);
             var order = await _mediator.Send(cmd);
-            _notifier.NotifyInfo(_notify.GetString("OrderCreated") ?? "Success");
             TotalPriceLabel.Text = string.Format(_resources.GetString("TotalPriceLabel") ?? "Total: {0}", order.Price);
             _navigation.Navigate<MainForm>(this);
         }

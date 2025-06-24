@@ -5,6 +5,8 @@ using Publishing.Core.Interfaces;
 using Publishing.Core.DTOs;
 using System.Resources;
 using System.Threading.Tasks;
+using FluentValidation;
+using System.Linq;
 
 namespace Publishing
 {
@@ -13,6 +15,7 @@ namespace Publishing
         private readonly IOrganizationService _service;
         private readonly IRoleService _roles;
         private readonly IUiNotifier _notifier;
+        private readonly IErrorHandler _errorHandler;
         private readonly ResourceManager _resources = new("Publishing.Resources.Resources", typeof(OrganizationForm).Assembly);
         private readonly ResourceManager _notify = new("Publishing.Services.Resources.Notifications", typeof(Publishing.Services.IUiNotifier).Assembly);
 
@@ -22,12 +25,19 @@ namespace Publishing
             InitializeComponent();
         }
 
-        public OrganizationForm(INavigationService navigation, IOrganizationService service, IUserSession session, IRoleService roles, IUiNotifier notifier)
+        public OrganizationForm(
+            INavigationService navigation,
+            IOrganizationService service,
+            IUserSession session,
+            IRoleService roles,
+            IUiNotifier notifier,
+            IErrorHandler errorHandler)
             : base(session, navigation)
         {
             _service = service;
             _roles = roles;
             _notifier = notifier;
+            _errorHandler = errorHandler;
             InitializeComponent();
         }
 
@@ -53,9 +63,20 @@ namespace Publishing
                 Address = AddressTextBox.Text
             };
 
-            await _service.UpdateAsync(dto);
-            _notifier.NotifyInfo(_notify.GetString("OrganizationUpdated") ?? "Success");
-            _navigation.Navigate<MainForm>(this);
+            try
+            {
+                await _service.UpdateAsync(dto);
+                _notifier.NotifyInfo(_notify.GetString("OrganizationUpdated") ?? "Success");
+                _navigation.Navigate<MainForm>(this);
+            }
+            catch (ValidationException ex)
+            {
+                _notifier.NotifyWarning(string.Join("\n", ex.Errors.Select(e => e.ErrorMessage)));
+            }
+            catch (Exception ex)
+            {
+                _errorHandler.Handle(ex);
+            }
         }
 
         private void ListMenuItem_Click(object sender, EventArgs e)
