@@ -16,6 +16,7 @@ using MediatR;
 using Publishing.AppLayer.Handlers;
 using Publishing.AppLayer.Mapping;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Microsoft.Extensions.Caching.Distributed;
 using Publishing.Orders.Service.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Http;
