@@ -32,7 +32,7 @@ public class OrderSaga : IOrderSaga
             Price = dto.Price
         };
 
-        await _orders.SaveAsync(order);
+        var orderId = await _orders.SaveAsync(order);
         try
         {
             var profile = _factory.CreateClient("profile-updates");
@@ -45,7 +45,7 @@ public class OrderSaga : IOrderSaga
         }
         catch
         {
-            await _orders.DeleteLatestAsync(dto.PersonId);
+            await _orders.DeleteAsync(orderId);
             throw;
         }
     }

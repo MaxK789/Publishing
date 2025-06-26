@@ -144,7 +144,7 @@ app.UseCors();
 app.UseExceptionHandling();
 app.UseAuthentication();
 app.UseAuthorization();
-app.RegisterWithConsul(app.Lifetime, app.Configuration);
+await app.RegisterWithConsulAsync(app.Lifetime, app.Configuration);
 app.MapControllers();
 
 // Map health check endpoint so Docker can check container status

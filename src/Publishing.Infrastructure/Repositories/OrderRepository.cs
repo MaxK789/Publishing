@@ -19,7 +19,7 @@ namespace Publishing.Infrastructure.Repositories
             _uow = uow;
         }
 
-        public async Task SaveAsync(Publishing.Core.Domain.Order order)
+        public async Task<int> SaveAsync(Publishing.Core.Domain.Order order)
         {
             const string selectProduct = @"SELECT idProduct FROM Product WHERE typeProduct = @Type AND nameProduct = @Name AND idPerson = @PersonId AND pagesNum = @Pages";
             IEnumerable<int> ids;
@@ -75,9 +75,10 @@ namespace Publishing.Infrastructure.Repositories
             const string sql = @"INSERT INTO Orders(idProduct,idPerson,namePrintery,dateOrder,dateStart,dateFinish,statusOrder,tirage,price)
                                    VALUES(@ProdId,@PersonId,@Printery,GETDATE(),@DateStart,@DateFinish,@Status,@Tirage,@Price)";
 
+            int orderId;
             if (_uow != null)
             {
-                await _uow.Connection.ExecuteAsync(sql, new
+                orderId = await _uow.Connection.QuerySingleAsync<int>(sql + "; SELECT CAST(SCOPE_IDENTITY() as int);", new
                 {
                     ProdId = prodId,
                     order.PersonId,
@@ -91,7 +92,7 @@ namespace Publishing.Infrastructure.Repositories
             }
             else
             {
-                await _db.ExecuteAsync(sql, new
+                orderId = await _db.QuerySingleAsync<int>(sql + "; SELECT CAST(SCOPE_IDENTITY() as int);", new
                 {
                     ProdId = prodId,
                     order.PersonId,
@@ -103,6 +104,8 @@ namespace Publishing.Infrastructure.Repositories
                     order.Price
                 });
             }
+
+            return orderId;
         }
 
         public Task UpdateExpiredAsync()

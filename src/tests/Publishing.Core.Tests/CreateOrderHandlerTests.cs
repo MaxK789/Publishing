@@ -24,10 +24,10 @@ namespace Publishing.Core.Tests
         private class StubOrderRepository : IOrderRepository
         {
             public Order? SavedOrder { get; private set; }
-            public Task SaveAsync(Order order)
+            public Task<int> SaveAsync(Order order)
             {
                 SavedOrder = order;
-                return Task.CompletedTask;
+                return Task.FromResult(1);
             }
             public Task UpdateExpiredAsync() => Task.CompletedTask;
             public Task<DataTable> GetActiveAsync() => Task.FromResult(new DataTable());
