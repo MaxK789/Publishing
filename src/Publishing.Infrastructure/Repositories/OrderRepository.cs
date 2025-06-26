@@ -132,5 +132,12 @@ namespace Publishing.Infrastructure.Repositories
         {
             return _db.ExecuteAsync("DELETE FROM Orders WHERE idOrder = @id", new { id });
         }
+
+        public Task DeleteLatestAsync(string personId)
+        {
+            const string sql = @"DELETE FROM Orders WHERE idOrder = (
+                SELECT TOP 1 idOrder FROM Orders WHERE idPerson = @id ORDER BY idOrder DESC)";
+            return _db.ExecuteAsync(sql, new { id = personId });
+        }
     }
 }

@@ -9,5 +9,6 @@ public class ProfileProfile : Profile
     public ProfileProfile()
     {
         CreateMap<UpdateProfileDto, UpdateProfileCommand>();
+        CreateMap<CreateProfileDto, CreateProfileCommand>();
     }
 }

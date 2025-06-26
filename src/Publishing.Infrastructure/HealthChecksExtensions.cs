@@ -5,8 +5,12 @@ namespace Publishing.Infrastructure;
 
 public static class HealthChecksExtensions
 {
-    public static IHealthChecksBuilder AddDatabaseHealthChecks(this IHealthChecksBuilder builder)
+    public static IHealthChecksBuilder AddInfrastructureHealthChecks(this IHealthChecksBuilder builder, string redisConn, string? rabbitConn)
     {
-        return builder.AddDbContextCheck<AppDbContext>("Database");
+        builder.AddDbContextCheck<AppDbContext>("Database")
+               .AddRedis(redisConn, name: "Redis");
+        if (!string.IsNullOrWhiteSpace(rabbitConn))
+            builder.AddRabbitMQ(rabbitConnectionString: rabbitConn, name: "RabbitMQ");
+        return builder;
     }
 }

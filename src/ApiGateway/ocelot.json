@@ -3,7 +3,7 @@
     {
       "DownstreamPathTemplate": "/api/orders/{everything}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "orders", "Port": 80 } ],
+      "ServiceName": "orders",
       "UpstreamPathTemplate": "/orders/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": {
@@ -14,14 +14,14 @@
     {
       "DownstreamPathTemplate": "/swagger/v1/swagger.json",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "orders", "Port": 80 } ],
+      "ServiceName": "orders",
       "UpstreamPathTemplate": "/orders/swagger",
       "UpstreamHttpMethod": [ "GET" ]
     },
     {
       "DownstreamPathTemplate": "/api/profile/{everything}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "profile", "Port": 80 } ],
+      "ServiceName": "profile",
       "UpstreamPathTemplate": "/profile/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": {
@@ -32,14 +32,14 @@
     {
       "DownstreamPathTemplate": "/swagger/v1/swagger.json",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "profile", "Port": 80 } ],
+      "ServiceName": "profile",
       "UpstreamPathTemplate": "/profile/swagger",
       "UpstreamHttpMethod": [ "GET" ]
     },
     {
       "DownstreamPathTemplate": "/api/org/{everything}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "organization", "Port": 80 } ],
+      "ServiceName": "organization",
       "UpstreamPathTemplate": "/organization/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": {
@@ -50,12 +50,35 @@
     {
       "DownstreamPathTemplate": "/swagger/v1/swagger.json",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "organization", "Port": 80 } ],
+      "ServiceName": "organization",
       "UpstreamPathTemplate": "/organization/swagger",
       "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/aggregation/person/{id}",
+      "DownstreamScheme": "http",
+      "ServiceName": "gateway",
+      "UpstreamPathTemplate": "/api/aggregation/person/{id}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:5000"
+    "BaseUrl": "http://localhost:5000",
+    "ServiceDiscoveryProvider": {
+      "Host": "consul",
+      "Port": 8500,
+      "Type": "Consul"
+    },
+    "RateLimitOptions": {
+      "ClientIdHeader": "X-Client-ID",
+      "EnableRateLimiting": true,
+      "Period": "1m",
+      "PeriodTimespan": 60,
+      "Limit": 100
+    }
   }
 }

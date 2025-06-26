@@ -44,4 +44,25 @@ public class OrderContracts
             Assert.IsTrue(response.IsSuccessStatusCode);
         });
     }
+
+    [TestMethod]
+    public async Task CreateOrder_VerifyContract()
+    {
+        var pact = Pact.V3("OrdersService", "Gateway", new PactConfig());
+        pact
+            .UponReceiving("A POST request to create an order")
+            .WithRequest(HttpMethod.Post, "/orders/api/orders")
+            .WithJsonBody(new { Name = "Book", Type = "Standard", Pages = 1, Tirage = 1, DateStart = "2021-01-01", DateFinish = "2021-01-02", PersonId = "p1", Printery = "main", Price = 10 })
+            .WillRespond()
+            .WithStatus(200);
+
+        await pact.VerifyAsync(async ctx =>
+        {
+            using var client = new HttpClient { BaseAddress = ctx.MockServerUri };
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateJwt());
+            var content = new StringContent("{\"name\":\"Book\",\"type\":\"Standard\",\"pages\":1,\"tirage\":1,\"dateStart\":\"2021-01-01\",\"dateFinish\":\"2021-01-02\",\"personId\":\"p1\",\"printery\":\"main\",\"price\":10}", Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("/orders/api/orders", content);
+            Assert.IsTrue(response.IsSuccessStatusCode);
+        });
+    }
 }

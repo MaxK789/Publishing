@@ -1,0 +1,9 @@
+replicaCount: 1
+gateway:
+  image: gateway:latest
+orders:
+  image: orders:latest
+profile:
+  image: profile:latest
+organization:
+  image: organization:latest

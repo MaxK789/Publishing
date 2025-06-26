@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: gateway
+    static_configs:
+      - targets: ['gateway:80']
+  - job_name: orders
+    static_configs:
+      - targets: ['orders:80']
+  - job_name: profile
+    static_configs:
+      - targets: ['profile:80']
+  - job_name: organization
+    static_configs:
+      - targets: ['organization:80']
+  - job_name: consul
+    static_configs:
+      - targets: ['consul:8500']

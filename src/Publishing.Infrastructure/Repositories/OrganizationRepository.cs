@@ -4,6 +4,7 @@ using System.Linq;
 using Dapper;
 using Publishing.Core.Interfaces;
 using Publishing.Core.Commands;
+using Publishing.Core.DTOs;
 
 namespace Publishing.Infrastructure.Repositories
 {
@@ -50,6 +51,29 @@ namespace Publishing.Infrastructure.Repositories
                 sb.Remove(sb.Length - 1, 1);
             sb.Append(" WHERE idPerson = @id");
             return _db.ExecuteAsync(sb.ToString(), parameters);
+        }
+
+        public async Task<OrganizationDto?> GetByPersonIdAsync(string personId)
+        {
+            const string sql = @"SELECT TOP (1) nameOrganization AS Name, emailOrganization AS Email,
+                phoneOrganization AS Phone, faxOrganization AS Fax, addressOrganization AS Address
+                FROM Organization WHERE idPerson = @personId";
+            var res = await _db.QueryAsync<OrganizationDto>(sql, new { personId });
+            return res.FirstOrDefault();
+        }
+
+        public Task<IEnumerable<OrganizationDto>> GetAllAsync()
+        {
+            const string sql = @"SELECT nameOrganization AS Name, emailOrganization AS Email,
+                phoneOrganization AS Phone, faxOrganization AS Fax, addressOrganization AS Address
+                FROM Organization";
+            return _db.QueryAsync<OrganizationDto>(sql);
+        }
+
+        public Task DeleteAsync(string id)
+        {
+            const string sql = "DELETE FROM Organization WHERE idPerson = @id";
+            return _db.ExecuteAsync(sql, new { id });
         }
     }
 }

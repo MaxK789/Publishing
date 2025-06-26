@@ -17,5 +17,7 @@ namespace Publishing.Core.Interfaces
         Task<DataTable> GetAllAsync();
 
         Task DeleteAsync(int id);
+
+        Task DeleteLatestAsync(string personId);
     }
 }

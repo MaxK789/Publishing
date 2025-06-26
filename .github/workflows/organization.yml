@@ -32,13 +32,21 @@ jobs:
         run: dotnet test src/tests/Publishing.Integration.Tests/Publishing.Integration.Tests.csproj --no-build
       - name: Build container
         env:
-          DB_CONN: ${{ secrets.DB_CONN }}
+          ORGANIZATION_DB_CONN: ${{ secrets.ORGANIZATION_DB_CONN }}
           REDIS_CONN: ${{ secrets.REDIS_CONN }}
+          CONSUL_URL: ${{ secrets.CONSUL_URL }}
+          OIDC_AUTHORITY: ${{ secrets.OIDC_AUTHORITY }}
+          OIDC_AUDIENCE: ${{ secrets.OIDC_AUDIENCE }}
+          ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/organization-service src/Publishing.Organization.Service
       - name: Login & Push
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
           docker push ${{ secrets.DOCKER_USERNAME }}/organization-service
         env:
-          DB_CONN: ${{ secrets.DB_CONN }}
+          ORGANIZATION_DB_CONN: ${{ secrets.ORGANIZATION_DB_CONN }}
           REDIS_CONN: ${{ secrets.REDIS_CONN }}
+          CONSUL_URL: ${{ secrets.CONSUL_URL }}
+          OIDC_AUTHORITY: ${{ secrets.OIDC_AUTHORITY }}
+          OIDC_AUDIENCE: ${{ secrets.OIDC_AUDIENCE }}
+          ELASTIC_URL: ${{ secrets.ELASTIC_URL }}

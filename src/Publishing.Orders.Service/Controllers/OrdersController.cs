@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Publishing.Core.Interfaces;
 using Publishing.Core.Domain;
-using MediatR;
-using Publishing.AppLayer.Commands;
 using Publishing.Core.DTOs;
-using AutoMapper;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
@@ -17,19 +14,17 @@ namespace Publishing.Orders.Service.Controllers;
 [Route("api/[controller]")]
 public class OrdersController : ControllerBase
 {
-    private readonly IMediator _mediator;
     private readonly IOrderRepository _orders;
+    private readonly IOrderSaga _saga;
     private readonly IDistributedCache _cache;
     private readonly IOrderInputValidator _validator;
-    private readonly IMapper _mapper;
 
-    public OrdersController(IMediator mediator, IOrderRepository orders, IDistributedCache cache, IOrderInputValidator validator, IMapper mapper)
+    public OrdersController(IOrderRepository orders, IDistributedCache cache, IOrderInputValidator validator, IOrderSaga saga)
     {
-        _mediator = mediator;
         _orders = orders;
         _cache = cache;
         _validator = validator;
-        _mapper = mapper;
+        _saga = saga;
     }
 
     [HttpGet]
@@ -66,8 +61,7 @@ public class OrdersController : ControllerBase
     public async Task<IActionResult> Create(CreateOrderDto dto)
     {
         _validator.Validate(dto);
-        var cmd = _mapper.Map<CreateOrderCommand>(dto);
-        Order order = await _mediator.Send(cmd);
+        var order = await _saga.ExecuteAsync(dto);
         await _cache.RemoveAsync("orders_all");
         return Ok(order);
     }

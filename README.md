@@ -156,17 +156,40 @@ Start the whole stack using:
 docker-compose up --build
 ```
 
-The API gateway project under `src/ApiGateway` routes requests to the services. Swagger is enabled for each service at `/swagger` and health checks are exposed at `/health`.
-Copy `.env.example` to `.env` and adjust the connection strings and JWT settings before starting the stack. Required variables are `SA_PASSWORD`, `ACCEPT_EULA`, `DB_CONN`, `REDIS_CONN`, `RABBIT_CONN`, `JWT__Issuer`, `JWT__Audience` and `JWT__SigningKey`.
+The API gateway project under `src/ApiGateway` routes requests to the services. Swagger is enabled for each service and the gateway itself at `/swagger`. Health checks are exposed at `/health`. The compose stack also launches **Elasticsearch**, **Kibana**, **Jaeger** and **Prometheus** for centralized logging and tracing.
+Copy `.env.example` to `.env` and adjust the connection strings and JWT settings before starting the stack. Required variables are `SA_PASSWORD`, `ACCEPT_EULA`, `ORDERS_DB_CONN`, `PROFILE_DB_CONN`, `ORGANIZATION_DB_CONN`, `REDIS_CONN`, `RABBIT_CONN`, `CONSUL_URL`, `OIDC_AUTHORITY`, `OIDC_AUDIENCE`, `ELASTIC_URL`, `JWT__Issuer`, `JWT__Audience` and `JWT__SigningKey`.
+Elasticsearch runs on `http://localhost:9200` with Kibana at `http://localhost:5601`. Jaeger UI is available at `http://localhost:16686` and Prometheus at `http://localhost:9090` when using the compose stack.
+See `docs/kibana.md` for hints on visualising logs with Kibana.
+Keycloak is used as an OAuth2 provider. Import the realm configuration under `keycloak/realm-export.json` with:
+
+```bash
+docker exec keycloak /opt/keycloak/bin/kc.sh import --file=/config/realm-export.json
+```
+
+The compose file already mounts this configuration so the command runs once at start up. After importing, obtain a token by visiting `http://localhost:8080/realms/publishing/protocol/openid-connect/token`.
 The signing key must be at least 32 characters long when using the default HS256 algorithm. The issuer, audience and key must match the values used to sign JWT tokens consumed by the services.
 Set `ASPNETCORE_ENVIRONMENT=Development` in the compose file (or `.env`) to enable Swagger inside the containers. Change or remove this variable to run the services in production.
 Database migrations now apply **asynchronously** during startup and each service reports readiness via `/health`.
 All API routes require an `Authorization: Bearer <token>` header containing a JWT signed with the configured key.
 When browsing Swagger, use the **Authorize** button to provide a token for authenticated requests.
-Persistent volumes `db-data` and `redis-data` preserve SQL Server and Redis data between restarts. The services automatically apply EF Core migrations using the `DB_CONN` connection string. All containers join the `micro-net` Docker network so the gateway can resolve service names. Swagger can also be reached through the gateway under `/orders/swagger`, `/profile/swagger` and `/organization/swagger`.
+Persistent volumes `db-data` and `redis-data` preserve SQL Server and Redis data between restarts. The services automatically apply EF Core migrations using their respective connection strings (`ORDERS_DB_CONN`, `PROFILE_DB_CONN` and `ORGANIZATION_DB_CONN`). All containers join the `micro-net` Docker network so the gateway can resolve service names. Swagger can also be reached through the gateway under `/orders/swagger`, `/profile/swagger` and `/organization/swagger`.
+The gateway exposes an aggregation endpoint at `/api/aggregation/person/{id}` returning combined order, profile and organization data. Prometheus metrics from each service are available at `/metrics`. The profile and organization services now expose full CRUD APIs via `/api/profile` and `/api/org`.
 RabbitMQ runs as `rabbit` on port `5672` for publishing order events used by statistics.
 
-Each service enables Redis caching via `REDIS_CONN`, OpenTelemetry tracing with a console exporter and secures endpoints using CORS and JWT bearer authentication. Contract tests live under `src/tests/Publishing.Contracts.Tests` and verify API compatibility using Pact. These tests run automatically via the `contracts.yml` GitHub Actions workflow.
+Each service enables Redis caching via `REDIS_CONN`, OpenTelemetry tracing with Jaeger and Prometheus exporters and logs via Serilog to Elasticsearch. Services register with Consul for discovery and secure endpoints using OAuth2 bearer authentication. Contract tests live under `src/tests/Publishing.Contracts.Tests` and verify API compatibility using Pact. These tests run automatically via the `contracts.yml` GitHub Actions workflow.
+Kubernetes manifests for all components, including the database, Redis, RabbitMQ, Jaeger, Prometheus and a gateway ingress, can be found under the `k8s/` directory.
+The ingress relies on cert-manager to automatically provision TLS certificates. Adjust the host name in `gateway-ingress.yaml` and ensure a cluster issuer is configured.
+For easier deployment there is also a Helm chart in `helm/publishing` covering the gateway, orders, profile and organization services. Customize the values file and install with `helm install publishing helm/publishing`.
+Example overrides can be provided with `helm install -f my-values.yaml publishing helm/publishing` where `my-values.yaml` defines new image tags or secret references:
+```yaml
+orders:
+  image: myrepo/orders:latest
+gateway:
+  oidcAuthority: https://auth.example.com/realms/publishing
+```
+Grafana dashboards are located under `docs/grafana` and can be imported to visualise metrics stored in Prometheus.
+Alert rules for Prometheus reside in `prometheus-alerts.yml` and can be imported into Grafana to trigger notifications when error rates spike.
+See [docs/secrets.md](docs/secrets.md) for guidance on managing sensitive configuration with Vault.
 
 ## CI/CD
 
@@ -199,3 +222,7 @@ To consume the package in other projects reference it as:
 ```xml
 <PackageReference Include="Publishing.Analyzers" Version="1.1.0" PrivateAssets="all" />
 ```
+
+## Load testing
+
+Sample JMeter plans reside in the `load-tests` directory. Run `jmeter -n -t gateway.jmx` to stress the aggregation endpoint through the gateway. Other scripts cover individual services.
