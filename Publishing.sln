@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publishing.Infrastructure",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publishing.Services", "src\Publishing.Services\Publishing.Services.csproj", "{FF727600-00AE-423C-BBDF-79CE9A936887}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "src\ApiGateway\ApiGateway.csproj", "{C9EC4128-38A1-4C06-82DC-CE6183F4DE82}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publishing.Analyzers", "src\Publishing.Analyzers\Publishing.Analyzers.csproj", "{AC103089-64AD-4B26-A15B-2F84A918CD25}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Publishing.Analyzers.Tests", "src\tests\Publishing.Analyzers.Tests\Publishing.Analyzers.Tests.csproj", "{CE5E9BC3-FA99-48FA-9D32-A5CFD407FFAA}"
@@ -77,6 +79,10 @@ Global
                 {44E051FA-33A2-40AE-9F13-47D40DE71DBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
                 {44E051FA-33A2-40AE-9F13-47D40DE71DBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
                 {44E051FA-33A2-40AE-9F13-47D40DE71DBD}.Release|Any CPU.Build.0 = Release|Any CPU
+                {C9EC4128-38A1-4C06-82DC-CE6183F4DE82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+                {C9EC4128-38A1-4C06-82DC-CE6183F4DE82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+                {C9EC4128-38A1-4C06-82DC-CE6183F4DE82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+                {C9EC4128-38A1-4C06-82DC-CE6183F4DE82}.Release|Any CPU.Build.0 = Release|Any CPU
                 {9B9E0E43-9D97-4EC5-90DF-5FF262EE6237}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
                 {9B9E0E43-9D97-4EC5-90DF-5FF262EE6237}.Debug|Any CPU.Build.0 = Debug|Any CPU
                 {9B9E0E43-9D97-4EC5-90DF-5FF262EE6237}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -94,6 +100,7 @@ Global
                 {231CAED0-18C1-49D4-8FED-53712F50F9DE} = {9FCB158E-82F3-4656-90C3-45A54BFB864D}
                 {FF727600-00AE-423C-BBDF-79CE9A936887} = {9FCB158E-82F3-4656-90C3-45A54BFB864D}
                 {AC103089-64AD-4B26-A15B-2F84A918CD25} = {9FCB158E-82F3-4656-90C3-45A54BFB864D}
+                {C9EC4128-38A1-4C06-82DC-CE6183F4DE82} = {9FCB158E-82F3-4656-90C3-45A54BFB864D}
                 {9B9E0E43-9D97-4EC5-90DF-5FF262EE6237} = {9FCB158E-82F3-4656-90C3-45A54BFB864D}
                 {CE5E9BC3-FA99-48FA-9D32-A5CFD407FFAA} = {FFA3015B-5245-4B86-951B-1D94EF3D19E3}
                 {44E051FA-33A2-40AE-9F13-47D40DE71DBD} = {FFA3015B-5245-4B86-951B-1D94EF3D19E3}

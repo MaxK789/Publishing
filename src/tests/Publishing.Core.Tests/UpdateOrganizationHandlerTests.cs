@@ -7,6 +7,7 @@ using MediatR;
 using Publishing.Services;
 using System.Diagnostics.CodeAnalysis;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,6 +24,10 @@ public class UpdateOrganizationHandlerTests
         public Task<string?> GetNameIfExistsAsync(string name) => Task.FromResult(name == ExistingName ? ExistingName : null);
         public Task InsertAsync(CreateOrganizationCommand cmd) { Created = cmd; return Task.CompletedTask; }
         public Task UpdateAsync(UpdateOrganizationCommand cmd) { Updated = cmd; return Task.CompletedTask; }
+
+        public Task<OrganizationDto?> GetByPersonIdAsync(string personId) => Task.FromResult<OrganizationDto?>(null);
+        public Task<IEnumerable<OrganizationDto>> GetAllAsync() => Task.FromResult<IEnumerable<OrganizationDto>>(Array.Empty<OrganizationDto>());
+        public Task DeleteAsync(string id) => Task.CompletedTask;
     }
 
     private class StubUnitOfWork : IUnitOfWork

@@ -7,6 +7,7 @@ using Publishing.Core.Interfaces;
 using Publishing.Core.Services;
 using Publishing.AppLayer.Validators;
 using Publishing.Core.Commands;
+using System.Collections.Generic;
 
 namespace Publishing.Core.Tests
 {
@@ -25,6 +26,15 @@ namespace Publishing.Core.Tests
                 Updated = cmd;
                 return Task.CompletedTask;
             }
+
+            public Task<ProfileDto?> GetAsync(string id) => Task.FromResult<ProfileDto?>(null);
+
+            public Task<IEnumerable<ProfileDto>> GetAllAsync()
+                => Task.FromResult<IEnumerable<ProfileDto>>(Array.Empty<ProfileDto>());
+
+            public Task CreateAsync(CreateProfileCommand cmd) => Task.CompletedTask;
+
+            public Task DeleteAsync(string id) => Task.CompletedTask;
         }
 
         private class PassValidator : AbstractValidator<UpdateProfileDto> { }

@@ -1,5 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System;
 using FluentValidation;
 using Publishing.Core.DTOs;
 using Publishing.Core.Interfaces;
@@ -34,6 +36,14 @@ namespace Publishing.Core.Tests
                 Updated = cmd;
                 return Task.CompletedTask;
             }
+
+            public Task<OrganizationDto?> GetByPersonIdAsync(string personId)
+                => Task.FromResult<OrganizationDto?>(null);
+
+            public Task<IEnumerable<OrganizationDto>> GetAllAsync()
+                => Task.FromResult<IEnumerable<OrganizationDto>>(Array.Empty<OrganizationDto>());
+
+            public Task DeleteAsync(string id) => Task.CompletedTask;
         }
 
         private class PassValidator : AbstractValidator<UpdateOrganizationDto> { }
