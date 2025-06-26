@@ -1,4 +1,3 @@
-#if WINDOWS
 using System.Windows.Forms;
 
 namespace Publishing.Services
@@ -31,4 +30,3 @@ namespace Publishing.Services
     }
 #pragma warning restore PUB002
 }
-#endif

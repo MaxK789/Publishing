@@ -15,6 +15,9 @@
   <ItemGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
     <!-- WinForms-specific implementations are included by default -->
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'!='net6.0-windows'">
+    <Compile Remove="UiNotifications/MessageBoxNotifier.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.31.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.31.0" />
