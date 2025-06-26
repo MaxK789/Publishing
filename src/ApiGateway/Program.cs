@@ -1,5 +1,6 @@
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Ocelot.Provider.Consul;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
@@ -16,6 +17,7 @@ using Publishing.Core.Interfaces;
 using ApiGateway.Extensions;
 using Polly;
 using Polly.Extensions.Http;
+using HealthChecks.Uris;
 using System.Net;
 using System.Net.Http;
 
