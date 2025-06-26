@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using Publishing.Core.DTOs;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
+using System;
 
 namespace ApiGateway.Controllers;
 
@@ -46,7 +47,11 @@ public class AggregationController : ControllerBase
             Profile = profileTask.Result,
             Organization = orgTask.Result
         };
-        await _cache.SetStringAsync($"agg_{id}", JsonSerializer.Serialize(result));
+        var options = new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+        };
+        await _cache.SetStringAsync($"agg_{id}", JsonSerializer.Serialize(result), options);
         return Ok(result);
     }
 }
