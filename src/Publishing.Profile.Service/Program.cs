@@ -94,6 +94,7 @@ if (string.IsNullOrWhiteSpace(rabbitConn))
 {
     builder.Services.AddSingleton<IOrderEventsPublisher, OrderEventsPublisher>();
     builder.Services.AddSingleton<IProfileEventsPublisher, ProfileEventsPublisher>();
+    builder.Services.AddSingleton<IOrganizationEventsPublisher, OrganizationEventsPublisher>();
 }
 else
 {
@@ -101,6 +102,8 @@ else
         new RabbitOrderEventsPublisher(rabbitConn));
     builder.Services.AddSingleton<IProfileEventsPublisher>(sp =>
         new RabbitProfileEventsPublisher(rabbitConn));
+    builder.Services.AddSingleton<IOrganizationEventsPublisher>(sp =>
+        new RabbitOrganizationEventsPublisher(rabbitConn));
 }
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(r => r.AddService(builder.Environment.ApplicationName))
