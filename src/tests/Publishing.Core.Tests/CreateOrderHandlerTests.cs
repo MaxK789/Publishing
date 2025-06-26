@@ -35,6 +35,8 @@ namespace Publishing.Core.Tests
             public Task<DataTable> GetAllAsync() => Task.FromResult(new DataTable());
             public Task DeleteAsync(int id) => Task.CompletedTask;
             public Task DeleteLatestAsync(string personId) => Task.CompletedTask;
+            public Task UpdateStatusAsync(int id, string status) => Task.CompletedTask;
+            public Task<string?> GetPersonIdAsync(int id) => Task.FromResult<string?>(null);
         }
 
         private class StubPrinteryRepository : IPrinteryRepository

@@ -30,6 +30,6 @@
     <ProjectReference Include="../../Publishing.Infrastructure/Publishing.Infrastructure.csproj" />
     <ProjectReference Include="../../Publishing.Core/Publishing.Core.csproj" />
     <ProjectReference Include="../../Publishing.Services/Publishing.Services.csproj" />
-    <ProjectReference Include="..\..\ApiGateway\ApiGateway.csproj" />
+    <ProjectReference Include="../../ApiGateway/ApiGateway.csproj" />
   </ItemGroup>
 </Project>

@@ -149,7 +149,8 @@ namespace Publishing.Infrastructure.Repositories
         public async Task<string?> GetPersonIdAsync(int id)
         {
             const string sql = "SELECT CAST(idPerson AS varchar) FROM Orders WHERE idOrder = @id";
-            return await _db.QueryFirstOrDefaultAsync<string>(sql, new { id });
+            var ids = await _db.QueryAsync<string>(sql, new { id });
+            return ids.FirstOrDefault();
         }
     }
 }
