@@ -5,6 +5,7 @@ using MediatR;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Publishing.Core.Interfaces;
+using Publishing.Services;
 
 namespace Publishing.Organization.Service.Controllers;
 
@@ -16,12 +17,14 @@ public class OrganizationController : ControllerBase
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
     private readonly IOrganizationRepository _organizations;
+    private readonly IOrganizationEventsPublisher _events;
 
-    public OrganizationController(IMediator mediator, IMapper mapper, IOrganizationRepository organizations)
+    public OrganizationController(IMediator mediator, IMapper mapper, IOrganizationRepository organizations, IOrganizationEventsPublisher events)
     {
         _mediator = mediator;
         _mapper = mapper;
         _organizations = organizations;
+        _events = events;
     }
 
     [HttpGet]
@@ -53,6 +56,9 @@ public class OrganizationController : ControllerBase
     {
         var cmd = _mapper.Map<UpdateOrganizationCommand>(dto);
         await _mediator.Send(cmd);
+        var org = await _organizations.GetByPersonIdAsync(dto.Id);
+        if (org is not null)
+            _events.PublishOrganizationUpdated(org);
         return NoContent();
     }
 

@@ -19,5 +19,9 @@ namespace Publishing.Core.Interfaces
         Task DeleteAsync(int id);
 
         Task DeleteLatestAsync(string personId);
+
+        Task UpdateStatusAsync(int id, string status);
+
+        Task<string?> GetPersonIdAsync(int id);
     }
 }

@@ -16,15 +16,17 @@ public class UpdateProfileHandler : IRequestHandler<UpdateProfileCommand, Unit>
     private readonly IValidator<UpdateProfileCommand> _validator;
     private readonly IUnitOfWork _uow;
     private readonly IUiNotifier _notifier;
+    private readonly IProfileEventsPublisher _events;
     private readonly ResourceManager _resources =
         new("Publishing.Services.Resources.Notifications", typeof(IUiNotifier).Assembly);
 
-    public UpdateProfileHandler(IProfileRepository repo, IValidator<UpdateProfileCommand> validator, IUnitOfWork uow, IUiNotifier notifier)
+    public UpdateProfileHandler(IProfileRepository repo, IValidator<UpdateProfileCommand> validator, IUnitOfWork uow, IUiNotifier notifier, IProfileEventsPublisher events)
     {
         _repo = repo;
         _validator = validator;
         _uow = uow;
         _notifier = notifier;
+        _events = events;
     }
 
     public async Task<Unit> Handle(UpdateProfileCommand request, CancellationToken cancellationToken)
@@ -39,6 +41,9 @@ public class UpdateProfileHandler : IRequestHandler<UpdateProfileCommand, Unit>
             }
             await _repo.UpdateAsync(request).ConfigureAwait(false);
             await _uow.CommitAsync();
+            var profile = await _repo.GetAsync(request.Id);
+            if (profile is not null)
+                _events.PublishProfileUpdated(profile);
             _notifier.NotifyInfo(_resources.GetString("ProfileUpdated") ?? "Profile updated");
             return Unit.Value;
         }

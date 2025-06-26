@@ -139,5 +139,17 @@ namespace Publishing.Infrastructure.Repositories
                 SELECT TOP 1 idOrder FROM Orders WHERE idPerson = @id ORDER BY idOrder DESC)";
             return _db.ExecuteAsync(sql, new { id = personId });
         }
+
+        public Task UpdateStatusAsync(int id, string status)
+        {
+            const string sql = "UPDATE Orders SET statusOrder = @status WHERE idOrder = @id";
+            return _db.ExecuteAsync(sql, new { status, id });
+        }
+
+        public async Task<string?> GetPersonIdAsync(int id)
+        {
+            const string sql = "SELECT CAST(idPerson AS varchar) FROM Orders WHERE idOrder = @id";
+            return await _db.QueryFirstOrDefaultAsync<string>(sql, new { id });
+        }
     }
 }
