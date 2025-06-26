@@ -1,5 +1,6 @@
 namespace Publishing.Core.Interfaces;
 
+using System.Threading.Tasks;
 using Publishing.Core.DTOs;
 using Publishing.Core.Domain;
 

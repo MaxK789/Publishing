@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
+using ApiGateway;
 
 namespace Publishing.E2E.Tests;
 
