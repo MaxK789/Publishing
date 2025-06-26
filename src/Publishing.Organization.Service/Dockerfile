@@ -11,6 +11,7 @@ COPY src/Publishing.Core/.           "Publishing.Core/"
 COPY src/Publishing.Infrastructure/. "Publishing.Infrastructure/"
 COPY src/Publishing.Application/.    "Publishing.Application/"
 COPY src/Publishing.Services/.       "Publishing.Services/"
+COPY src/Publishing.Analyzers/.     "Publishing.Analyzers/"
 
 # 1.2) Copy and restore Organization.Service itself
 COPY src/Publishing.Organization.Service/. "Publishing.Organization.Service/"
