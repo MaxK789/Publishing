@@ -6,7 +6,7 @@ namespace Publishing.Core.Interfaces
 {
     public interface IOrderRepository
     {
-        Task SaveAsync(Order order);
+        Task<int> SaveAsync(Order order);
 
         Task UpdateExpiredAsync();
 

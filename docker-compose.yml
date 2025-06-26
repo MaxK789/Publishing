@@ -163,6 +163,14 @@ services:
     networks:
       - micro-net
 
+  cache-replica:
+    image: redis:alpine
+    command: redis-server --slaveof cache 6379
+    depends_on:
+      - cache
+    networks:
+      - micro-net
+
   rabbit:
     image: rabbitmq:3-management
     ports:

@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Text.Json;
+using System.Diagnostics;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Publishing.Core.DTOs;
@@ -21,8 +22,9 @@ public class RabbitProfileEventsPublisher : IProfileEventsPublisher, IDisposable
         _channel = _connection.CreateModel();
         _channel.ExchangeDeclare("profiles", ExchangeType.Topic, durable: true);
 
-        var queue = _channel.QueueDeclare().QueueName;
-        _channel.QueueBind(queue, "profiles", "profile.updated");
+        var queueName = $"{Environment.GetEnvironmentVariable("SERVICE_NAME")}-profiles";
+        _channel.QueueDeclare(queueName, durable: true, exclusive: false, autoDelete: false);
+        _channel.QueueBind(queueName, "profiles", "profile.updated");
         var consumer = new EventingBasicConsumer(_channel);
         consumer.Received += (s, e) =>
         {
@@ -30,14 +32,20 @@ public class RabbitProfileEventsPublisher : IProfileEventsPublisher, IDisposable
             var profile = JsonSerializer.Deserialize<ProfileDto>(message);
             ProfileUpdated?.Invoke(profile!);
         };
-        _channel.BasicConsume(queue, autoAck: true, consumer);
+        _channel.BasicConsume(queueName, autoAck: true, consumer);
     }
 
     public void PublishProfileUpdated(ProfileDto profile)
     {
         ProfileUpdated?.Invoke(profile);
         var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(profile));
-        _channel.BasicPublish("profiles", "profile.updated", null, body);
+        var props = _channel.CreateBasicProperties();
+        props.DeliveryMode = 2;
+        props.Headers = new Dictionary<string, object>
+        {
+            ["traceparent"] = Activity.Current?.Id ?? string.Empty
+        };
+        _channel.BasicPublish("profiles", "profile.updated", props, body);
     }
 
     public void Dispose()

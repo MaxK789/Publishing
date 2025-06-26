@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Diagnostics;
 using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -22,8 +23,9 @@ public class RabbitOrderEventsPublisher : IOrderEventsPublisher, IDisposable
         _channel = _connection.CreateModel();
         _channel.ExchangeDeclare("orders", ExchangeType.Topic, durable: true);
 
-        var queue = _channel.QueueDeclare().QueueName;
-        _channel.QueueBind(queue, "orders", "order.*");
+        var queueName = $"{Environment.GetEnvironmentVariable("SERVICE_NAME")}-orders";
+        _channel.QueueDeclare(queueName, durable: true, exclusive: false, autoDelete: false);
+        _channel.QueueBind(queueName, "orders", "order.*");
         var consumer = new EventingBasicConsumer(_channel);
         consumer.Received += (s, e) =>
         {
@@ -34,7 +36,7 @@ public class RabbitOrderEventsPublisher : IOrderEventsPublisher, IDisposable
             else
                 OrderUpdated?.Invoke(order!);
         };
-        _channel.BasicConsume(queue, autoAck: true, consumer);
+        _channel.BasicConsume(queueName, autoAck: true, consumer);
     }
 
     public void PublishOrderCreated(OrderDto order)
@@ -52,7 +54,13 @@ public class RabbitOrderEventsPublisher : IOrderEventsPublisher, IDisposable
     private void Publish(string routingKey, OrderDto order)
     {
         var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(order));
-        _channel.BasicPublish("orders", routingKey, null, body);
+        var props = _channel.CreateBasicProperties();
+        props.DeliveryMode = 2;
+        props.Headers = new Dictionary<string, object>
+        {
+            ["traceparent"] = Activity.Current?.Id ?? string.Empty
+        };
+        _channel.BasicPublish("orders", routingKey, props, body);
     }
 
     public void Dispose()

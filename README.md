@@ -173,8 +173,12 @@ Database migrations now apply **asynchronously** during startup and each service
 All API routes require an `Authorization: Bearer <token>` header containing a JWT signed with the configured key.
 When browsing Swagger, use the **Authorize** button to provide a token for authenticated requests.
 Persistent volumes `db-data` and `redis-data` preserve SQL Server and Redis data between restarts. The services automatically apply EF Core migrations using their respective connection strings (`ORDERS_DB_CONN`, `PROFILE_DB_CONN` and `ORGANIZATION_DB_CONN`). All containers join the `micro-net` Docker network so the gateway can resolve service names. Swagger can also be reached through the gateway under `/orders/swagger`, `/profile/swagger` and `/organization/swagger`.
+A replica container `cache-replica` follows the master for higher availability.
 The gateway exposes an aggregation endpoint at `/api/aggregation/person/{id}` returning combined order, profile and organization data. Prometheus metrics from each service are available at `/metrics`. The profile and organization services now expose full CRUD APIs via `/api/profile` and `/api/org`.
 RabbitMQ runs as `rabbit` on port `5672` for publishing order events used by statistics.
+
+Services now register with Consul using HTTP health checks. Optional tags can be provided via `SERVICE_TAGS` and key-value metadata via `SERVICE_META`. RabbitMQ queues are created as durable and include the `traceparent` header so traces flow through message handling.
+The `OrderSaga` stores the created order's ID and deletes that specific row on compensation instead of removing the latest order for a person.
 
 Each service enables Redis caching via `REDIS_CONN`, OpenTelemetry tracing with Jaeger and Prometheus exporters and logs via Serilog to Elasticsearch. Services register with Consul for discovery and secure endpoints using OAuth2 bearer authentication. Contract tests live under `src/tests/Publishing.Contracts.Tests` and verify API compatibility using Pact. These tests run automatically via the `contracts.yml` GitHub Actions workflow.
 Kubernetes manifests for all components, including the database, Redis, RabbitMQ, Jaeger, Prometheus and a gateway ingress, can be found under the `k8s/` directory.
