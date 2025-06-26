@@ -20,7 +20,7 @@
     <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.8.2" />
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="9.1.0" />
-    <PackageReference Include="Consul" Version="1.8.1" />
+    <PackageReference Include="Consul" Version="1.7.14.7" />
     <ProjectReference Include="..\Publishing.Services\Publishing.Services.csproj" />
   </ItemGroup>
 </Project>
