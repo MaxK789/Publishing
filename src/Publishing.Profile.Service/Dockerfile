@@ -1,25 +1,16 @@
 # ------------------------------------------------------------
 # 1) Build stage using the .NET SDK
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
+WORKDIR /repo
 
 # Ensure MSBuild can resolve the RepoRoot property
-COPY Directory.Build.props .
+COPY Directory.Build.props ./
+COPY src ./src
 
-# 1.1) Copy dependent projects (code + csproj)
-COPY src/Publishing.Core/.           "Publishing.Core/"
-COPY src/Publishing.Infrastructure/. "Publishing.Infrastructure/"
-COPY src/Publishing.Application/.    "Publishing.Application/"
-COPY src/Publishing.Services/.       "Publishing.Services/"
-COPY src/Publishing.Analyzers/.     "Publishing.Analyzers/"
+RUN dotnet restore "src/Publishing.Profile.Service/Publishing.Profile.Service.csproj"
 
-# 1.2) Copy and restore Profile.Service itself
-COPY src/Publishing.Profile.Service/. "Publishing.Profile.Service/"
-RUN dotnet restore "Publishing.Profile.Service/Publishing.Profile.Service.csproj"
-
-# 1.3) Publish
-WORKDIR "/src/Publishing.Profile.Service"
-RUN dotnet publish "Publishing.Profile.Service.csproj" -c Release -o /app/publish
+WORKDIR /repo/src/Publishing.Profile.Service
+RUN dotnet publish -c Release -o /app/publish
 
 # ------------------------------------------------------------
 # 2) Runtime stage with ASP.NET Core Runtime
