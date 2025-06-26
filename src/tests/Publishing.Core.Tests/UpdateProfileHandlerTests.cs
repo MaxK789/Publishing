@@ -6,6 +6,7 @@ using Publishing.Services;
 using System.Diagnostics.CodeAnalysis;
 using FluentValidation;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,6 +21,11 @@ public class UpdateProfileHandlerTests
         public UpdateProfileCommand? Updated;
         public Task<bool> EmailExistsAsync(string email) => Task.FromResult(EmailExists);
         public Task UpdateAsync(UpdateProfileCommand cmd) { Updated = cmd; return Task.CompletedTask; }
+
+        public Task<ProfileDto?> GetAsync(string id) => Task.FromResult<ProfileDto?>(null);
+        public Task<IEnumerable<ProfileDto>> GetAllAsync() => Task.FromResult<IEnumerable<ProfileDto>>(Array.Empty<ProfileDto>());
+        public Task CreateAsync(CreateProfileCommand cmd) => Task.CompletedTask;
+        public Task DeleteAsync(string id) => Task.CompletedTask;
     }
 
     private class StubUnitOfWork : IUnitOfWork
