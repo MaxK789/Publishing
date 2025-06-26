@@ -21,6 +21,6 @@
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="9.1.0" />
     <PackageReference Include="Consul" Version="1.7.14.7" />
-    <ProjectReference Include="..\Publishing.Services\Publishing.Services.csproj" />
+    <ProjectReference Include="../Publishing.Services/Publishing.Services.csproj" />
   </ItemGroup>
 </Project>
