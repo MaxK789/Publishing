@@ -6,7 +6,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
-    <!-- Use backslashes to avoid path resolution issues on Windows -->
-    <ProjectReference Include="..\..\ApiGateway\ApiGateway.csproj" />
+  <!-- Project path should use forward slashes to work on all platforms -->
+  <ProjectReference Include="../../ApiGateway/ApiGateway.csproj" />
   </ItemGroup>
 </Project>
