@@ -9,4 +9,4 @@ dotnet run --project ApiGateway.csproj
 ```
 
 The gateway exposes a health endpoint at `/health`. Swagger for each service is reachable via `/orders/swagger`, `/profile/swagger` and `/organization/swagger`.
-Requests are cached with Redis, traced via OpenTelemetry and secured using JWT bearer authentication.
+Requests are cached with Redis, traced via OpenTelemetry and secured using JWT bearer authentication. Cached responses expire after one minute.
