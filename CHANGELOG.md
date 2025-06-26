@@ -18,4 +18,4 @@
 ## [1.2.1] - 2025-06-26
 ### Fixed
 - Docker builds copy the full `src/` tree so `Publishing.Analyzers` resolves
-- Prometheus exporter downgraded to `1.11.2-beta.1` for .NET 6 compatibility
+- Prometheus exporter downgraded to `1.11.0` for .NET 6 compatibility
