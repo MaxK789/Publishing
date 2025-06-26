@@ -1,25 +1,16 @@
 # ------------------------------------------------------------
 # 1) Build stage using the .NET SDK
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
+WORKDIR /repo
 
 # Ensure MSBuild can resolve the RepoRoot property
-COPY Directory.Build.props .
+COPY Directory.Build.props ./
+COPY src ./src
 
-# 1.1) Copy dependent projects (code + csproj)
-COPY src/Publishing.Core/.           "Publishing.Core/"
-COPY src/Publishing.Infrastructure/. "Publishing.Infrastructure/"
-COPY src/Publishing.Application/.    "Publishing.Application/"
-COPY src/Publishing.Services/.       "Publishing.Services/"
-COPY src/Publishing.Analyzers/.     "Publishing.Analyzers/"
+RUN dotnet restore "src/ApiGateway/ApiGateway.csproj"
 
-# 1.2) Copy and restore ApiGateway itself
-COPY src/ApiGateway/. "ApiGateway/"
-RUN dotnet restore "ApiGateway/ApiGateway.csproj"
-
-# 1.3) Publish
-WORKDIR "/src/ApiGateway"
-RUN dotnet publish "ApiGateway.csproj" -c Release -o /app/publish
+WORKDIR /repo/src/ApiGateway
+RUN dotnet publish -c Release -o /app/publish
 
 # ------------------------------------------------------------
 # 2) Runtime stage with ASP.NET Core Runtime
