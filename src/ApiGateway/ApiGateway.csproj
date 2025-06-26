@@ -23,5 +23,6 @@
     <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
     <PackageReference Include="Consul" Version="1.7.14.7" />
     <ProjectReference Include="../Publishing.Services/Publishing.Services.csproj" />
+    <ProjectReference Include="../Publishing.Infrastructure/Publishing.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
