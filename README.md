@@ -156,6 +156,24 @@ Start the whole stack using:
 docker-compose up --build
 ```
 
+### Local endpoints
+
+The compose file maps each container to `localhost` for development purposes:
+
+| Service        | URL                       |
+| -------------- | ------------------------- |
+| ApiGateway     | <http://localhost:5000> |
+| Orders         | <http://localhost:5001> |
+| Profile        | <http://localhost:5002> |
+| Organization   | <http://localhost:5003> |
+
+Visit `http://localhost:5000/orders` to reach the Orders API through the gateway.
+Each service also exposes `/swagger` and `/health` on its port.
+
+For production deployments these ports are typically not published. Comment out
+the `ports:` sections or bind them to an internal network if you do not want the
+services reachable directly from the host.
+
 The API gateway project under `src/ApiGateway` routes requests to the services. Swagger is enabled for each service and the gateway itself at `/swagger`. Health checks are exposed at `/health`. The compose stack also launches **Elasticsearch**, **Kibana**, **Jaeger** and **Prometheus** for centralized logging and tracing.
 Copy `.env.example` to `.env` and adjust the connection strings and JWT settings before starting the stack. Required variables are `SA_PASSWORD`, `ACCEPT_EULA`, `ORDERS_DB_CONN`, `PROFILE_DB_CONN`, `ORGANIZATION_DB_CONN`, `REDIS_CONN`, `RABBIT_CONN`, `CONSUL_URL`, `OIDC_AUTHORITY`, `OIDC_AUDIENCE`, `ELASTIC_URL`, `JWT__Issuer`, `JWT__Audience` and `JWT__SigningKey`.
 Elasticsearch runs on `http://localhost:9200` with Kibana at `http://localhost:5601`. Jaeger UI is available at `http://localhost:16686` and Prometheus at `http://localhost:9090` when using the compose stack.
