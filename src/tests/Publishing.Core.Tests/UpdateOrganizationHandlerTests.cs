@@ -5,6 +5,7 @@ using Publishing.Core.Interfaces;
 using FluentValidation;
 using MediatR;
 using Publishing.Services;
+using Publishing.Core.DTOs;
 using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Collections.Generic;
