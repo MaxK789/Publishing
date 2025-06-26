@@ -70,12 +70,22 @@ public class UpdateOrganizationHandlerTests
         public void NotifyError(string message, string? details = null) { }
     }
 
+    private class StubEvents : IOrganizationEventsPublisher
+    {
+        public event Action<OrganizationDto>? OrganizationUpdated;
+
+        public void PublishOrganizationUpdated(OrganizationDto organization)
+        {
+            OrganizationUpdated?.Invoke(organization);
+        }
+    }
+
     [TestMethod]
     public async Task Handle_ExistingName_Updates()
     {
         var repo = new StubRepo { ExistingName = "org" };
         var uow = new StubUnitOfWork();
-        var handler = new UpdateOrganizationHandler(repo, new InlineValidator<UpdateOrganizationCommand>(), uow, new StubNotifier());
+        var handler = new UpdateOrganizationHandler(repo, new InlineValidator<UpdateOrganizationCommand>(), uow, new StubNotifier(), new StubEvents());
         var cmd = new UpdateOrganizationCommand { Id = "1", Name = "org" };
         await handler.Handle(cmd, CancellationToken.None);
         Assert.IsNotNull(repo.Updated);
@@ -87,7 +97,7 @@ public class UpdateOrganizationHandlerTests
     {
         var repo = new StubRepo { ExistingName = "other" };
         var uow = new StubUnitOfWork();
-        var handler = new UpdateOrganizationHandler(repo, new InlineValidator<UpdateOrganizationCommand>(), uow, new StubNotifier());
+        var handler = new UpdateOrganizationHandler(repo, new InlineValidator<UpdateOrganizationCommand>(), uow, new StubNotifier(), new StubEvents());
         var cmd = new UpdateOrganizationCommand { Id = "2", Name = "org" };
         await handler.Handle(cmd, CancellationToken.None);
         Assert.IsNotNull(repo.Created);

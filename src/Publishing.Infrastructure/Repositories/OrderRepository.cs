@@ -92,7 +92,7 @@ namespace Publishing.Infrastructure.Repositories
             }
             else
             {
-                orderId = await _db.QuerySingleAsync<int>(sql + "; SELECT CAST(SCOPE_IDENTITY() as int);", new
+                var idsSingle = await _db.QueryAsync<int>(sql + "; SELECT CAST(SCOPE_IDENTITY() as int);", new
                 {
                     ProdId = prodId,
                     order.PersonId,
@@ -103,6 +103,7 @@ namespace Publishing.Infrastructure.Repositories
                     order.Tirage,
                     order.Price
                 });
+                orderId = idsSingle.First();
             }
 
             return orderId;
