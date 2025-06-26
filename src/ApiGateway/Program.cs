@@ -10,6 +10,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Metrics;
 using Serilog;
 using Publishing.Infrastructure;
+using OpenTelemetry.Instrumentation.Runtime;
 using Publishing.Services;
 using Publishing.Core.Interfaces;
 using ApiGateway.Extensions;
