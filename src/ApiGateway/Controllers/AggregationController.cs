@@ -2,6 +2,8 @@ using ApiGateway.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Json;
 using Publishing.Core.DTOs;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace ApiGateway.Controllers;
 
@@ -10,15 +12,24 @@ namespace ApiGateway.Controllers;
 public class AggregationController : ControllerBase
 {
     private readonly IHttpClientFactory _factory;
+    private readonly IDistributedCache _cache;
 
-    public AggregationController(IHttpClientFactory factory)
+    public AggregationController(IHttpClientFactory factory, IDistributedCache cache)
     {
         _factory = factory;
+        _cache = cache;
     }
 
     [HttpGet("person/{id}")]
     public async Task<ActionResult<AggregatedResponseDto>> Get(string id)
     {
+        var cached = await _cache.GetStringAsync($"agg_{id}");
+        if (cached is not null)
+        {
+            var dto = JsonSerializer.Deserialize<AggregatedResponseDto>(cached);
+            return Ok(dto);
+        }
+
         var ordersClient = _factory.CreateClient("orders");
         var profileClient = _factory.CreateClient("profile");
         var orgClient = _factory.CreateClient("organization");
@@ -35,6 +46,7 @@ public class AggregationController : ControllerBase
             Profile = profileTask.Result,
             Organization = orgTask.Result
         };
+        await _cache.SetStringAsync($"agg_{id}", JsonSerializer.Serialize(result));
         return Ok(result);
     }
 }
