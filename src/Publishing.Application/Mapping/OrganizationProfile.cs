@@ -11,5 +11,6 @@ public class OrganizationProfile : Profile
         CreateMap<UpdateOrganizationDto, UpdateOrganizationCommand>();
         CreateMap<UpdateOrganizationDto, CreateOrganizationCommand>()
             .ForMember(d => d.PersonId, o => o.MapFrom(s => s.Id));
+        CreateMap<CreateOrganizationDto, CreateOrganizationCommand>();
     }
 }

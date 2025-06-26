@@ -1,0 +1,19 @@
+{
+  "realm": "publishing",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "publishing-api",
+      "publicClient": true,
+      "redirectUris": [
+        "*"
+      ]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {"name": "admin"},
+      {"name": "user"}
+    ]
+  }
+}

@@ -6,9 +6,15 @@ services:
     ports:
       - "5001:80"
     environment:
-      - DB_CONN=${DB_CONN}
+      - ORDERS_DB_CONN=${ORDERS_DB_CONN}
       - REDIS_CONN=${REDIS_CONN}
       - RABBIT_CONN=${RABBIT_CONN}
+      - CONSUL_URL=${CONSUL_URL}
+      - SERVICE_NAME=orders
+      - SERVICE_ADDRESS=orders
+      - SERVICE_PORT=80
+      - OIDC_AUTHORITY=${OIDC_AUTHORITY}
+      - OIDC_AUDIENCE=${OIDC_AUDIENCE}
       - JWT__Issuer=${JWT__Issuer}
       - JWT__Audience=${JWT__Audience}
       - JWT__SigningKey=${JWT__SigningKey}
@@ -36,8 +42,14 @@ services:
     ports:
       - "5002:80"
     environment:
-      - DB_CONN=${DB_CONN}
+      - PROFILE_DB_CONN=${PROFILE_DB_CONN}
       - REDIS_CONN=${REDIS_CONN}
+      - CONSUL_URL=${CONSUL_URL}
+      - SERVICE_NAME=profile
+      - SERVICE_ADDRESS=profile
+      - SERVICE_PORT=80
+      - OIDC_AUTHORITY=${OIDC_AUTHORITY}
+      - OIDC_AUDIENCE=${OIDC_AUDIENCE}
       - JWT__Issuer=${JWT__Issuer}
       - JWT__Audience=${JWT__Audience}
       - JWT__SigningKey=${JWT__SigningKey}
@@ -65,8 +77,14 @@ services:
     ports:
       - "5003:80"
     environment:
-      - DB_CONN=${DB_CONN}
+      - ORGANIZATION_DB_CONN=${ORGANIZATION_DB_CONN}
       - REDIS_CONN=${REDIS_CONN}
+      - CONSUL_URL=${CONSUL_URL}
+      - SERVICE_NAME=organization
+      - SERVICE_ADDRESS=organization
+      - SERVICE_PORT=80
+      - OIDC_AUTHORITY=${OIDC_AUTHORITY}
+      - OIDC_AUDIENCE=${OIDC_AUDIENCE}
       - JWT__Issuer=${JWT__Issuer}
       - JWT__Audience=${JWT__Audience}
       - JWT__SigningKey=${JWT__SigningKey}
@@ -97,6 +115,12 @@ services:
       - JWT__Issuer=${JWT__Issuer}
       - JWT__Audience=${JWT__Audience}
       - JWT__SigningKey=${JWT__SigningKey}
+      - CONSUL_URL=${CONSUL_URL}
+      - SERVICE_NAME=gateway
+      - SERVICE_ADDRESS=gateway
+      - SERVICE_PORT=80
+      - OIDC_AUTHORITY=${OIDC_AUTHORITY}
+      - OIDC_AUDIENCE=${OIDC_AUDIENCE}
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       orders:
@@ -144,6 +168,67 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - micro-net
+
+  consul:
+    image: hashicorp/consul:1.15
+    command: agent -dev -client=0.0.0.0
+    ports:
+      - "8500:8500"
+    networks:
+      - micro-net
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    networks:
+      - micro-net
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.12.2
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - micro-net
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.54
+    ports:
+      - "16686:16686"
+      - "6831:6831/udp"
+      - "14268:14268"
+    networks:
+      - micro-net
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - micro-net
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KEYCLOAK_IMPORT=/opt/keycloak/data/import/realm-export.json
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     networks:
       - micro-net
 

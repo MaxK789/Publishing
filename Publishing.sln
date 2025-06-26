@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Publishing.Analyzers.Tests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Publishing.UI.Tests", "src\tests\Publishing.UI.Tests\Publishing.UI.Tests.csproj", "{44E051FA-33A2-40AE-9F13-47D40DE71DBD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Publishing.E2E.Tests", "src\tests\Publishing.E2E.Tests\Publishing.E2E.Tests.csproj", "{8696EAD3-00EE-44CA-A0ED-3A0C133C174E}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publishing.AppLayer", "src\Publishing.Application\Publishing.Application.csproj", "{9B9E0E43-9D97-4EC5-90DF-5FF262EE6237}"
 EndProject
 Global
@@ -95,6 +97,7 @@ Global
                 {9B9E0E43-9D97-4EC5-90DF-5FF262EE6237} = {9FCB158E-82F3-4656-90C3-45A54BFB864D}
                 {CE5E9BC3-FA99-48FA-9D32-A5CFD407FFAA} = {FFA3015B-5245-4B86-951B-1D94EF3D19E3}
                 {44E051FA-33A2-40AE-9F13-47D40DE71DBD} = {FFA3015B-5245-4B86-951B-1D94EF3D19E3}
+                {8696EAD3-00EE-44CA-A0ED-3A0C133C174E} = {FFA3015B-5245-4B86-951B-1D94EF3D19E3}
         EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4C64FC7B-E529-436C-853E-F7D353E38210}

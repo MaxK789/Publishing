@@ -28,6 +28,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="6.0.0" />
+    <PackageReference Include="Consul" Version="1.15.5" />
   </ItemGroup>
 
   <!-- Ensure EF Core migrations are compiled into the assembly -->

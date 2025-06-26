@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consul
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consul
+  template:
+    metadata:
+      labels:
+        app: consul
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8500"
+        prometheus.io/path: "/v1/agent/metrics"
+    spec:
+      containers:
+      - name: consul
+        image: hashicorp/consul:1.15
+        args: ["agent","-dev","-client=0.0.0.0"]
+        ports:
+        - containerPort: 8500
+        readinessProbe:
+          httpGet:
+            path: /v1/status/leader
+            port: 8500
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /v1/status/leader
+            port: 8500
+          initialDelaySeconds: 10
+          periodSeconds: 10

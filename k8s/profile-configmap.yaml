@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: profile-config
+data:
+  REDIS_CONN: redis:6379
+  CONSUL_URL: http://consul:8500
+  OIDC_AUTHORITY: http://keycloak:8080/realms/publishing
+  OIDC_AUDIENCE: publishing-api

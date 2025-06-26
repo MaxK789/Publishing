@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-config
+data:
+  realm-export.json: |
+    {
+      "realm": "publishing",
+      "enabled": true,
+      "clients": [
+        {
+          "clientId": "publishing-api",
+          "publicClient": true,
+          "redirectUris": [
+            "*"
+          ]
+        }
+      ],
+      "roles": {
+        "realm": [
+          {"name": "admin"},
+          {"name": "user"}
+        ]
+      }
+    }
