@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.AspNetCore.Authorization;
 using Publishing.Core.Interfaces;
+using Publishing.Services;
 
 namespace Publishing.Profile.Service.Controllers;
 
@@ -18,13 +19,15 @@ public class ProfileController : ControllerBase
     private readonly IDistributedCache _cache;
     private readonly IMapper _mapper;
     private readonly IProfileRepository _profiles;
+    private readonly IProfileEventsPublisher _events;
 
-    public ProfileController(IMediator mediator, IDistributedCache cache, IMapper mapper, IProfileRepository profiles)
+    public ProfileController(IMediator mediator, IDistributedCache cache, IMapper mapper, IProfileRepository profiles, IProfileEventsPublisher events)
     {
         _mediator = mediator;
         _cache = cache;
         _mapper = mapper;
         _profiles = profiles;
+        _events = events;
     }
 
     [HttpGet]
@@ -48,7 +51,9 @@ public class ProfileController : ControllerBase
     {
         var cmd = _mapper.Map<UpdateProfileCommand>(dto);
         await _mediator.Send(cmd);
-        await _cache.RemoveAsync("orders_all");
+        var profile = await _profiles.GetAsync(dto.Id);
+        if (profile is not null)
+            _events.PublishProfileUpdated(profile);
         return NoContent();
     }
 

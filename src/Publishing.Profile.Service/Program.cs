@@ -91,10 +91,17 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IJwtFactory, JwtFactory>();
 var rabbitConn = builder.Configuration["RABBIT_CONN"];
 if (string.IsNullOrWhiteSpace(rabbitConn))
+{
     builder.Services.AddSingleton<IOrderEventsPublisher, OrderEventsPublisher>();
+    builder.Services.AddSingleton<IProfileEventsPublisher, ProfileEventsPublisher>();
+}
 else
+{
     builder.Services.AddSingleton<IOrderEventsPublisher>(sp =>
         new RabbitOrderEventsPublisher(rabbitConn));
+    builder.Services.AddSingleton<IProfileEventsPublisher>(sp =>
+        new RabbitProfileEventsPublisher(rabbitConn));
+}
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(r => r.AddService(builder.Environment.ApplicationName))
     .WithTracing(b => b

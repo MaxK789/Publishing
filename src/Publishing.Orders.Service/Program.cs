@@ -123,10 +123,20 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IJwtFactory, JwtFactory>();
 var rabbitConn = builder.Configuration["RABBIT_CONN"];
 if (string.IsNullOrWhiteSpace(rabbitConn))
+{
     builder.Services.AddSingleton<IOrderEventsPublisher, OrderEventsPublisher>();
+    builder.Services.AddSingleton<IProfileEventsPublisher, ProfileEventsPublisher>();
+    builder.Services.AddSingleton<IOrganizationEventsPublisher, OrganizationEventsPublisher>();
+}
 else
+{
     builder.Services.AddSingleton<IOrderEventsPublisher>(sp =>
         new RabbitOrderEventsPublisher(rabbitConn));
+    builder.Services.AddSingleton<IProfileEventsPublisher>(sp =>
+        new RabbitProfileEventsPublisher(rabbitConn));
+    builder.Services.AddSingleton<IOrganizationEventsPublisher>(sp =>
+        new RabbitOrganizationEventsPublisher(rabbitConn));
+}
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(r => r.AddService(builder.Environment.ApplicationName))
     .WithTracing(b => b
@@ -157,6 +167,17 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
+    var profileEvents = scope.ServiceProvider.GetRequiredService<IProfileEventsPublisher>();
+    var organizationEvents = scope.ServiceProvider.GetRequiredService<IOrganizationEventsPublisher>();
+    var cache = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
+    profileEvents.ProfileUpdated += _ =>
+    {
+        cache.RemoveAsync("orders_all");
+    };
+    organizationEvents.OrganizationUpdated += _ =>
+    {
+        cache.RemoveAsync("orders_all");
+    };
 }
 
 if (app.Environment.IsDevelopment())

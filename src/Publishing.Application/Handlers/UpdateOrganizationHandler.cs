@@ -16,15 +16,17 @@ public class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizationComma
     private readonly IValidator<UpdateOrganizationCommand> _validator;
     private readonly IUnitOfWork _uow;
     private readonly IUiNotifier _notifier;
+    private readonly IOrganizationEventsPublisher _events;
     private readonly ResourceManager _resources =
         new("Publishing.Services.Resources.Notifications", typeof(IUiNotifier).Assembly);
 
-    public UpdateOrganizationHandler(IOrganizationRepository repo, IValidator<UpdateOrganizationCommand> validator, IUnitOfWork uow, IUiNotifier notifier)
+    public UpdateOrganizationHandler(IOrganizationRepository repo, IValidator<UpdateOrganizationCommand> validator, IUnitOfWork uow, IUiNotifier notifier, IOrganizationEventsPublisher events)
     {
         _repo = repo;
         _validator = validator;
         _uow = uow;
         _notifier = notifier;
+        _events = events;
     }
 
     public async Task<Unit> Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
@@ -52,6 +54,9 @@ public class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizationComma
                 await _repo.InsertAsync(createCmd).ConfigureAwait(false);
             }
             await _uow.CommitAsync();
+            var org = await _repo.GetByPersonIdAsync(request.Id);
+            if (org is not null)
+                _events.PublishOrganizationUpdated(org);
             _notifier.NotifyInfo(_resources.GetString("OrganizationUpdated") ?? "Organization updated");
         }
         catch

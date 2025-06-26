@@ -91,10 +91,17 @@ builder.Services.AddScoped<IPriceCalculator, PriceCalculator>();
 builder.Services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
 var rabbitConn = builder.Configuration["RABBIT_CONN"];
 if (string.IsNullOrWhiteSpace(rabbitConn))
+{
     builder.Services.AddSingleton<IOrderEventsPublisher, OrderEventsPublisher>();
+    builder.Services.AddSingleton<IOrganizationEventsPublisher, OrganizationEventsPublisher>();
+}
 else
+{
     builder.Services.AddSingleton<IOrderEventsPublisher>(sp =>
         new RabbitOrderEventsPublisher(rabbitConn));
+    builder.Services.AddSingleton<IOrganizationEventsPublisher>(sp =>
+        new RabbitOrganizationEventsPublisher(rabbitConn));
+}
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(r => r.AddService(builder.Environment.ApplicationName))
     .WithTracing(b => b
