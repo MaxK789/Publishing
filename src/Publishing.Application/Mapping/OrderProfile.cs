@@ -2,6 +2,7 @@ using AutoMapper;
 using Publishing.Core.Domain;
 using Publishing.Core.DTOs;
 using Publishing.AppLayer.Commands;
+using Publishing.Core.Commands;
 
 namespace Publishing.AppLayer.Mapping;
 
