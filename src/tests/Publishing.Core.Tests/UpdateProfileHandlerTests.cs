@@ -3,6 +3,7 @@ using Publishing.AppLayer.Handlers;
 using Publishing.Core.Commands;
 using Publishing.Core.Interfaces;
 using Publishing.Services;
+using Publishing.Core.DTOs;
 using System.Diagnostics.CodeAnalysis;
 using FluentValidation;
 using System;
