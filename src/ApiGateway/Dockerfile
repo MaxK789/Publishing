@@ -3,6 +3,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
+# Ensure MSBuild can resolve the RepoRoot property
+COPY Directory.Build.props .
+
 # 1.1) Copy dependent projects (code + csproj)
 COPY src/Publishing.Core/.           "Publishing.Core/"
 COPY src/Publishing.Infrastructure/. "Publishing.Infrastructure/"
