@@ -70,12 +70,21 @@ public class UpdateProfileHandlerTests
         public void NotifyError(string message, string? details = null) { }
     }
 
+    private class StubEvents : IProfileEventsPublisher
+    {
+        public event Action<ProfileDto>? ProfileUpdated;
+        public void PublishProfileUpdated(ProfileDto profile)
+        {
+            ProfileUpdated?.Invoke(profile);
+        }
+    }
+
     [TestMethod]
     public async Task Handle_EmailNotExists_Updates()
     {
         var repo = new StubRepo();
         var uow = new StubUnitOfWork();
-        var handler = new UpdateProfileHandler(repo, new InlineValidator<UpdateProfileCommand>(), uow, new StubNotifier());
+        var handler = new UpdateProfileHandler(repo, new InlineValidator<UpdateProfileCommand>(), uow, new StubNotifier(), new StubEvents());
         var cmd = new UpdateProfileCommand { Id = "1", Email = "e@e.com" };
         await handler.Handle(cmd, CancellationToken.None);
         Assert.IsNotNull(repo.Updated);
@@ -87,7 +96,7 @@ public class UpdateProfileHandlerTests
     {
         var repo = new StubRepo { EmailExists = true };
         var uow = new StubUnitOfWork();
-        var handler = new UpdateProfileHandler(repo, new InlineValidator<UpdateProfileCommand>(), uow, new StubNotifier());
+        var handler = new UpdateProfileHandler(repo, new InlineValidator<UpdateProfileCommand>(), uow, new StubNotifier(), new StubEvents());
         var cmd = new UpdateProfileCommand { Id = "1", Email = "e@e.com" };
         await handler.Handle(cmd, CancellationToken.None);
     }

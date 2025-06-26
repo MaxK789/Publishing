@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Collections.Generic;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Publishing.Core.DTOs;
