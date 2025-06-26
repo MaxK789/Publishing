@@ -19,6 +19,8 @@ jobs:
       run: dotnet tool install --global dotnet-ef --version 6.0.*
     - name: Add dotnet-ef to PATH
       run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+    - name: Validate project paths
+      run: ./tools/validate-project-paths.sh
     - name: Restore
       run: dotnet restore
     - name: Build
