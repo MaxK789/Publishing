@@ -5,22 +5,52 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using Polly;
 using Publishing.Core.DTOs;
 
 namespace Publishing.Services;
 
 public class RabbitProfileEventsPublisher : IProfileEventsPublisher, IDisposable
 {
-    private readonly IModel _channel;
-    private readonly IConnection _connection;
+    private IModel? _channel;
+    private IConnection? _connection;
 
     public event Action<ProfileDto>? ProfileUpdated;
 
     public RabbitProfileEventsPublisher(string connectionString)
     {
-        var factory = new ConnectionFactory { Uri = new Uri(connectionString) };
-        _connection = factory.CreateConnection();
-        _channel = _connection.CreateModel();
+        var factory = new ConnectionFactory
+        {
+            Uri = new Uri(connectionString),
+            AutomaticRecoveryEnabled = true,
+            NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
+        };
+
+        var retry = Policy
+            .Handle<Exception>()
+            .WaitAndRetry(3, _ => TimeSpan.FromSeconds(5));
+        var breaker = Policy
+            .Handle<Exception>()
+            .CircuitBreaker(2, TimeSpan.FromSeconds(30));
+        var policy = Policy.Wrap(retry, breaker);
+
+        try
+        {
+            policy.Execute(() =>
+            {
+                _connection = factory.CreateConnection();
+                _channel = _connection.CreateModel();
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR: Failed to connect to RabbitMQ: {ex.Message}");
+            return;
+        }
+
+        if (_channel is null)
+            return;
+
         _channel.ExchangeDeclare("profiles", ExchangeType.Topic, durable: true);
 
         var queueName = $"{Environment.GetEnvironmentVariable("SERVICE_NAME")}-profiles";
@@ -39,6 +69,8 @@ public class RabbitProfileEventsPublisher : IProfileEventsPublisher, IDisposable
     public void PublishProfileUpdated(ProfileDto profile)
     {
         ProfileUpdated?.Invoke(profile);
+        if (_channel is null)
+            return;
         var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(profile));
         var props = _channel.CreateBasicProperties();
         props.DeliveryMode = 2;
@@ -51,7 +83,7 @@ public class RabbitProfileEventsPublisher : IProfileEventsPublisher, IDisposable
 
     public void Dispose()
     {
-        _channel.Close();
-        _connection.Close();
+        _channel?.Close();
+        _connection?.Close();
     }
 }

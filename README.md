@@ -248,3 +248,12 @@ To consume the package in other projects reference it as:
 ## Load testing
 
 Sample JMeter plans reside in the `load-tests` directory. Run `jmeter -n -t gateway.jmx` to stress the aggregation endpoint through the gateway. Other scripts cover individual services.
+
+## Troubleshooting RabbitMQ connectivity
+If the `orders` service exits with `RabbitMQ.Client.ConnectFailureException: Name or service not known`, ensure the `RABBIT_CONN` variable in `.env` uses `amqp://guest:guest@rabbit:5672/`. Docker will wait for the broker to become healthy because of the `depends_on` condition in `docker-compose.yml`. After updating the variable, restart the stack with:
+
+```bash
+docker compose down -v
+docker compose up --build -d
+```
+
