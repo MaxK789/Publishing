@@ -147,7 +147,8 @@ app.UseCors();
 app.UseExceptionHandling();
 app.UseAuthentication();
 app.UseAuthorization();
-await app.RegisterWithConsulAsync(app.Lifetime, app.Configuration);
+if (!app.Environment.IsEnvironment("Test"))
+    await app.RegisterWithConsulAsync(app.Lifetime, app.Configuration);
 app.MapControllers();
 app.MapHealthChecks("/health");
 app.UseOpenTelemetryPrometheusScrapingEndpoint();

@@ -115,7 +115,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseSwagger();
 app.UseSwaggerUI();
-await app.RegisterWithConsulAsync(app.Lifetime, app.Configuration);
+if (!app.Environment.IsEnvironment("Test"))
+    await app.RegisterWithConsulAsync(app.Lifetime, app.Configuration);
 await app.UseOcelot();
 app.MapHealthChecks("/health");
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
