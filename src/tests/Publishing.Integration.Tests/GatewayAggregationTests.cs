@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
