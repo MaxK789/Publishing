@@ -14,6 +14,9 @@ public class AggregationE2ETests : IClassFixture<WebApplicationFactory<Program>>
     public AggregationE2ETests(WebApplicationFactory<Program> factory)
     {
         Environment.SetEnvironmentVariable("CONSUL_URL", "http://consul");
+        Environment.SetEnvironmentVariable("REDIS_CONN", "localhost");
+        Environment.SetEnvironmentVariable("OIDC_AUTHORITY", "http://auth");
+        Environment.SetEnvironmentVariable("OIDC_AUDIENCE", "audience");
         _factory = factory.WithWebHostBuilder(builder => { });
     }
 
