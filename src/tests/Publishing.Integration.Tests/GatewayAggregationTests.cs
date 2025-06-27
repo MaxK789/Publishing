@@ -11,6 +11,7 @@ using System.Text.Encodings.Web;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
@@ -48,7 +49,7 @@ public class GatewayAggregationTests
                 });
                 builder.ConfigureAppConfiguration((ctx, cfg) =>
                 {
-                    cfg.AddInMemoryCollection(new()
+                    cfg.AddInMemoryCollection(new Dictionary<string, string?>
                     {
                         ["REDIS_CONN"] = "localhost",
                         ["CONSUL_URL"] = "http://consul",
