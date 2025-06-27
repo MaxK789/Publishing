@@ -2,7 +2,6 @@ using System;
 using Publishing.Core.Interfaces;
 using Publishing.Services;
 using System.Resources;
-using System.Net.Mail;
 using System.Windows.Forms;
 
 namespace Publishing
@@ -32,26 +31,6 @@ namespace Publishing
         {
             string email = EmailTextBox.Text;
             string password = PasswordTextBox.Text;
-
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                _notifier.NotifyWarning(_notify.GetString("EmailRequired") ?? "Email is required");
-                return;
-            }
-            try
-            {
-                _ = new MailAddress(email);
-            }
-            catch
-            {
-                _notifier.NotifyWarning(_notify.GetString("InvalidEmailFormat") ?? "Invalid email format");
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                _notifier.NotifyWarning(_notify.GetString("PasswordRequired") ?? "Password is required");
-                return;
-            }
 
             var result = await _authService.AuthenticateAsync(email, password);
 

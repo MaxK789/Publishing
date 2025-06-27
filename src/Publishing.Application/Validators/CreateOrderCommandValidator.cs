@@ -7,12 +7,12 @@ namespace Publishing.AppLayer.Validators
     {
         public CreateOrderCommandValidator()
         {
-            RuleFor(x => x.Pages).GreaterThan(0).WithMessage("Invalid page count");
-            RuleFor(x => x.Tirage).GreaterThan(0).WithMessage("Invalid tirage");
-            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
-            RuleFor(x => x.Type).NotEmpty().WithMessage("Type is required");
+            RuleFor(x => x.Pages).GreaterThan(0);
+            RuleFor(x => x.Tirage).GreaterThan(0);
+            RuleFor(x => x.Name).NotEmpty();
+            RuleFor(x => x.Type).NotEmpty();
             RuleFor(x => x.PersonId).NotEmpty();
-            RuleFor(x => x.Printery).NotEmpty().WithMessage("Printery is required");
+            RuleFor(x => x.Printery).NotEmpty();
         }
     }
 }

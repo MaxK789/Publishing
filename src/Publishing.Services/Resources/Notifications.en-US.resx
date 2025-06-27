@@ -18,31 +18,4 @@
   <data name="WelcomeUser" xml:space="preserve">
     <value>Welcome, {0} ({1})!</value>
   </data>
-  <data name="EmailRequired" xml:space="preserve">
-    <value>Email is required</value>
-  </data>
-  <data name="PasswordRequired" xml:space="preserve">
-    <value>Password is required</value>
-  </data>
-  <data name="FirstNameRequired" xml:space="preserve">
-    <value>First name is required</value>
-  </data>
-  <data name="LastNameRequired" xml:space="preserve">
-    <value>Last name is required</value>
-  </data>
-  <data name="StatusRequired" xml:space="preserve">
-    <value>Status is required</value>
-  </data>
-  <data name="OrgNameRequired" xml:space="preserve">
-    <value>Organization name is required</value>
-  </data>
-  <data name="InvalidEmailFormat" xml:space="preserve">
-    <value>Invalid email format</value>
-  </data>
-  <data name="InvalidPhoneFormat" xml:space="preserve">
-    <value>Invalid phone format</value>
-  </data>
-  <data name="InvalidFaxFormat" xml:space="preserve">
-    <value>Invalid fax format</value>
-  </data>
 </root>

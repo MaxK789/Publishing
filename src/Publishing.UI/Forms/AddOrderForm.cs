@@ -127,22 +127,6 @@ namespace Publishing
                 PersonId = _session.UserId
             };
 
-            if (string.IsNullOrWhiteSpace(dto.Type))
-            {
-                _notifier.NotifyWarning(_resources.GetString("TypeRequired") ?? "Type is required");
-                return false;
-            }
-            if (string.IsNullOrWhiteSpace(dto.Name))
-            {
-                _notifier.NotifyWarning(_resources.GetString("NameRequired") ?? "Name is required");
-                return false;
-            }
-            if (string.IsNullOrWhiteSpace(dto.Printery))
-            {
-                _notifier.NotifyWarning(_resources.GetString("PrinteryRequired") ?? "Printery is required");
-                return false;
-            }
-
             if (!int.TryParse(PageNumTextBox.Text, out var pages))
             {
                 _notifier.NotifyWarning(_resources.GetString("PagesParseError") ?? "Error");
