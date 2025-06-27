@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 using ApiGateway;
+using Publishing.Core.Interfaces;
+using Publishing.Infrastructure;
 
 namespace Publishing.E2E.Tests;
 
@@ -17,7 +19,13 @@ public class AggregationE2ETests : IClassFixture<WebApplicationFactory<Program>>
         Environment.SetEnvironmentVariable("REDIS_CONN", "localhost");
         Environment.SetEnvironmentVariable("OIDC_AUTHORITY", "http://auth");
         Environment.SetEnvironmentVariable("OIDC_AUDIENCE", "audience");
-        _factory = factory.WithWebHostBuilder(builder => { });
+        _factory = factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureServices(services =>
+            {
+                services.AddTransient<ILogger, LoggerService>();
+            });
+        });
     }
 
     [Fact]
