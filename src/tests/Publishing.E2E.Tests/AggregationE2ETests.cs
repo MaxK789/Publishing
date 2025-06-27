@@ -12,6 +12,7 @@ public class AggregationE2ETests : IClassFixture<WebApplicationFactory<Program>>
 
     public AggregationE2ETests(WebApplicationFactory<Program> factory)
     {
+        Environment.SetEnvironmentVariable("CONSUL_URL", "http://consul");
         _factory = factory.WithWebHostBuilder(builder => { });
     }
 

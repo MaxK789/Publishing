@@ -36,6 +36,7 @@ public class GatewayAggregationTests
 {
     private WebApplicationFactory<Program> CreateFactory()
     {
+        Environment.SetEnvironmentVariable("CONSUL_URL", "http://consul");
         return new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
             {
