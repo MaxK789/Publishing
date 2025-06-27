@@ -18,31 +18,4 @@
   <data name="WelcomeUser" xml:space="preserve">
     <value>Вітаємо, {0} ({1})!</value>
   </data>
-  <data name="EmailRequired" xml:space="preserve">
-    <value>Потрібна електронна пошта</value>
-  </data>
-  <data name="PasswordRequired" xml:space="preserve">
-    <value>Потрібен пароль</value>
-  </data>
-  <data name="FirstNameRequired" xml:space="preserve">
-    <value>Потрібне ім'я</value>
-  </data>
-  <data name="LastNameRequired" xml:space="preserve">
-    <value>Потрібне прізвище</value>
-  </data>
-  <data name="StatusRequired" xml:space="preserve">
-    <value>Потрібно вибрати статус</value>
-  </data>
-  <data name="OrgNameRequired" xml:space="preserve">
-    <value>Потрібна назва організації</value>
-  </data>
-  <data name="InvalidEmailFormat" xml:space="preserve">
-    <value>Некоректний формат електронної пошти</value>
-  </data>
-  <data name="InvalidPhoneFormat" xml:space="preserve">
-    <value>Некоректний формат телефону</value>
-  </data>
-  <data name="InvalidFaxFormat" xml:space="preserve">
-    <value>Некоректний формат факсу</value>
-  </data>
 </root>

@@ -8,8 +8,8 @@ namespace Publishing.AppLayer.Validators
         public RegisterUserValidator(IValidator<string> emailValidator)
         {
             RuleFor(x => x.Email).SetValidator(emailValidator);
-            RuleFor(x => x.Status).NotEmpty().WithMessage("Status is required");
-            RuleFor(x => x.Password).NotEmpty().WithMessage("Password is required");
+            RuleFor(x => x.Status).NotEmpty();
+            RuleFor(x => x.Password).NotEmpty();
         }
     }
 }

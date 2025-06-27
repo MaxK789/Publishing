@@ -7,8 +7,6 @@ using System.Resources;
 using System.Threading.Tasks;
 using FluentValidation;
 using System.Linq;
-using System.Net.Mail;
-using System.Text.RegularExpressions;
 
 namespace Publishing
 {
@@ -60,29 +58,6 @@ namespace Publishing
                 Fax = FaxTextBox.Text,
                 Address = AddressTextBox.Text
             };
-
-            if (!string.IsNullOrWhiteSpace(dto.Email))
-            {
-                try
-                {
-                    _ = new MailAddress(dto.Email);
-                }
-                catch
-                {
-                    _notifier.NotifyWarning(_notify.GetString("InvalidEmailFormat") ?? "Invalid email format");
-                    return;
-                }
-            }
-            if (!string.IsNullOrWhiteSpace(dto.Phone) && !Regex.IsMatch(dto.Phone, "^\\+?[1-9]\\d{2,14}$"))
-            {
-                _notifier.NotifyWarning(_notify.GetString("InvalidPhoneFormat") ?? "Invalid phone format");
-                return;
-            }
-            if (!string.IsNullOrWhiteSpace(dto.Fax) && !Regex.IsMatch(dto.Fax, "^\\+?[1-9]\\d{2,14}$"))
-            {
-                _notifier.NotifyWarning(_notify.GetString("InvalidFaxFormat") ?? "Invalid fax format");
-                return;
-            }
 
             try
             {
