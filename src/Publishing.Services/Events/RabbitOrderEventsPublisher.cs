@@ -27,13 +27,10 @@ public class RabbitOrderEventsPublisher : IOrderEventsPublisher, IDisposable
             NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
         };
 
-        var retry = Policy
+        var policy = Policy
             .Handle<Exception>()
-            .WaitAndRetry(3, _ => TimeSpan.FromSeconds(5));
-        var breaker = Policy
-            .Handle<Exception>()
-            .CircuitBreaker(2, TimeSpan.FromSeconds(30));
-        var policy = Policy.Wrap(retry, breaker);
+            .WaitAndRetryForever(_ => TimeSpan.FromSeconds(5),
+                (ex, _) => Console.WriteLine($"RabbitMQ connection failed: {ex.Message}, retrying..."));
 
         try
         {
