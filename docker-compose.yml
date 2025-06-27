@@ -24,6 +24,8 @@ services:
         condition: service_healthy
       cache:
         condition: service_started
+      rabbit:
+        condition: service_started
       organization:
         condition: service_healthy
     restart: on-failure
@@ -59,6 +61,8 @@ services:
         condition: service_healthy
       cache:
         condition: service_started
+      rabbit:
+        condition: service_started
       organization:
         condition: service_healthy
     restart: on-failure
@@ -93,6 +97,8 @@ services:
       db:
         condition: service_healthy
       cache:
+        condition: service_started
+      rabbit:
         condition: service_started
     restart: on-failure
     healthcheck:
