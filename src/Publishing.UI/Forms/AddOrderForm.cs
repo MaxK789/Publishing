@@ -7,7 +7,6 @@ using Publishing.AppLayer.Commands;
 using System.Resources;
 using FluentValidation;
 using System.Linq;
-using System.Collections.Generic;
 using Publishing.Services;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -102,11 +101,7 @@ namespace Publishing
 
         private async void OrderButton_Click(object sender, EventArgs e)
         {
-            if (!TryParseInput(out var dto, out var parseErrors))
-            {
-                _notifier.NotifyWarning(string.Join("\n", parseErrors));
-                return;
-            }
+            if (!TryParseInput(out var dto)) return;
             try
             {
                 _inputValidator.Validate(dto);
@@ -122,7 +117,7 @@ namespace Publishing
             }
         }
 
-        private bool TryParseInput(out CreateOrderDto dto, out List<string> errors)
+        private bool TryParseInput(out CreateOrderDto dto)
         {
             dto = new CreateOrderDto
             {
@@ -132,34 +127,35 @@ namespace Publishing
                 PersonId = _session.UserId
             };
 
-            errors = new List<string>();
-
             if (string.IsNullOrWhiteSpace(dto.Type))
             {
-                errors.Add(_resources.GetString("TypeRequired") ?? "Type is required");
+                _notifier.NotifyWarning(_resources.GetString("TypeRequired") ?? "Type is required");
+                return false;
             }
             if (string.IsNullOrWhiteSpace(dto.Name))
             {
-                errors.Add(_resources.GetString("NameRequired") ?? "Name is required");
+                _notifier.NotifyWarning(_resources.GetString("NameRequired") ?? "Name is required");
+                return false;
             }
             if (string.IsNullOrWhiteSpace(dto.Printery))
             {
-                errors.Add(_resources.GetString("PrinteryRequired") ?? "Printery is required");
+                _notifier.NotifyWarning(_resources.GetString("PrinteryRequired") ?? "Printery is required");
+                return false;
             }
 
             if (!int.TryParse(PageNumTextBox.Text, out var pages))
             {
-                errors.Add(_resources.GetString("PagesParseError") ?? "Error");
+                _notifier.NotifyWarning(_resources.GetString("PagesParseError") ?? "Error");
+                return false;
             }
             if (!int.TryParse(TirageTextBox.Text, out var tirage))
             {
-                errors.Add(_resources.GetString("TirageParseError") ?? "Error");
+                _notifier.NotifyWarning(_resources.GetString("TirageParseError") ?? "Error");
+                return false;
             }
-
             dto.Pages = pages;
             dto.Tirage = tirage;
-
-            return errors.Count == 0;
+            return true;
         }
 
         private async Task SubmitOrder(CreateOrderDto dto)
