@@ -37,8 +37,15 @@ builder.Host.UseSerilog((ctx, cfg) =>
     if (!string.IsNullOrWhiteSpace(elastic))
         cfg.WriteTo.Elasticsearch(elastic);
 });
-builder.Services.AddOcelot(builder.Configuration).AddConsul();
-builder.Services.AddConsul(builder.Configuration);
+if (!builder.Environment.IsEnvironment("Test"))
+{
+    builder.Services.AddOcelot(builder.Configuration).AddConsul();
+    builder.Services.AddConsul(builder.Configuration);
+}
+else
+{
+    builder.Services.AddOcelot(builder.Configuration);
+}
 var redisConn = builder.Configuration["REDIS_CONN"];
 if (string.IsNullOrWhiteSpace(redisConn))
     throw new InvalidOperationException("REDIS_CONN environment variable is missing");
@@ -116,8 +123,10 @@ app.UseAuthorization();
 app.UseSwagger();
 app.UseSwaggerUI();
 if (!app.Environment.IsEnvironment("Test"))
+{
     await app.RegisterWithConsulAsync(app.Lifetime, app.Configuration);
-await app.UseOcelot();
+    await app.UseOcelot();
+}
 app.MapHealthChecks("/health");
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 app.MapControllers();
