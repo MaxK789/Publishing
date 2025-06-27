@@ -176,6 +176,7 @@ services reachable directly from the host.
 
 The API gateway project under `src/ApiGateway` routes requests to the services. Swagger is enabled for each service and the gateway itself at `/swagger`. Health checks are exposed at `/health`. The compose stack also launches **Elasticsearch**, **Kibana**, **Jaeger** and **Prometheus** for centralized logging and tracing.
 Copy `.env.example` to `.env` and adjust the connection strings and JWT settings before starting the stack. Required variables are `SA_PASSWORD`, `ACCEPT_EULA`, `ORDERS_DB_CONN`, `PROFILE_DB_CONN`, `ORGANIZATION_DB_CONN`, `REDIS_CONN`, `RABBIT_CONN`, `CONSUL_URL`, `OIDC_AUTHORITY`, `OIDC_AUDIENCE`, `ELASTIC_URL`, `JWT__Issuer`, `JWT__Audience` and `JWT__SigningKey`.
+Comment characters (`#`) are only recognised when the line begins with `#`; inline comments must be avoided.
 Elasticsearch runs on `http://localhost:9200` with Kibana at `http://localhost:5601`. Jaeger UI is available at `http://localhost:16686` and Prometheus at `http://localhost:9090` when using the compose stack.
 Security is disabled for Elasticsearch via `xpack.security.enabled=false` to simplify local development.
 See `docs/kibana.md` for hints on visualising logs with Kibana.
