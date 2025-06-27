@@ -6,6 +6,7 @@ using Xunit;
 using ApiGateway;
 using Publishing.Core.Interfaces;
 using Publishing.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Publishing.E2E.Tests;
 
