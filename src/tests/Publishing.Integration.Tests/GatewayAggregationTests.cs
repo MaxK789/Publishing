@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.Extensions.Logging;
 using Publishing.Core.Interfaces;
+using CoreLogger = Publishing.Core.Interfaces.ILogger;
 using Publishing.Infrastructure;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
@@ -50,7 +51,7 @@ public class GatewayAggregationTests
                 {
                     services.AddAuthentication("Test")
                         .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
-                    services.AddTransient<ILogger, LoggerService>();
+                    services.AddTransient<CoreLogger, LoggerService>();
                     services.AddHttpClient("orders").ConfigurePrimaryHttpMessageHandler(() => new StubHandler("[]"));
                     services.AddHttpClient("profile").ConfigurePrimaryHttpMessageHandler(() => new StubHandler("{}"));
                     services.AddHttpClient("organization").ConfigurePrimaryHttpMessageHandler(() => new StubHandler("{}"));
