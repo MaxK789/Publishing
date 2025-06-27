@@ -11,8 +11,8 @@ namespace Publishing.AppLayer.Validators
             {
                 RuleFor(x => x.Email!).SetValidator(emailValidator);
             });
-            RuleFor(x => x.Phone).SetValidator(phoneFaxValidator);
-            RuleFor(x => x.Fax).SetValidator(phoneFaxValidator);
+            RuleFor(x => x.Phone).SetValidator(phoneFaxValidator).WithMessage("Invalid phone format");
+            RuleFor(x => x.Fax).SetValidator(phoneFaxValidator).WithMessage("Invalid fax format");
             RuleFor(x => x).Must(HasAnyValue).WithMessage("No data to update");
         }
 
