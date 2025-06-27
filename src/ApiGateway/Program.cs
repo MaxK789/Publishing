@@ -22,8 +22,6 @@ using HealthChecks.Uris;
 using System.Net;
 using System.Net.Http;
 
-namespace ApiGateway;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
