@@ -2,6 +2,7 @@
   <PropertyGroup>
     <!-- Root folder for all project references -->
     <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <!-- Attach analyzer project as an Analyzer to all projects except the analyzer itself -->
