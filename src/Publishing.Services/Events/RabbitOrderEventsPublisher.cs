@@ -5,23 +5,53 @@ using System.Text.Json;
 using System.Collections.Generic;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using Polly;
 using Publishing.Core.DTOs;
 
 namespace Publishing.Services;
 
 public class RabbitOrderEventsPublisher : IOrderEventsPublisher, IDisposable
 {
-    private readonly IModel _channel;
-    private readonly IConnection _connection;
+    private IModel? _channel;
+    private IConnection? _connection;
 
     public event Action<OrderDto>? OrderCreated;
     public event Action<OrderDto>? OrderUpdated;
 
     public RabbitOrderEventsPublisher(string connectionString)
     {
-        var factory = new ConnectionFactory { Uri = new Uri(connectionString) };
-        _connection = factory.CreateConnection();
-        _channel = _connection.CreateModel();
+        var factory = new ConnectionFactory
+        {
+            Uri = new Uri(connectionString),
+            AutomaticRecoveryEnabled = true,
+            NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
+        };
+
+        var retry = Policy
+            .Handle<Exception>()
+            .WaitAndRetry(3, _ => TimeSpan.FromSeconds(5));
+        var breaker = Policy
+            .Handle<Exception>()
+            .CircuitBreaker(2, TimeSpan.FromSeconds(30));
+        var policy = Policy.Wrap(retry, breaker);
+
+        try
+        {
+            policy.Execute(() =>
+            {
+                _connection = factory.CreateConnection();
+                _channel = _connection.CreateModel();
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR: Failed to connect to RabbitMQ: {ex.Message}");
+            return;
+        }
+
+        if (_channel is null)
+            return;
+
         _channel.ExchangeDeclare("orders", ExchangeType.Topic, durable: true);
 
         var queueName = $"{Environment.GetEnvironmentVariable("SERVICE_NAME")}-orders";
@@ -54,6 +84,9 @@ public class RabbitOrderEventsPublisher : IOrderEventsPublisher, IDisposable
 
     private void Publish(string routingKey, OrderDto order)
     {
+        if (_channel is null)
+            return;
+
         var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(order));
         var props = _channel.CreateBasicProperties();
         props.DeliveryMode = 2;
@@ -66,7 +99,7 @@ public class RabbitOrderEventsPublisher : IOrderEventsPublisher, IDisposable
 
     public void Dispose()
     {
-        _channel.Close();
-        _connection.Close();
+        _channel?.Close();
+        _connection?.Close();
     }
 }
