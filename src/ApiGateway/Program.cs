@@ -65,6 +65,7 @@ builder.Services.AddSingleton<IUiNotifier, ConsoleUiNotifier>();
 builder.Services.AddScoped<IErrorHandler, ErrorHandler>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IJwtFactory, JwtFactory>();
+builder.Services.AddScoped<Publishing.Core.Interfaces.ILogger, LoggerService>();
 
 var fallbackResponse = new HttpResponseMessage(HttpStatusCode.OK)
 {

@@ -37,6 +37,10 @@ public class GatewayAggregationTests
     private WebApplicationFactory<Program> CreateFactory()
     {
         Environment.SetEnvironmentVariable("CONSUL_URL", "http://consul");
+        Environment.SetEnvironmentVariable("REDIS_CONN", "localhost");
+        Environment.SetEnvironmentVariable("OIDC_AUTHORITY", "http://auth");
+        Environment.SetEnvironmentVariable("OIDC_AUDIENCE", "aud");
+        Environment.SetEnvironmentVariable("ELASTIC_URL", "http://elastic");
         return new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
             {
@@ -47,17 +51,6 @@ public class GatewayAggregationTests
                     services.AddHttpClient("orders").ConfigurePrimaryHttpMessageHandler(() => new StubHandler("[]"));
                     services.AddHttpClient("profile").ConfigurePrimaryHttpMessageHandler(() => new StubHandler("{}"));
                     services.AddHttpClient("organization").ConfigurePrimaryHttpMessageHandler(() => new StubHandler("{}"));
-                });
-                builder.ConfigureAppConfiguration((ctx, cfg) =>
-                {
-                    cfg.AddInMemoryCollection(new Dictionary<string, string?>
-                    {
-                        ["REDIS_CONN"] = "localhost",
-                        ["CONSUL_URL"] = "http://consul",
-                        ["OIDC_AUTHORITY"] = "http://auth",
-                        ["OIDC_AUDIENCE"] = "aud",
-                        ["ELASTIC_URL"] = "http://elastic"
-                    });
                 });
             });
     }
