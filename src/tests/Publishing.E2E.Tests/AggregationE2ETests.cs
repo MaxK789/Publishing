@@ -23,6 +23,7 @@ public class AggregationE2ETests : IClassFixture<WebApplicationFactory<Program>>
         Environment.SetEnvironmentVariable("OIDC_AUDIENCE", "audience");
         _factory = factory.WithWebHostBuilder(builder =>
         {
+            builder.UseEnvironment("Test");
             builder.ConfigureServices(services =>
             {
                 services.AddTransient<ILogger, LoggerService>();

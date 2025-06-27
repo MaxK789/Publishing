@@ -48,6 +48,7 @@ public class GatewayAggregationTests
         return new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
             {
+                builder.UseEnvironment("Test");
                 builder.ConfigureServices(services =>
                 {
                     services.AddAuthentication("Test")
