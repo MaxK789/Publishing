@@ -92,7 +92,8 @@ namespace Publishing
             services.AddDbContext<AppDbContext>(o =>
                 o.UseSqlServer(
                     configuration.GetConnectionString("DefaultConnection"),
-                    b => b.MigrationsAssembly("Publishing.Infrastructure")));
+                    b => b.MigrationsAssembly("Publishing.Infrastructure")
+                          .EnableRetryOnFailure()));
             services.AddTransient<IDbConnectionFactory, SqlDbConnectionFactory>();
             services.AddSingleton<QueryDispatcher>();
             services.AddSingleton<IQueryDispatcher>(sp =>
