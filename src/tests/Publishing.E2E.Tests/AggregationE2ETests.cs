@@ -6,11 +6,11 @@ using ApiGateway;
 
 namespace Publishing.E2E.Tests;
 
-public class AggregationE2ETests : IClassFixture<WebApplicationFactory<ApiGateway.Program>>
+public class AggregationE2ETests : IClassFixture<WebApplicationFactory<Program>>
 {
-    private readonly WebApplicationFactory<ApiGateway.Program> _factory;
+    private readonly WebApplicationFactory<Program> _factory;
 
-    public AggregationE2ETests(WebApplicationFactory<ApiGateway.Program> factory)
+    public AggregationE2ETests(WebApplicationFactory<Program> factory)
     {
         _factory = factory.WithWebHostBuilder(builder => { });
     }
