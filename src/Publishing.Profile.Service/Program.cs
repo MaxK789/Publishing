@@ -123,7 +123,9 @@ var conn = builder.Configuration["PROFILE_DB_CONN"];
 if (string.IsNullOrWhiteSpace(conn))
     throw new InvalidOperationException("PROFILE_DB_CONN environment variable is missing");
 builder.Services.AddDbContext<AppDbContext>(o =>
-    o.UseSqlServer(conn, b => b.MigrationsAssembly("Publishing.Infrastructure")));
+    o.UseSqlServer(conn, b =>
+        b.MigrationsAssembly("Publishing.Infrastructure")
+         .EnableRetryOnFailure()));
 
 var healthChecks = builder.Services
     .AddHealthChecks()
