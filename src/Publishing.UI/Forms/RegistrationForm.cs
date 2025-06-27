@@ -6,6 +6,7 @@ using Publishing.Core.DTOs;
 using Publishing.Services;
 using System.Threading.Tasks;
 using System.Resources;
+using System.Net.Mail;
 
 namespace Publishing
 {
@@ -47,6 +48,41 @@ namespace Publishing
                 Status = StatusBox.SelectedItem?.ToString(),
                 Password = PasswordTextBox.Text
             };
+
+            if (string.IsNullOrWhiteSpace(dto.FirstName))
+            {
+                _notifier.NotifyWarning(_notify.GetString("FirstNameRequired") ?? "First name is required");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(dto.LastName))
+            {
+                _notifier.NotifyWarning(_notify.GetString("LastNameRequired") ?? "Last name is required");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(dto.Email))
+            {
+                _notifier.NotifyWarning(_notify.GetString("EmailRequired") ?? "Email is required");
+                return;
+            }
+            try
+            {
+                _ = new MailAddress(dto.Email);
+            }
+            catch
+            {
+                _notifier.NotifyWarning(_notify.GetString("InvalidEmailFormat") ?? "Invalid email format");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(dto.Status))
+            {
+                _notifier.NotifyWarning(_notify.GetString("StatusRequired") ?? "Status is required");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(dto.Password))
+            {
+                _notifier.NotifyWarning(_notify.GetString("PasswordRequired") ?? "Password is required");
+                return;
+            }
 
             try
             {

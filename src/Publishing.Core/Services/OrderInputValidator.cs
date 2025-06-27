@@ -8,12 +8,12 @@ namespace Publishing.Core.Services
     {
         public OrderInputValidator()
         {
-            RuleFor(x => x.Type).NotEmpty();
-            RuleFor(x => x.Name).NotEmpty();
-            RuleFor(x => x.Printery).NotEmpty();
+            RuleFor(x => x.Type).NotEmpty().WithMessage("Type is required");
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
+            RuleFor(x => x.Printery).NotEmpty().WithMessage("Printery is required");
             RuleFor(x => x.PersonId).NotEmpty();
-            RuleFor(x => x.Pages).GreaterThan(0);
-            RuleFor(x => x.Tirage).GreaterThan(0);
+            RuleFor(x => x.Pages).GreaterThan(0).WithMessage("Invalid page count");
+            RuleFor(x => x.Tirage).GreaterThan(0).WithMessage("Invalid tirage");
         }
 
         public new void Validate(CreateOrderDto dto)

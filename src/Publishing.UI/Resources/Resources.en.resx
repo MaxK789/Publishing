@@ -15,4 +15,13 @@
   <data name="TotalPriceLabel" xml:space="preserve">
     <value>Total price: {0}</value>
   </data>
+  <data name="TypeRequired" xml:space="preserve">
+    <value>Select type</value>
+  </data>
+  <data name="NameRequired" xml:space="preserve">
+    <value>Name is required</value>
+  </data>
+  <data name="PrinteryRequired" xml:space="preserve">
+    <value>Select printery</value>
+  </data>
 </root>
